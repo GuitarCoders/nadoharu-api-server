@@ -1,0 +1,17 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  _id: String!
+  name: String!
+  account_id: String!
+  email: String!
+  pwd_salt: String!
+  pwd_hash: String!
+  friends: [String!]!
+}
+
+type Query {
+  userById(id: String!): User!
+}
