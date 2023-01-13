@@ -7,11 +7,28 @@ type User {
   name: String!
   account_id: String!
   email: String!
-  pwd_salt: String!
-  pwd_hash: String!
+  friends: [String!]!
+}
+
+type UserSafe {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
   friends: [String!]!
 }
 
 type Query {
   userById(id: String!): User!
+}
+
+type Mutation {
+  createUser(createUserData: UserCreateRequest!): UserSafe!
+}
+
+input UserCreateRequest {
+  name: String!
+  account_id: String!
+  email: String!
+  password: String!
 }

@@ -1,6 +1,8 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import mongoose, { LeanDocument } from 'mongoose';
+
 import { User, UserDocument } from './schemas/user.schema';
+import { UserCreateRequest, UserSafe } from './types/user.types';
 import { UserService } from './user.service';
 
 @Resolver(() => User)
@@ -10,7 +12,12 @@ export class UserResolver {
     ) {}
 
     @Query(() => User, { name: 'userById'})
-    async getUserOne(@Args('id') id: string): Promise<LeanDocument<User>> {
+    async getUserById(@Args('id') id: string): Promise<LeanDocument<User>> {
         return await this.UserService.getUserByAccountId(id);
+    }
+
+    @Mutation(UserCreateRequest => UserSafe, { name: 'createUser'})
+    async createUser(@Args('createUserData') reqUser: UserCreateRequest): Promise<UserSafe> {
+        return await this.UserService.createUser(reqUser);
     }
 }
