@@ -11,9 +11,14 @@ export class UserResolver {
         private readonly UserService: UserService
     ) {}
 
+    @Query(() => User, { name: 'userByAccountId'})
+    async getUserByAccountId(@Args('id') id: string): Promise<LeanDocument<User>> {
+        return await this.UserService.getUserByAccountId(id);
+    }
+
     @Query(() => User, { name: 'userById'})
     async getUserById(@Args('id') id: string): Promise<LeanDocument<User>> {
-        return await this.UserService.getUserByAccountId(id);
+        return await this.UserService.getUserById(id);
     }
 
     @Mutation(UserCreateRequest => UserSafe, { name: 'createUser'})

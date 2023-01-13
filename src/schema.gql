@@ -19,6 +19,7 @@ type UserSafe {
 }
 
 type Query {
+  userByAccountId(id: String!): User!
   userById(id: String!): User!
 }
 

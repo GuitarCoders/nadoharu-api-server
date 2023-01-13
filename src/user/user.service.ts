@@ -12,7 +12,16 @@ export class UserService {
 
     async getUserByAccountId(account_id: string): Promise<LeanDocument<UserDocument>> {
         try {
-            const result = await this.userModel.findOne({account_id});
+            const result = await this.userModel.findOne({account_id : account_id});
+            return result;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async getUserById(id: string): Promise<LeanDocument<UserDocument>> {
+        try {
+            const result = await this.userModel.findOne({_id : id});
             return result;
         } catch (err) {
             console.error(err);
