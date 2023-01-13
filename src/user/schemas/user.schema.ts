@@ -38,13 +38,6 @@ export class User{
         type: mongoose.Schema.Types.String  
     })
     @Field(() => String)
-    pwd_salt: string;
-
-    @Prop({ 
-        required: true,
-        type: mongoose.Schema.Types.String  
-    })
-    @Field(() => String)
     pwd_hash: string;
 
     @Prop({ 
