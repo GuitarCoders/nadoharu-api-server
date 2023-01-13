@@ -37,7 +37,6 @@ export class User{
         required: true,
         type: mongoose.Schema.Types.String  
     })
-    @Field(() => String)
     pwd_hash: string;
 
     @Prop({ 
