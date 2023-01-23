@@ -1,3 +1,5 @@
+// TODO : DTO라고 부르는 구조와 이것이 뭐가 다른지 알아봐야 할 필요가 있음
+
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { isNullableType } from "graphql";
 import { ObjectId } from "mongoose";
