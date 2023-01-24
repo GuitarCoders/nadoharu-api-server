@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import mongoose, { LeanDocument } from 'mongoose';
 
 import { User, UserDocument } from './schemas/user.schema';
-import { UserCreateRequest, UserSafe } from './types/user.types';
+import { UserCreateRequest, UserSafe } from './models/user.model';
 import { UserService } from './user.service';
 
 @Resolver(() => User)
