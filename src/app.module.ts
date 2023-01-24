@@ -7,6 +7,7 @@ import { ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo'
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { join } from 'path';
+import { AuthModule } from './auth/auth.module';
 
 console.log(process.env.NODE_ENV);
 
@@ -20,7 +21,8 @@ console.log(process.env.NODE_ENV);
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql')
     }),
-    UserModule
+    UserModule,
+    AuthModule
   ],
   providers: [AppService],
 })
