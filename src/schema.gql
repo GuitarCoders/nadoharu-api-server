@@ -18,9 +18,20 @@ type UserSafe {
   friends: [String!]!
 }
 
+type LoginResponse {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
+  friends: [String!]!
+  status: String!
+  jwt_token: String!
+}
+
 type Query {
   userByAccountId(id: String!): User!
   userById(id: String!): User!
+  login(account_id: String!, password: String!): LoginResponse!
 }
 
 type Mutation {
