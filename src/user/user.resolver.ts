@@ -5,7 +5,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { UserCreateRequest, UserSafe } from './models/user.model';
 import { UserService } from './user.service';
 
-@Resolver(() => User)
+@Resolver()
 export class UserResolver {
     constructor(
         private readonly UserService: UserService
