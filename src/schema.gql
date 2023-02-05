@@ -31,7 +31,8 @@ type LoginResponse {
 type Query {
   userByAccountId(id: String!): User!
   userById(id: String!): User!
-  login(account_id: String!, password: String!): LoginResponse!
+  login(username: String!, password: String!): LoginResponse!
+  jwtTest(test_arg: String!): LoginResponse!
 }
 
 type Mutation {
