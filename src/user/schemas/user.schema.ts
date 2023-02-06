@@ -1,21 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, Mongoose, ObjectId } from 'mongoose';
+import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 
-export type UserDocument = User & Document;
+export type UserDocument = HydratedDocument<User>;
 
 @Schema({timestamps: true})
-@ObjectType()
 export class User{
-
-    @Field(() => String)
-    _id: mongoose.Schema.Types.ObjectId;
-
     @Prop({ 
         required: true,
         type: mongoose.Schema.Types.String 
     })
-    @Field(() => String)
     name: string;
 
     @Prop({
@@ -23,14 +17,12 @@ export class User{
         unique: true,
         type: mongoose.Schema.Types.String
     })
-    @Field(() => String)
     account_id: string;
 
     @Prop({ 
         required: true,
         type: mongoose.Schema.Types.String  
     })
-    @Field(() => String)
     email: string;
 
     @Prop({ 
@@ -42,7 +34,6 @@ export class User{
     @Prop({ 
         type: [mongoose.Schema.Types.ObjectId], ref: 'User' 
     })
-    @Field(() => [String])
     friends: ObjectId[];
 }
 

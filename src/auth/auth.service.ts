@@ -24,11 +24,13 @@ export class AuthService {
         const isValidPwd = await Bcrypt.compare(reqLogin.password, loginUser.pwd_hash);
 
         if (loginUser && isValidPwd) {
-            const { pwd_hash, ...result } = {
-                ...loginUser,
-                friends: loginUser.friends.map(friend => friend.toString())
+            const result = {
+                _id: loginUser._id.toString(),
+                name: loginUser.name,
+                email: loginUser.email,
+                account_id: loginUser.account_id,
+                friends: loginUser.friends?.map(id => id.toString())
             }
-
             return result
         }
 
@@ -57,7 +59,7 @@ export class AuthService {
             }
 
             const resUser: LoginResponse = {
-                _id: loginUser._id,
+                _id: loginUser._id.toString(),
                 name: loginUser.name,
                 email: loginUser.email,
                 account_id: loginUser.account_id,

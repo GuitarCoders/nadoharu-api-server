@@ -11,7 +11,7 @@ export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
     //TODO : Safety한 Service도 만들것
-    async getUserByAccountId(account_id: string): Promise<LeanDocument<UserDocument>> {
+    async getUserByAccountId(account_id: string): Promise<UserDocument> {
         try {
             const result = await this.userModel.findOne({account_id : account_id});
             return result;
@@ -20,8 +20,25 @@ export class UserService {
         }
     }
 
+    async getUserByAccountIdSafe(account_id: string): Promise<UserSafe> {
+        try {
+            const result = await this.getUserByAccountId(account_id);
+            if(!result) throw new Error("Account_id 없음");
+            const resultUserSafe = {
+                _id: result._id.toString(),
+                name: result.name,
+                email: result.email,
+                account_id: result.account_id,
+                friends: result.friends?.map(id => id.toString())
+            }
+            return resultUserSafe;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     //TODO : Safety한 Service도 만들것
-    async getUserById(id: string): Promise<LeanDocument<UserDocument>> {
+    async getUserById(id: string): Promise<UserDocument> {
         try {
             const result = await this.userModel.findOne({_id : id});
             return result;
@@ -29,6 +46,23 @@ export class UserService {
             console.error(err);
         }
     }
+
+    async getUserByIdSafe(id: string): Promise<UserSafe> {
+        try {
+            const result = await this.getUserById(id);
+            const resultUserSafe = {
+                _id: result._id.toString(),
+                name: result.name,
+                email: result.email,
+                account_id: result.account_id,
+                friends: result.friends?.map(id => id.toString())
+            }
+            return resultUserSafe;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
 
     async createUser(reqUser: UserCreateRequest): Promise<UserSafe> {
         try {
@@ -45,7 +79,7 @@ export class UserService {
             await createdUser.save()
 
             const createdUserSafe: UserSafe = {
-                _id : createdUser._id,
+                _id : createdUser._id.toString(),
                 name : createdUser.name,
                 email : createdUser.email,
                 account_id : createdUser.account_id,

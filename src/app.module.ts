@@ -14,7 +14,8 @@ console.log(process.env.NODE_ENV);
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.', process.env.NODE_ENV].join("")
+      envFilePath: ['.env.', process.env.NODE_ENV].join(""),
+      isGlobal: true
     }),
     MongooseModule.forRoot(process.env.MONGO_DB_URL),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -27,3 +28,4 @@ console.log(process.env.NODE_ENV);
   providers: [AppService],
 })
 export class AppModule {}
+                               

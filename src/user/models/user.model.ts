@@ -20,7 +20,7 @@ export class UserCreateRequest{
     password: string;
 }
 
-@ObjectType()
+@ObjectType('User')
 export class UserSafe{
 
     @Field(() => String)

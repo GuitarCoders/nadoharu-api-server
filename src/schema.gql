@@ -5,14 +5,6 @@
 type User {
   _id: String!
   name: String!
-  account_id: String!
-  email: String!
-  friends: [String!]!
-}
-
-type UserSafe {
-  _id: String!
-  name: String!
   email: String!
   account_id: String!
   friends: [String!]!
@@ -29,14 +21,14 @@ type LoginResponse {
 }
 
 type Query {
-  userByAccountId(id: String!): User!
+  userByAccountId(account_id: String!): User!
   userById(id: String!): User!
   login(username: String!, password: String!): LoginResponse!
   jwtTest(test_arg: String!): LoginResponse!
 }
 
 type Mutation {
-  createUser(createUserData: UserCreateRequest!): UserSafe!
+  createUser(createUserData: UserCreateRequest!): User!
 }
 
 input UserCreateRequest {
