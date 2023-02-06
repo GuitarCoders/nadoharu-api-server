@@ -10,7 +10,6 @@ import { UserCreateRequest, UserSafe } from './models/user.model';
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    //TODO : Safety한 Service도 만들것
     async getUserByAccountId(account_id: string): Promise<UserDocument> {
         try {
             const result = await this.userModel.findOne({account_id : account_id});
@@ -37,7 +36,6 @@ export class UserService {
         }
     }
 
-    //TODO : Safety한 Service도 만들것
     async getUserById(id: string): Promise<UserDocument> {
         try {
             const result = await this.userModel.findOne({_id : id});
