@@ -13,7 +13,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) { //웬만하면 타입을 만들어주자
-        console.log("jwt str");
         return { _id: payload._id, account_id: payload.account_id };
     }
 }

@@ -23,8 +23,6 @@ export class AuthService {
         const loginUser = await this.userService.getUserByAccountId(reqLogin.account_id);
         const isValidPwd = await Bcrypt.compare(reqLogin.password, loginUser.pwd_hash);
 
-        console.log(loginUser);
-
         if (loginUser && isValidPwd) {
             const { pwd_hash, ...result } = {
                 ...loginUser,
