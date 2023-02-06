@@ -69,6 +69,7 @@ export class AuthService {
             }
 
             return resUser;
+
         } catch (err) {
             console.error(err);
             const resUser: LoginResponse = {
