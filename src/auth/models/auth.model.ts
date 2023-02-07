@@ -19,5 +19,9 @@ export class LoginResponse extends UserSafe{
 
     @Field(() => String)
     jwt_token: string;
+}
 
+export class UserJwtPayload {
+    _id: string;
+    account_id: string;
 }

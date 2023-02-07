@@ -23,10 +23,3 @@ export class GqlLocalAuthGuard extends AuthGuard('local') {
         return request;
     }
 }
-
-// export const CurrentUser = createParamDecorator(
-//     (data: unknown, context: ExecutionContext) => {
-//         const ctx = GqlExecutionContext.create(context);
-//         return ctx.getContext().req.
-//     }
-// )
