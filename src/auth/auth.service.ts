@@ -29,6 +29,7 @@ export class AuthService {
                 name: loginUser.name,
                 email: loginUser.email,
                 account_id: loginUser.account_id,
+                about_me: loginUser.about_me,
                 friends: loginUser.friends?.map(id => id.toString())
             }
             return result
@@ -63,6 +64,7 @@ export class AuthService {
                 name: loginUser.name,
                 email: loginUser.email,
                 account_id: loginUser.account_id,
+                about_me: loginUser.about_me,
                 friends: loginUser.friends.map(id => id.toString()),
                 status: "success",
                 jwt_token: this.jwtService.sign(jwtPayload)
@@ -77,6 +79,7 @@ export class AuthService {
                 name: "",
                 email: "",
                 account_id: "",
+                about_me: "",
                 friends: [],
                 status: "failed",
                 jwt_token: ""
