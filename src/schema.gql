@@ -10,6 +10,15 @@ type User {
   friends: [String!]!
 }
 
+type UserUpdateResult {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
+  friends: [String!]!
+  status: String!
+}
+
 type LoginResponse {
   _id: String!
   name: String!
@@ -28,7 +37,13 @@ type Query {
 }
 
 type Mutation {
+  updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
   createUser(createUserData: UserCreateRequest!): User!
+}
+
+input UserUpdateRequest {
+  name: String!
+  password: String!
 }
 
 input UserCreateRequest {

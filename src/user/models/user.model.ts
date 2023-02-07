@@ -20,6 +20,20 @@ export class UserCreateRequest{
     password: string;
 }
 
+@InputType()
+export class UserUpdateRequest{
+    
+    @Field(() => String)
+    name: string;
+
+    @Field(() => String)
+    about_me: string;
+
+    @Field(() => String)
+    password: string;
+}
+
+
 @ObjectType('User')
 export class UserSafe{
 
@@ -35,6 +49,17 @@ export class UserSafe{
     @Field(() => String)
     account_id: string;
 
+    @Field(() => String)
+    about_me: string;
+
     @Field(() => [String])
     friends: string[];
+}
+
+@ObjectType()
+export class UserUpdateResult extends UserSafe{
+
+    @Field(() => String)
+    status: string
+
 }

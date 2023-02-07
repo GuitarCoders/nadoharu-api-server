@@ -31,6 +31,13 @@ export class User{
     })
     pwd_hash: string;
 
+    @Prop({
+        required: true,
+        maxlength: 250,
+        type: mongoose.Schema.Types.String
+    })
+    about_me: string;
+
     @Prop({ 
         type: [mongoose.Schema.Types.ObjectId], ref: 'User' 
     })

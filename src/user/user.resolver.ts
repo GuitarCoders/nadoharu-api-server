@@ -3,9 +3,11 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import mongoose, { LeanDocument } from 'mongoose';
 
 import { User, UserDocument } from './schemas/user.schema';
-import { UserCreateRequest, UserSafe } from './models/user.model';
+import { UserCreateRequest, UserSafe, UserUpdateRequest, UserUpdateResult } from './models/user.model';
 import { UserService } from './user.service';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { UserJwtPayload } from 'src/auth/models/auth.model';
+import { CurrentUser } from 'src/auth/auth-user.decorator';
 
 @Resolver()
 export class UserResolver {
@@ -23,6 +25,15 @@ export class UserResolver {
     @UseGuards(GqlAuthGuard)
     async getUserById(@Args('id') id: string): Promise<UserSafe> {
         return await this.UserService.getUserByIdSafe(id);
+    }
+
+    @Mutation(() => UserUpdateResult, { name: 'updateUser'})
+    @UseGuards(GqlAuthGuard)
+    async updateUser(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('updateUserData') reqUser: UserUpdateRequest
+    ): Promise<UserUpdateResult> {
+        return await this.UserService.updateUserById(user._id, reqUser);
     }
 
     @Mutation(() => UserSafe, { name: 'createUser'})
