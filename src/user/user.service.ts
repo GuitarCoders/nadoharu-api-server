@@ -104,6 +104,7 @@ export class UserService {
                 account_id: reqUser.account_id,
                 email: reqUser.email,
                 pwd_hash: pwd_hash,
+                about_me: " ", //TODO: 빈 문자열도 허용하도록 수정
                 friends: []
             });
             await createdUser.save()

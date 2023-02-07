@@ -7,6 +7,7 @@ type User {
   name: String!
   email: String!
   account_id: String!
+  about_me: String!
   friends: [String!]!
 }
 
@@ -15,6 +16,7 @@ type UserUpdateResult {
   name: String!
   email: String!
   account_id: String!
+  about_me: String!
   friends: [String!]!
   status: String!
 }
@@ -24,6 +26,7 @@ type LoginResponse {
   name: String!
   email: String!
   account_id: String!
+  about_me: String!
   friends: [String!]!
   status: String!
   jwt_token: String!
@@ -43,6 +46,7 @@ type Mutation {
 
 input UserUpdateRequest {
   name: String!
+  about_me: String!
   password: String!
 }
 

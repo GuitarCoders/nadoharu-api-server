@@ -34,6 +34,7 @@ export class AuthResolver {
             name: "test",
             account_id: "test",
             email: "test@test.com",
+            about_me: "hihi",
             friends: [],
             status: "test",
             jwt_token: "testToken"
