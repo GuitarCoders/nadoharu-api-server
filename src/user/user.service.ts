@@ -49,6 +49,7 @@ export class UserService {
     async getUserByIdSafe(id: string): Promise<UserSafe> {
         try {
             const result = await this.getUserById(id);
+            if(!result) throw new Error("null user (temp error)");
             const resultUserSafe = {
                 _id: result._id.toString(),
                 name: result.name,
