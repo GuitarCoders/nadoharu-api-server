@@ -21,6 +21,10 @@ type UserUpdateResult {
   status: String!
 }
 
+type UserDeleteResult {
+  deleteStatus: Boolean!
+}
+
 type LoginResponse {
   _id: String!
   name: String!
@@ -42,6 +46,7 @@ type Query {
 type Mutation {
   updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
   createUser(createUserData: UserCreateRequest!): User!
+  deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
 }
 
 input UserUpdateRequest {
@@ -55,4 +60,8 @@ input UserCreateRequest {
   account_id: String!
   email: String!
   password: String!
+}
+
+input UserDeleteRequest {
+  deleteConfirm: Boolean!
 }

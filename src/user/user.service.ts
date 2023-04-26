@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
 
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
-import { UserCreateRequest, UserSafe, UserUpdateRequest, UserUpdateResult } from './models/user.model';
+import { UserCreateRequest, UserDeleteRequest, UserDeleteResult, UserSafe, UserUpdateRequest, UserUpdateResult } from './models/user.model';
 
 @Injectable()
 export class UserService {
@@ -123,6 +123,23 @@ export class UserService {
 
         } catch (err) {
             console.error(err);
+        }
+    }
+
+    async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequest): Promise<UserDeleteResult> {
+        try{
+
+            const targetUser = await this.getUserById(jwtOwnerId);
+            const deleteResult = await targetUser.deleteOne();
+
+            console.log(deleteResult);
+
+            console.log(this.getUserById(jwtOwnerId));
+
+            return {deleteStatus: true}
+        } catch (err) {
+            console.error(err);
+            return {deleteStatus: false}
         }
     }
 }
