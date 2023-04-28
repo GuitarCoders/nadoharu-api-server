@@ -1,0 +1,67 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
+  about_me: String!
+  friends: [String!]!
+}
+
+type UserUpdateResult {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
+  about_me: String!
+  friends: [String!]!
+  status: String!
+}
+
+type UserDeleteResult {
+  deleteStatus: Boolean!
+}
+
+type LoginResponse {
+  _id: String!
+  name: String!
+  email: String!
+  account_id: String!
+  about_me: String!
+  friends: [String!]!
+  status: String!
+  jwt_token: String!
+}
+
+type Query {
+  userByAccountId(account_id: String!): User!
+  userById(id: String!): User!
+  login(username: String!, password: String!): LoginResponse!
+  jwtTest(test_arg: String!): LoginResponse!
+}
+
+type Mutation {
+  updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
+  createUser(createUserData: UserCreateRequest!): User!
+  deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
+}
+
+input UserUpdateRequest {
+  name: String!
+  about_me: String!
+  password: String!
+}
+
+input UserCreateRequest {
+  name: String!
+  account_id: String!
+  email: String!
+  password: String!
+}
+
+input UserDeleteRequest {
+  deleteConfirm: Boolean!
+}
