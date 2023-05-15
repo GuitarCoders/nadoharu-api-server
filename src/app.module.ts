@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { FriendRequestModule } from './friendRequset/friendRequest.module';
 
 console.log(process.env.NODE_ENV);
 
@@ -26,9 +27,9 @@ console.log(process.env.NODE_ENV);
       autoSchemaFile: join(process.cwd(), 'src/schema.gql')
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    FriendRequestModule
   ],
   providers: [AppService],
 })
 export class AppModule {}
-                               
