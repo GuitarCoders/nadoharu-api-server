@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 
-import { User } from "src/user/schemas/user.schema";
+import { User, UserDocument } from "src/user/schemas/user.schema";
 
 export type FriendRequestDocument = HydratedDocument<FriendRequest>;
 
@@ -13,19 +13,24 @@ export class FriendRequest{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
-    requestUserId: User;
+    requestUserId: UserDocument;
 
     @Prop({
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
-    receiveUserId: User;
+    receiveUserId: UserDocument;
 
     @Prop({
         type: mongoose.Schema.Types.String
     })
     requestMessage: string;
+
+    @Prop({
+        type: mongoose.Schema.Types.Date
+    })
+    createdAt: Date;
 
 }
 

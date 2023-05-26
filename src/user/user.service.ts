@@ -1,4 +1,4 @@
-import { Model, Document, ObjectId, LeanDocument } from 'mongoose';
+import mongoose, { Model, Document, ObjectId, LeanDocument } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
@@ -127,6 +127,7 @@ export class UserService {
     }
 
     async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequest): Promise<UserDeleteResult> {
+        const result = new UserDeleteResult;
         try{
 
             const targetUser = await this.getUserById(jwtOwnerId);
@@ -135,11 +136,35 @@ export class UserService {
             console.log(deleteResult);
 
             console.log(this.getUserById(jwtOwnerId));
-
-            return {deleteStatus: true}
+            result.deleteStatus = true;
+            
+            return result;
         } catch (err) {
             console.error(err);
-            return {deleteStatus: false}
+            result.deleteStatus = false;
+            return result;
         }
+    }
+
+    //TODO : Promise type 결정하기
+    async addFriend(
+        jwtOwnerId: string, 
+        reqUserId: string)
+    : Promise<any> {
+
+        try {
+            const acceptUser = await this.getUserById(jwtOwnerId);
+            const requestUser = await this.getUserById(reqUserId);
+
+            acceptUser.friends.push(requestUser._id);
+            requestUser.friends.push(acceptUser._id);
+    
+            return {success: true};
+
+        } catch {
+            return {success: false};
+        }
+
+
     }
 }

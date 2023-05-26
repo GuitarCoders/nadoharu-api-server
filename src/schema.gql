@@ -36,6 +36,15 @@ type LoginResponse {
   jwt_token: String!
 }
 
+type CreateFriendResult {
+  _id: String!
+  requestUserId: String!
+  receiveUserId: String!
+  requestMessage: String!
+  createdAt: String!
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -47,6 +56,8 @@ type Mutation {
   updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
   createUser(createUserData: UserCreateRequest!): User!
   deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
+  createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendResult!
+  test(createFriendRequestData: CreateFriendRequest!): CreateFriendResult!
 }
 
 input UserUpdateRequest {
@@ -64,4 +75,10 @@ input UserCreateRequest {
 
 input UserDeleteRequest {
   deleteConfirm: Boolean!
+}
+
+input CreateFriendRequest {
+  requestUserId: String!
+  receiveUserId: String!
+  requestMessage: String!
 }

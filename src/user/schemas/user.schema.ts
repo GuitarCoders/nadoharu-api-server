@@ -40,7 +40,7 @@ export class User{
     @Prop({ 
         type: [mongoose.Schema.Types.ObjectId], ref: 'User' 
     })
-    friends: ObjectId[];
+    friends: mongoose.Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
