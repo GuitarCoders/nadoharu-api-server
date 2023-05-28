@@ -35,27 +35,4 @@ export class FriendRequestService {
 
         }
     }
-
-
-    //TODO : 필요없어보이면 지우자
-    async createFriendRequestTest(reqData: CreateFriendRequestDto): Promise<CreateFriendResultDto>{
-
-        const createdFriendRequest = new this.friendRequestModel(
-            {
-                requestUserId: reqData.requestUserId,
-                receiveUserId: reqData.receiveUserId,
-                requestMessage: reqData.requestMessage
-            }
-        )
-        await createdFriendRequest.save()
-
-        return {
-            _id: "test",
-            requestUserId: "test",
-            receiveUserId: "test",
-            requestMessage: "test",
-            createdAt: "test",
-            success: true
-        }
-    }
 }

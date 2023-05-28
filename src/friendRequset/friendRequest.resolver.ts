@@ -20,12 +20,4 @@ export class FriendRequestResolver {
     ): Promise<CreateFriendResultDto> {
         return await this.FriendRequestService.createFriendRequest(reqData);
     }
-
-    @Mutation(() => CreateFriendResultDto, { name: "test"})
-    async test(
-        @Args('createFriendRequestData') reqData: CreateFriendRequestDto
-    ): Promise<CreateFriendResultDto> {
-        return await this.FriendRequestService.createFriendRequestTest(reqData);
-    }
-
 }
