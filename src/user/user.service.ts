@@ -126,6 +126,8 @@ export class UserService {
         }
     }
 
+    //jwtOwnerId -> ownerId 이쪽이 좀더 의도에 맞는 듯.
+    //함수가 이게 jwt를 타고 오는건지 알 필요가 없다.
     async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequest): Promise<UserDeleteResult> {
         const result = new UserDeleteResult;
         try{

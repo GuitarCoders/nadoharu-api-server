@@ -12,6 +12,12 @@ export class CreateFriendRequestDto{
     requestMessage: string;
 }
 
+@InputType('DeleteFriendRequest')
+export class DeleteFriendRequestDto{
+    @Field(() => String)
+    friendRequestId: string;
+}
+
 @ObjectType('FriendRequest')
 export class FriendRequestDto{
     @Field(() => String)
@@ -30,14 +36,14 @@ export class FriendRequestDto{
     createdAt: string;
 }
 
-@ObjectType('CreateFriendResult')
-export class CreateFriendResultDto extends FriendRequestDto{
+@ObjectType('CreateFriendRequestResult')
+export class CreateFriendRequestResultDto extends FriendRequestDto{
     @Field(() => Boolean)
     success: boolean;
 }
 
-@ObjectType('Test')
-export class Test{
+@ObjectType('DeleteFriendRequestResult')
+export class DeleteFriendRequestResultDto{
     @Field(() => Boolean)
     success: boolean;
 }
