@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendRequest, FriendRequestDocument } from './schemas/friendRequest.schema';
 import { Model } from 'mongoose';
-import { CreateFriendRequestDto, CreateFriendRequestResultDto, DeleteFriendRequestDto, DeleteFriendRequestResultDto, FriendRequestDto } from './dto/friendRequest.dto';
+import { CreateFriendRequestDto, CreateFriendRequestResultDto, DeleteFriendRequestDto, DeleteFriendRequestResultDto, FriendRequestArrayDto, FriendRequestDto } from './dto/friendRequest.dto';
 
 @Injectable()
 export class FriendRequestService {
@@ -10,7 +10,7 @@ export class FriendRequestService {
 
     async getFriendRequestById(id: string): Promise<FriendRequestDocument> {
         try{
-            const result = this.friendRequestModel.findById(id);
+            const result = await this.friendRequestModel.findById(id);
 
             return result;
         } catch(err) {
@@ -18,12 +18,39 @@ export class FriendRequestService {
         }
     }
 
+    async getFriendRequestsByRequestUserId(requestUserId: string): Promise<FriendRequestArrayDto> {
+        try{
+            const result = await this.friendRequestModel.find({requestUserId: requestUserId});
+
+            const resultToArray: FriendRequestDto[] = new Array();
+            result.forEach( item => {
+                resultToArray.push({
+                    _id: item._id.toString(),
+                    requestUserId: item.requestUserId._id.toString(),
+                    receiveUserId: item.receiveUserId._id.toString(),
+                    requestMessage: item.requestMessage,
+                    createdAt: item.createdAt.toISOString()
+                })
+            })
+
+            return {friendRequests: resultToArray};
+        } catch(err) {
+            
+            console.error(err);
+
+        }
+    }
+
     // TODO : 이미 같은 친구에게 친추를 걸었는지 확인하는 과정을 추가하자
-    async createFriendRequest(createFriendRequestDto: CreateFriendRequestDto): Promise<CreateFriendRequestResultDto> {
+    // TODO : 파라미터를 두개 받는게 유연한건지 한번 생각해보자.
+    async createFriendRequest(
+        requestUserId: string,
+        createFriendRequestDto: CreateFriendRequestDto
+    ): Promise<CreateFriendRequestResultDto> {
         try{
             const createdFriendRequest = new this.friendRequestModel(
                 {
-                    requestUserId: createFriendRequestDto.requestUserId,
+                    requestUserId: requestUserId,
                     receiveUserId: createFriendRequestDto.receiveUserId,
                     requestMessage: createFriendRequestDto.requestMessage
                 }

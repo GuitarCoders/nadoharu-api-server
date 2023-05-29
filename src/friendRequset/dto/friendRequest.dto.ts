@@ -1,23 +1,5 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 
-@InputType('CreateFriendRequest')
-export class CreateFriendRequestDto{
-    @Field(() => String)
-    requestUserId: string;
-    
-    @Field(() => String)
-    receiveUserId: string;
-    
-    @Field(() => String)
-    requestMessage: string;
-}
-
-@InputType('DeleteFriendRequest')
-export class DeleteFriendRequestDto{
-    @Field(() => String)
-    friendRequestId: string;
-}
-
 @ObjectType('FriendRequest')
 export class FriendRequestDto{
     @Field(() => String)
@@ -35,6 +17,32 @@ export class FriendRequestDto{
     @Field(() => String)
     createdAt: string;
 }
+
+@ObjectType('FriendRequestArray')
+export class FriendRequestArrayDto{
+    @Field(() => [FriendRequestDto])
+    friendRequests: FriendRequestDto[]; 
+}
+
+//TODO: 이거 그냥 고민해보자 주석 달아놓은거.
+@InputType('CreateFriendRequest')
+export class CreateFriendRequestDto{
+    // @Field(() => String)
+    // requestUserId: string;
+
+    @Field(() => String)
+    receiveUserId: string;
+    
+    @Field(() => String)
+    requestMessage: string;
+}
+
+@InputType('DeleteFriendRequest')
+export class DeleteFriendRequestDto{
+    @Field(() => String)
+    friendRequestId: string;
+}
+
 
 @ObjectType('CreateFriendRequestResult')
 export class CreateFriendRequestResultDto extends FriendRequestDto{

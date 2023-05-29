@@ -36,6 +36,18 @@ type LoginResponse {
   jwt_token: String!
 }
 
+type FriendRequest {
+  _id: String!
+  requestUserId: String!
+  receiveUserId: String!
+  requestMessage: String!
+  createdAt: String!
+}
+
+type FriendRequestArray {
+  friendRequests: [FriendRequest!]!
+}
+
 type CreateFriendRequestResult {
   _id: String!
   requestUserId: String!
@@ -54,6 +66,7 @@ type Query {
   userById(id: String!): User!
   login(username: String!, password: String!): LoginResponse!
   jwtTest(test_arg: String!): LoginResponse!
+  getFriendRequestByRequestUserId: FriendRequestArray!
 }
 
 type Mutation {
@@ -82,7 +95,6 @@ input UserDeleteRequest {
 }
 
 input CreateFriendRequest {
-  requestUserId: String!
   receiveUserId: String!
   requestMessage: String!
 }
