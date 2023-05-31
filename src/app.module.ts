@@ -20,9 +20,9 @@ console.log(process.env.NODE_ENV);
     }),
     MongooseModule.forRoot(process.env.MONGO_DB_URL),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      cors: {
-        origin: "*",
-      },
+      // cors: {
+      //   origin: "*",
+      // },
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql')
     }),
