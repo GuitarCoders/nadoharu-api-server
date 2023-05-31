@@ -150,16 +150,19 @@ export class UserService {
 
     //TODO : Promise type 결정하기
     async addFriend(
-        jwtOwnerId: string, 
+        acceptUserId: string, 
         reqUserId: string)
     : Promise<any> {
 
         try {
-            const acceptUser = await this.getUserById(jwtOwnerId);
+            const acceptUser = await this.getUserById(acceptUserId);
             const requestUser = await this.getUserById(reqUserId);
 
             acceptUser.friends.push(requestUser._id);
             requestUser.friends.push(acceptUser._id);
+
+            await acceptUser.save();
+            await requestUser.save();
     
             return {success: true};
 

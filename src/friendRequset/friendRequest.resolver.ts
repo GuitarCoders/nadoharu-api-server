@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FriendRequestService } from './friendRequest.service';
 import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
-import { CreateFriendRequestDto, CreateFriendRequestResultDto, DeleteFriendRequestDto, DeleteFriendRequestResultDto, FriendRequestArrayDto, FriendRequestDto } from './dto/friendRequest.dto';
+import { AcceptFriendRequestDto, AcceptFriendRequestResultDto, CreateFriendRequestDto, CreateFriendRequestResultDto, DeleteFriendRequestDto, DeleteFriendRequestResultDto, FriendRequestArrayDto, FriendRequestDto } from './dto/friendRequest.dto';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { FriendRequest } from './schemas/friendRequest.schema';
@@ -37,5 +37,14 @@ export class FriendRequestResolver {
         @Args('deleteFriendRequestData') reqData: DeleteFriendRequestDto
     ): Promise<DeleteFriendRequestResultDto> {
         return await this.FriendRequestService.deleteFriendRequest(reqData);
+    }
+
+    @Mutation(() => AcceptFriendRequestResultDto, { name: 'acceptFriendRequest' })
+    @UseGuards(GqlAuthGuard)
+    async acceptFriendRequest(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('acceptFriendRequestData') reqData: AcceptFriendRequestDto
+    ): Promise<AcceptFriendRequestResultDto> {
+        return await this.FriendRequestService.acceptFriendRequest(user._id, reqData);
     }
 }

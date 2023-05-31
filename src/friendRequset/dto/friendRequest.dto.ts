@@ -55,3 +55,15 @@ export class DeleteFriendRequestResultDto{
     @Field(() => Boolean)
     success: boolean;
 }
+
+@InputType('AcceptFriendRequest')
+export class AcceptFriendRequestDto{
+    @Field(() => String)
+    friendRequestId: string;
+}
+
+@ObjectType('AcceptFriendRequestResult')
+export class AcceptFriendRequestResultDto{
+    @Field(() => String)
+    success: boolean;
+}

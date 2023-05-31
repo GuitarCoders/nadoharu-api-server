@@ -61,6 +61,10 @@ type DeleteFriendRequestResult {
   success: Boolean!
 }
 
+type AcceptFriendRequestResult {
+  success: String!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -75,6 +79,7 @@ type Mutation {
   deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
+  acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
 }
 
 input UserUpdateRequest {
@@ -100,5 +105,9 @@ input CreateFriendRequest {
 }
 
 input DeleteFriendRequest {
+  friendRequestId: String!
+}
+
+input AcceptFriendRequest {
   friendRequestId: String!
 }

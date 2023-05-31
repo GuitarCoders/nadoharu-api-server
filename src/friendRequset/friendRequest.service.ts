@@ -2,11 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendRequest, FriendRequestDocument } from './schemas/friendRequest.schema';
 import { Model } from 'mongoose';
-import { CreateFriendRequestDto, CreateFriendRequestResultDto, DeleteFriendRequestDto, DeleteFriendRequestResultDto, FriendRequestArrayDto, FriendRequestDto } from './dto/friendRequest.dto';
+import { 
+    CreateFriendRequestDto, 
+    CreateFriendRequestResultDto, 
+    DeleteFriendRequestDto, 
+    DeleteFriendRequestResultDto, 
+    FriendRequestArrayDto, 
+    FriendRequestDto,
+    AcceptFriendRequestDto,
+    AcceptFriendRequestResultDto
+} from './dto/friendRequest.dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FriendRequestService {
-    constructor(@InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>) {}
+    constructor(
+        private userService: UserService,
+        @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
+    ) {}
 
     async getFriendRequestById(id: string): Promise<FriendRequestDocument> {
         try{
@@ -82,6 +95,29 @@ export class FriendRequestService {
             }
         } catch(err) {
             console.error(err);
+        }
+    }
+
+    async acceptFriendRequest(
+        acceptUserId: string, 
+        acceptFriendRequestDto: AcceptFriendRequestDto
+    ): Promise<AcceptFriendRequestResultDto> {
+        try{
+            const targetFriendRequest = await this.friendRequestModel.findById(acceptFriendRequestDto.friendRequestId);
+
+            if(acceptUserId !== targetFriendRequest.receiveUserId._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
+
+            this.userService.addFriend(
+                targetFriendRequest.requestUserId._id.toString(),
+                targetFriendRequest.receiveUserId._id.toString()
+            )
+
+            await targetFriendRequest.deleteOne();
+
+            return {success: true}
+        } catch (err) {
+            console.log(err)
+            return {success: false}
         }
     }
 }
