@@ -61,6 +61,14 @@ export class FriendRequestService {
         createFriendRequestDto: CreateFriendRequestDto
     ): Promise<CreateFriendRequestResultDto> {
         try{
+
+            const alreadyFriendRequests = await this.friendRequestModel.find({
+                receiveUserId: createFriendRequestDto.receiveUserId
+            })
+            if(alreadyFriendRequests.length > 0) {
+                throw new Error('이미 친구를 신청한 대상입니다.')
+            } 
+
             const createdFriendRequest = new this.friendRequestModel(
                 {
                     requestUserId: requestUserId,
@@ -80,8 +88,8 @@ export class FriendRequestService {
             }
             
             return createFriendResult
-        } catch {
-
+        } catch (err) {
+            console.error(err);
         }
     }
 
