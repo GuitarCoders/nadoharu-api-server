@@ -54,7 +54,6 @@ export class FriendRequestService {
         }
     }
 
-    // TODO : 이미 같은 친구에게 친추를 걸었는지 확인하는 과정을 추가하자
     // TODO : 파라미터를 두개 받는게 유연한건지 한번 생각해보자.
     async createFriendRequest(
         requestUserId: string,
