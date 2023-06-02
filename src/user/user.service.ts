@@ -73,7 +73,8 @@ export class UserService {
             const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
             const updateResult = await targetUser.updateOne({
                 name: updateReq.name,
-                pwd_hash: pwd_hash
+                pwd_hash: pwd_hash,
+                about_me: updateReq.about_me
             })
 
             console.log(updateResult.modifiedCount);
