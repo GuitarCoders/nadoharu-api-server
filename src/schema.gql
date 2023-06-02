@@ -36,17 +36,50 @@ type LoginResponse {
   jwt_token: String!
 }
 
+type FriendRequest {
+  _id: String!
+  requestUserId: String!
+  receiveUserId: String!
+  requestMessage: String!
+  createdAt: String!
+}
+
+type FriendRequestArray {
+  friendRequests: [FriendRequest!]!
+}
+
+type CreateFriendRequestResult {
+  _id: String!
+  requestUserId: String!
+  receiveUserId: String!
+  requestMessage: String!
+  createdAt: String!
+  success: Boolean!
+}
+
+type DeleteFriendRequestResult {
+  success: Boolean!
+}
+
+type AcceptFriendRequestResult {
+  success: String!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
   login(username: String!, password: String!): LoginResponse!
   jwtTest(test_arg: String!): LoginResponse!
+  getFriendRequestByRequestUserId: FriendRequestArray!
 }
 
 type Mutation {
   updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
   createUser(createUserData: UserCreateRequest!): User!
   deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
+  createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
+  deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
+  acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
 }
 
 input UserUpdateRequest {
@@ -64,4 +97,17 @@ input UserCreateRequest {
 
 input UserDeleteRequest {
   deleteConfirm: Boolean!
+}
+
+input CreateFriendRequest {
+  receiveUserId: String!
+  requestMessage: String!
+}
+
+input DeleteFriendRequest {
+  friendRequestId: String!
+}
+
+input AcceptFriendRequest {
+  friendRequestId: String!
 }
