@@ -54,6 +54,29 @@ export class FriendRequestService {
         }
     }
 
+    async getFriendRequestsByReceiveUserId(receiveUserId: string): Promise<FriendRequestArrayDto> {
+        try{
+            const result = await this.friendRequestModel.find({receiveUserId: receiveUserId});
+
+            const resultToArray: FriendRequestDto[] = new Array();
+            result.forEach( item => {
+                resultToArray.push({
+                    _id: item._id.toString(),
+                    requestUserId: item.requestUserId._id.toString(),
+                    receiveUserId: item.receiveUserId._id.toString(),
+                    requestMessage: item.requestMessage,
+                    createdAt: item.createdAt.toISOString()
+                })
+            })
+
+            return {friendRequests: resultToArray};
+        } catch(err) {
+
+            console.error(err);
+            
+        }
+    }
+
     // TODO : 파라미터를 두개 받는게 유연한건지 한번 생각해보자.
     async createFriendRequest(
         requestUserId: string,

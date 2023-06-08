@@ -13,12 +13,20 @@ export class FriendRequestResolver {
         private readonly FriendRequestService: FriendRequestService
     ) {}
 
-    @Query(() => FriendRequestArrayDto, { name: 'getFriendRequestByRequestUserId'})
+    @Query(() => FriendRequestArrayDto, { name: 'getSentFriendRequests'})
     @UseGuards(GqlAuthGuard)
-    async getFriendRequestByRequestUserId(
+    async getSentFriendRequests(
         @CurrentUser() user: UserJwtPayload,
     ): Promise<FriendRequestArrayDto> {
         return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id);
+    }
+
+    @Query(() => FriendRequestArrayDto, { name: 'getReceiveFriendRequests'})
+    @UseGuards(GqlAuthGuard)
+    async getReceiveFriendRequests(
+        @CurrentUser() user: UserJwtPayload,
+    ): Promise<FriendRequestArrayDto> {
+        return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id);
     }
 
     @Mutation(() => CreateFriendRequestResultDto, { name: 'createFriendRequest' })
