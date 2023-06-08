@@ -65,6 +65,25 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
+type Post {
+  _id: String!
+  authorId: String!
+  content: String!
+  tags: String
+  category: String!
+  createdAt: String!
+}
+
+type CreatePostResult {
+  _id: String!
+  authorId: String!
+  content: String!
+  tags: String
+  category: String!
+  createdAt: String!
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -80,6 +99,7 @@ type Mutation {
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
+  createPost(createPostData: CreatePost!): CreatePostResult!
 }
 
 input UserUpdateRequest {
@@ -110,4 +130,10 @@ input DeleteFriendRequest {
 
 input AcceptFriendRequest {
   friendRequestId: String!
+}
+
+input CreatePost {
+  content: String!
+  tags: String
+  category: String
 }
