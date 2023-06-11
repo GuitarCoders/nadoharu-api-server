@@ -132,6 +132,7 @@ export class FriendRequestService {
             return createdFriendResult
         } catch (err) {
             console.error(err);
+            //TODO: 에러 코드를 프론트엔드 작업자와 합의하여 보낼 것 (처리하기 쉽게)
             throw new GraphQLError(
                 '이미 친구를 신청한 대상입니다.'
             );
