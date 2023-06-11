@@ -13,6 +13,9 @@ import {
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
 import { UserService } from 'src/user/user.service';
+import { UserSafe } from 'src/user/models/user.model';
+import { User, UserDocument } from 'src/user/schemas/user.schema';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class FriendRequestService {
@@ -20,6 +23,17 @@ export class FriendRequestService {
         private userService: UserService,
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
+
+    userDocumentToUserSafe(doc: UserDocument): UserSafe{
+        return {
+            _id: doc._id.toString(),
+            name: doc.name,
+            email: doc.email,
+            account_id: doc.account_id,
+            about_me: doc.about_me,
+            friends: doc.friends?.map(objectId => objectId.toString())
+        }
+    }
 
     async getFriendRequestById(id: string): Promise<FriendRequestDocument> {
         try{
@@ -33,14 +47,17 @@ export class FriendRequestService {
 
     async getFriendRequestsByRequestUserId(requestUserId: string): Promise<FriendRequestArrayDto> {
         try{
-            const result = await this.friendRequestModel.find({requestUserId: requestUserId});
+            const result = await this.friendRequestModel
+                .find({requestUserId: requestUserId})
+                .populate('requestUser')
+                .populate('receiveUser');
 
             const resultToArray: FriendRequestDto[] = new Array();
             result.forEach( item => {
                 resultToArray.push({
                     _id: item._id.toString(),
-                    requestUserId: item.requestUserId._id.toString(),
-                    receiveUserId: item.receiveUserId._id.toString(),
+                    requestUser: this.userDocumentToUserSafe(item.requestUser),
+                    receiveUser: this.userDocumentToUserSafe(item.receiveUser),
                     requestMessage: item.requestMessage,
                     createdAt: item.createdAt.toISOString()
                 })
@@ -56,14 +73,17 @@ export class FriendRequestService {
 
     async getFriendRequestsByReceiveUserId(receiveUserId: string): Promise<FriendRequestArrayDto> {
         try{
-            const result = await this.friendRequestModel.find({receiveUserId: receiveUserId});
+            const result = await this.friendRequestModel
+                .find({receiveUserId: receiveUserId})
+                .populate('requestUser')
+                .populate('receiveUser');
 
             const resultToArray: FriendRequestDto[] = new Array();
             result.forEach( item => {
                 resultToArray.push({
                     _id: item._id.toString(),
-                    requestUserId: item.requestUserId._id.toString(),
-                    receiveUserId: item.receiveUserId._id.toString(),
+                    requestUser: this.userDocumentToUserSafe(item.requestUser),
+                    receiveUser: this.userDocumentToUserSafe(item.receiveUser),
                     requestMessage: item.requestMessage,
                     createdAt: item.createdAt.toISOString()
                 })
@@ -85,33 +105,36 @@ export class FriendRequestService {
         try{
 
             const alreadyFriendRequests = await this.friendRequestModel.find({
-                receiveUserId: createFriendRequestDto.receiveUserId
+                receiveUser: createFriendRequestDto.receiveUserId
             })
             if(alreadyFriendRequests.length > 0) {
                 throw new Error('이미 친구를 신청한 대상입니다.')
             } 
 
             const createdFriendRequest = new this.friendRequestModel(
+                // {
+                //     requestUser: requestUserId,
+                //     receiveUser: createFriendRequestDto.receiveUserId,
+                //     requestMessage: createFriendRequestDto.requestMessage
+                // }
                 {
-                    requestUserId: requestUserId,
-                    receiveUserId: createFriendRequestDto.receiveUserId,
+                    requestUser: requestUserId,
+                    receiveUser: createFriendRequestDto.receiveUserId,
                     requestMessage: createFriendRequestDto.requestMessage
                 }
             );
             await createdFriendRequest.save();
             
-            const createFriendResult = {
-                _id: createdFriendRequest._id.toString(),
-                requestUserId: createdFriendRequest.requestUserId._id.toString(),
-                receiveUserId: createdFriendRequest.receiveUserId._id.toString(),
-                requestMessage: createdFriendRequest.requestMessage,
-                createdAt: createdFriendRequest.createdAt.toISOString(),
-                success: true
-            }
-            
-            return createFriendResult
+            const createdFriendResult:CreateFriendRequestResultDto = 
+                await this.friendRequestModel.findById(createdFriendRequest._id)
+                    .populate('requestUser')
+                    .populate('receiveUser');            
+            return createdFriendResult
         } catch (err) {
             console.error(err);
+            throw new GraphQLError(
+                '이미 친구를 신청한 대상입니다.'
+            );
         }
     }
 
@@ -135,11 +158,11 @@ export class FriendRequestService {
         try{
             const targetFriendRequest = await this.friendRequestModel.findById(acceptFriendRequestDto.friendRequestId);
 
-            if(acceptUserId !== targetFriendRequest.receiveUserId._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
+            if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
 
             this.userService.addFriend(
-                targetFriendRequest.requestUserId._id.toString(),
-                targetFriendRequest.receiveUserId._id.toString()
+                targetFriendRequest.requestUser._id.toString(),
+                targetFriendRequest.receiveUser._id.toString()
             )
 
             await targetFriendRequest.deleteOne();

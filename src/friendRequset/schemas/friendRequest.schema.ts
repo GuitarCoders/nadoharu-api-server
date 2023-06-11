@@ -13,14 +13,14 @@ export class FriendRequest{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
-    requestUserId: UserDocument;
+    requestUser: UserDocument;
 
     @Prop({
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
-    receiveUserId: UserDocument;
+    receiveUser: UserDocument;
 
     @Prop({
         type: mongoose.Schema.Types.String
