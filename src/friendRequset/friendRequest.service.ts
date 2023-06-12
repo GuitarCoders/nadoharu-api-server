@@ -125,8 +125,8 @@ export class FriendRequestService {
             const createdFriendResult:CreateFriendRequestResultDto = 
                 await this.friendRequestModel.findById(createdFriendRequest._id)
                     .populate('requestUser')
-                    .populate('receiveUser');            
-            return createdFriendResult
+                    .populate('receiveUser');
+            return {...createdFriendResult, success: true}
         } catch (err) {
             console.error(err);
             //TODO: 에러 코드를 프론트엔드 작업자와 합의하여 보낼 것 (처리하기 쉽게)
