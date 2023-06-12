@@ -125,7 +125,8 @@ export class FriendRequestService {
             const createdFriendResult:CreateFriendRequestResultDto = 
                 await this.friendRequestModel.findById(createdFriendRequest._id)
                     .populate('requestUser')
-                    .populate('receiveUser');
+                    .populate('receiveUser').lean();
+            console.log({...createdFriendResult, success: true})
             return {...createdFriendResult, success: true}
         } catch (err) {
             console.error(err);
