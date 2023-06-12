@@ -48,7 +48,7 @@ export class FriendRequestService {
     async getFriendRequestsByRequestUserId(requestUserId: string): Promise<FriendRequestArrayDto> {
         try{
             const result = await this.friendRequestModel
-                .find({requestUserId: requestUserId})
+                .find({requestUser: requestUserId})
                 .populate('requestUser')
                 .populate('receiveUser');
 
@@ -74,9 +74,11 @@ export class FriendRequestService {
     async getFriendRequestsByReceiveUserId(receiveUserId: string): Promise<FriendRequestArrayDto> {
         try{
             const result = await this.friendRequestModel
-                .find({receiveUserId: receiveUserId})
+                .find({receiveUser: receiveUserId})
                 .populate('requestUser')
                 .populate('receiveUser');
+
+            console.log(result);
 
             const resultToArray: FriendRequestDto[] = new Array();
             result.forEach( item => {
