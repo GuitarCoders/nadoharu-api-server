@@ -122,12 +122,20 @@ export class FriendRequestService {
             );
             await createdFriendRequest.save();
             
-            const createdFriendResult:CreateFriendRequestResultDto = 
+            const createdFriendResult = 
                 await this.friendRequestModel.findById(createdFriendRequest._id)
                     .populate('requestUser')
-                    .populate('receiveUser').lean();
-            console.log({...createdFriendResult, success: true})
-            return {...createdFriendResult, success: true}
+                    .populate('receiveUser');
+
+            // return {...createdFriendResult, success: true}
+            return {
+                _id: createdFriendResult._id.toString(),
+                requestUser: this.userDocumentToUserSafe(createdFriendResult.requestUser),
+                receiveUser: this.userDocumentToUserSafe(createdFriendResult.receiveUser),
+                requestMessage: createdFriendResult.requestMessage,
+                createdAt: createdFriendResult.createdAt.toISOString(),
+                success: true
+            }
         } catch (err) {
             console.error(err);
             //TODO: 에러 코드를 프론트엔드 작업자와 합의하여 보낼 것 (처리하기 쉽게)
