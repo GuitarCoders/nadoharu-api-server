@@ -86,6 +86,18 @@ export class CreatePostResultDto extends PostDto{
     success: boolean;
 }
 
+@InputType('DeletePost')
+export class DeletePostDto {
+    @Field(() => String)
+    postId: string;
+}
+
+@ObjectType('DeletePostResult')
+export class DeletePostResultDto {
+    @Field(() => Boolean)
+    success: boolean;
+}
+
 @ObjectType('test')
 export class Test{
     @Field(() => Boolean)

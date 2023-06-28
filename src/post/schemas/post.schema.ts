@@ -24,7 +24,7 @@ export class Post {
     //TODO : category db를 따로 만들것인가.. 혹은 user에 넣을 것인가.
     //mongoose가 유연해도 얼마나 유연해도 되는지 고민할 필요가 있다.
     @Prop({
-        required: true,
+        required: false,
         type: mongoose.Schema.Types.String
     })
     category: string;
