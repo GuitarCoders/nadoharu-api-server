@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
-import { CreatePostDto, CreatePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
 
 @Injectable()
@@ -119,6 +119,23 @@ export class PostService {
             }
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async deletePost(
+        userId: string,
+        data: DeletePostDto
+    ): Promise<DeletePostResultDto> {
+        try{
+            const targetPostModel = await this.PostModel.findById(data.postId).populate('author');
+            if(targetPostModel.author._id.toString() != userId){
+                throw new Error("본인의 글만 삭제할 수 있습니다.");
+            }
+            await targetPostModel.deleteOne();
+
+            return {success: true}
+        } catch (err) {
+            console.error(err);
         }
     }
 }
