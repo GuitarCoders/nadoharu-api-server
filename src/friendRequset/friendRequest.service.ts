@@ -166,7 +166,12 @@ export class FriendRequestService {
         acceptFriendRequestDto: AcceptFriendRequestDto
     ): Promise<AcceptFriendRequestResultDto> {
         try{
-            const targetFriendRequest = await this.friendRequestModel.findById(acceptFriendRequestDto.friendRequestId);
+            const targetFriendRequest = await this.friendRequestModel
+                .findById(acceptFriendRequestDto.friendRequestId)
+                .populate('requestUser')
+                .populate('receiveUser');
+
+            console.log(targetFriendRequest);
 
             if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
 

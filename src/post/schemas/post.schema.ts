@@ -34,7 +34,7 @@ export class Post {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
-    authorId: UserDocument;
+    author: UserDocument;
     
     @Prop({
         type: mongoose.Schema.Types.Date

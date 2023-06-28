@@ -67,16 +67,21 @@ type AcceptFriendRequestResult {
 
 type Post {
   _id: String!
-  authorId: String!
+  author: User!
   content: String!
   tags: String
   category: String!
   createdAt: String!
 }
 
+type GetPostsResult {
+  posts: [Post!]!
+  lastDateTime: String!
+}
+
 type CreatePostResult {
   _id: String!
-  authorId: String!
+  author: User!
   content: String!
   tags: String
   category: String!
@@ -87,10 +92,26 @@ type CreatePostResult {
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
+  userWhoAmI: User!
   login(username: String!, password: String!): LoginResponse!
   jwtTest(test_arg: String!): LoginResponse!
   getSentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray!
+
+  """Deprecated"""
+  getPostsForTimeline(getPostsData: GetPosts!): GetPostsResult!
+  getPosts(filter: filter, count: Float!): GetPostsResult!
+}
+
+input GetPosts {
+  filter: filter
+  count: Int!
+}
+
+input filter {
+  userId: String
+  category: String
+  before: String
 }
 
 type Mutation {

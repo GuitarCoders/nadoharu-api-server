@@ -27,6 +27,12 @@ export class UserResolver {
         return await this.UserService.getUserByIdSafe(id);
     }
 
+    @Query(() => UserSafe, { name: 'userWhoAmI'})
+    @UseGuards(GqlAuthGuard)
+    async getUserWhoAmI(@CurrentUser() user: UserJwtPayload): Promise<UserSafe> {
+        return await this.UserService.getUserByIdSafe(user._id);
+    }
+
     @Mutation(() => UserUpdateResult, { name: 'updateUser'})
     @UseGuards(GqlAuthGuard)
     async updateUser(

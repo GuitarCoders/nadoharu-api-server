@@ -1,4 +1,7 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { UserSafe } from "src/user/models/user.model";
+import { UserDocument } from "src/user/schemas/user.schema";
+import { Int } from "type-graphql";
 
 
 @ObjectType('Post')
@@ -6,8 +9,8 @@ export class PostDto{
     @Field(() => String)
     _id: string;
 
-    @Field(() => String)
-    authorId: string;
+    @Field(() => UserSafe)
+    author: UserDocument;
 
     @Field(() => String)
     content: string;
@@ -28,20 +31,33 @@ export class PostArrayDto{
     Posts: PostDto[];
 }
 
+@InputType('filter')
+export class Filter{
+    @Field(() => String, { nullable: true })
+    userId?: string;
+
+    @Field(() => String, { nullable: true })
+    category?: string;
+
+    @Field(() => String, { nullable: true })
+    before?: string;
+
+    // @Field(() => String, { nullable: true })
+    // search?: string;
+}
+
 @InputType('GetPosts')
 export class GetPostsDto{
     @Field(
-        () => ({userId: String, before: String}),
+        () => (Filter),
         { nullable: true }
     )
-    options?: {
-        userId?: string,
-        before?: string,
-    };
+    filter?: Filter;
 
-    @Field(() => String)
+    @Field(() => Int)
     count: Number;
 }
+
 
 @ObjectType('GetPostsResult')
 export class GetPostsResultDto{
@@ -66,6 +82,12 @@ export class CreatePostDto{
 
 @ObjectType('CreatePostResult')
 export class CreatePostResultDto extends PostDto{
+    @Field(() => Boolean)
+    success: boolean;
+}
+
+@ObjectType('test')
+export class Test{
     @Field(() => Boolean)
     success: boolean;
 }
