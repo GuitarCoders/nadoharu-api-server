@@ -35,9 +35,8 @@ export class PostResolver {
     @UseGuards(GqlAuthGuard)
     async Test(
         @CurrentUser() user: UserJwtPayload,
-        @Args('filter', {nullable: true}) filter: Filter,
-        @Args('count') count: Number
+        @Args('getPostsData') reqData: GetPostsDto
     ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, {filter, count});
+        return await this.PostService.getPosts(user._id, reqData);
     }
 }
