@@ -13,7 +13,7 @@ import {
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
 import { UserService } from 'src/user/user.service';
-import { UserSafe } from 'src/user/models/user.model';
+import { UserSafeDto } from 'src/user/dto/user.dto';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { GraphQLError } from 'graphql';
 
@@ -24,7 +24,7 @@ export class FriendRequestService {
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
-    userDocumentToUserSafe(doc: UserDocument): UserSafe{
+    userDocumentToUserSafe(doc: UserDocument): UserSafeDto{
         return {
             _id: doc._id.toString(),
             name: doc.name,

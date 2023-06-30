@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
 
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
-import { UserCreateRequest, UserDeleteRequest, UserDeleteResult, UserSafe, UserUpdateRequest, UserUpdateResult } from './models/user.model';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -19,7 +19,7 @@ export class UserService {
         }
     }
 
-    async getUserByAccountIdSafe(account_id: string): Promise<UserSafe> {
+    async getUserByAccountIdSafe(account_id: string): Promise<UserSafeDto> {
         try {
             const result = await this.getUserByAccountId(account_id);
             if(!result) throw new Error("Account_id 없음");
@@ -46,7 +46,7 @@ export class UserService {
         }
     }
 
-    async getUserByIdSafe(id: string): Promise<UserSafe> {
+    async getUserByIdSafe(id: string): Promise<UserSafeDto> {
         try {
             const result = await this.getUserById(id);
             if(!result) throw new Error("null user (temp error)");
@@ -66,8 +66,8 @@ export class UserService {
 
     async updateUserById(
         jwtOwnerId: string, 
-        updateReq: UserUpdateRequest
-    ): Promise<UserUpdateResult> {
+        updateReq: UserUpdateRequestDto
+    ): Promise<UserUpdateResultDto> {
         try {
             const targetUser = await this.getUserById(jwtOwnerId);
             const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
@@ -79,7 +79,7 @@ export class UserService {
 
             console.log(updateResult.modifiedCount);
 
-            const updatedUser: UserUpdateResult = {
+            const updatedUser: UserUpdateResultDto = {
                 _id: targetUser._id.toString(),
                 name: targetUser.name,
                 email: targetUser.email,
@@ -96,7 +96,7 @@ export class UserService {
     }
 
 
-    async createUser(reqUser: UserCreateRequest): Promise<UserSafe> {
+    async createUser(reqUser: UserCreateRequestDto): Promise<UserSafeDto> {
         try {
 
             const pwd_hash = await Bcrypt.hash(reqUser.password, 10);
@@ -111,7 +111,7 @@ export class UserService {
             });
             await createdUser.save()
 
-            const createdUserSafe: UserSafe = {
+            const createdUserSafe: UserSafeDto = {
                 _id : createdUser._id.toString(),
                 name : createdUser.name,
                 email : createdUser.email,
@@ -129,8 +129,8 @@ export class UserService {
 
     //jwtOwnerId -> ownerId 이쪽이 좀더 의도에 맞는 듯.
     //함수가 이게 jwt를 타고 오는건지 알 필요가 없다.
-    async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequest): Promise<UserDeleteResult> {
-        const result = new UserDeleteResult;
+    async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequestDto): Promise<UserDeleteResultDto> {
+        const result = new UserDeleteResultDto;
         try{
 
             const targetUser = await this.getUserById(jwtOwnerId);

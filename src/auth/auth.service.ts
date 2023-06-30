@@ -7,7 +7,7 @@ import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { LoginRequest, LoginResponse } from './models/auth.model';
 import { createSecureServer } from 'http2';
 import { UserService } from 'src/user/user.service';
-import { UserSafe } from 'src/user/models/user.model';
+import { UserSafeDto } from 'src/user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 
 
@@ -19,7 +19,7 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async validateUser(reqLogin: LoginRequest): Promise<UserSafe> {
+    async validateUser(reqLogin: LoginRequest): Promise<UserSafeDto> {
         const loginUser = await this.userService.getUserByAccountId(reqLogin.account_id);
         const isValidPwd = await Bcrypt.compare(reqLogin.password, loginUser.pwd_hash);
 

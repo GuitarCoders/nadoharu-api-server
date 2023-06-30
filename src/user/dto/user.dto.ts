@@ -5,7 +5,7 @@ import { isNullableType } from "graphql";
 import { ObjectId } from "mongoose";
 
 @ObjectType('User')
-export class UserSafe{
+export class UserSafeDto{
     
     @Field(() => String)
     _id: string;
@@ -26,8 +26,8 @@ export class UserSafe{
     friends: string[];
 }
 
-@InputType()
-export class UserCreateRequest{
+@InputType('')
+export class UserCreateRequestDto{
 
     @Field(() => String)
     name: string;
@@ -43,7 +43,7 @@ export class UserCreateRequest{
 }
 
 @InputType()
-export class UserUpdateRequest{
+export class UserUpdateRequestDto{
     
     @Field(() => String)
     name: string;
@@ -56,7 +56,7 @@ export class UserUpdateRequest{
 }
 
 @ObjectType()
-export class UserUpdateResult extends UserSafe{
+export class UserUpdateResultDto extends UserSafeDto{
 
     @Field(() => String)
     status: string;
@@ -64,7 +64,7 @@ export class UserUpdateResult extends UserSafe{
 }
 
 @InputType()
-export class UserDeleteRequest{
+export class UserDeleteRequestDto{
     
     @Field(() => Boolean)
     deleteConfirm: boolean;
@@ -73,7 +73,7 @@ export class UserDeleteRequest{
 
 /** 유저 삭제 결과 모델 */
 @ObjectType()
-export class UserDeleteResult{
+export class UserDeleteResultDto{
     @Field(() => Boolean)
     deleteStatus: boolean;
 }

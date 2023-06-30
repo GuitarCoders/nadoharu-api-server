@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
-import { UserSafe } from "src/user/models/user.model";
+import { UserSafeDto } from "src/user/dto/user.dto";
 
 @InputType()
 export class LoginRequest{
@@ -12,7 +12,7 @@ export class LoginRequest{
 }
 
 @ObjectType()
-export class LoginResponse extends UserSafe{
+export class LoginResponse extends UserSafeDto{
 
     @Field(() => String)
     status: string;

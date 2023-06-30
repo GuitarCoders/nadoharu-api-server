@@ -11,7 +11,7 @@ type User {
   friends: [String!]!
 }
 
-type UserUpdateResult {
+type UserUpdateResultDto {
   _id: String!
   name: String!
   email: String!
@@ -21,7 +21,7 @@ type UserUpdateResult {
   status: String!
 }
 
-type UserDeleteResult {
+type UserDeleteResultDto {
   deleteStatus: Boolean!
 }
 
@@ -119,9 +119,9 @@ input filter {
 }
 
 type Mutation {
-  updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
-  createUser(createUserData: UserCreateRequest!): User!
-  deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
+  updateUser(updateUserData: UserUpdateRequestDto!): UserUpdateResultDto!
+  createUser(createUserData: UserCreateRequestDto!): User!
+  deleteUser(deleteUserData: UserDeleteRequestDto!): UserDeleteResultDto!
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
@@ -129,20 +129,20 @@ type Mutation {
   deletePost(deletePostData: DeletePost!): DeletePostResult!
 }
 
-input UserUpdateRequest {
+input UserUpdateRequestDto {
   name: String!
   about_me: String!
   password: String!
 }
 
-input UserCreateRequest {
+input UserCreateRequestDto {
   name: String!
   account_id: String!
   email: String!
   password: String!
 }
 
-input UserDeleteRequest {
+input UserDeleteRequestDto {
   deleteConfirm: Boolean!
 }
 
