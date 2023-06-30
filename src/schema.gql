@@ -89,6 +89,10 @@ type CreatePostResult {
   success: Boolean!
 }
 
+type DeletePostResult {
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -100,7 +104,7 @@ type Query {
 
   """Deprecated"""
   getPostsForTimeline(getPostsData: GetPosts!): GetPostsResult!
-  getPosts(filter: filter, count: Float!): GetPostsResult!
+  getPosts(getPostsData: GetPosts!): GetPostsResult!
 }
 
 input GetPosts {
@@ -122,6 +126,7 @@ type Mutation {
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
   createPost(createPostData: CreatePost!): CreatePostResult!
+  deletePost(deletePostData: DeletePost!): DeletePostResult!
 }
 
 input UserUpdateRequest {
@@ -158,4 +163,8 @@ input CreatePost {
   content: String!
   tags: String
   category: String
+}
+
+input DeletePost {
+  postId: String!
 }
