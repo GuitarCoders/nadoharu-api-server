@@ -55,7 +55,7 @@ export class GetPostsDto{
     filter?: Filter;
 
     @Field(() => Int)
-    count: Number;
+    count: number;
 }
 
 

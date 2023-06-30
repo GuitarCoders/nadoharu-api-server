@@ -73,7 +73,7 @@ export class PostService {
                 inQueryModel.lt('createdAt', data.filter.before);
             }
 
-            const resultPostModels = await inQueryModel.sort({createdAt: -1}).populate('author');
+            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(data.count).populate('author');
             const result: PostDto[] = []
             resultPostModels.forEach(item => {
                 result.push({
