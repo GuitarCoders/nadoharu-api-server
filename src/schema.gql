@@ -38,8 +38,8 @@ type LoginResponse {
 
 type FriendRequest {
   _id: String!
-  requestUserId: String!
-  receiveUserId: String!
+  requestUser: User!
+  receiveUser: User!
   requestMessage: String!
   createdAt: String!
 }
@@ -50,8 +50,8 @@ type FriendRequestArray {
 
 type CreateFriendRequestResult {
   _id: String!
-  requestUserId: String!
-  receiveUserId: String!
+  requestUser: User!
+  receiveUser: User!
   requestMessage: String!
   createdAt: String!
   success: Boolean!
@@ -65,12 +65,57 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
+type Post {
+  _id: String!
+  author: User!
+  content: String!
+  tags: String
+  category: String!
+  createdAt: String!
+}
+
+type GetPostsResult {
+  posts: [Post!]!
+  lastDateTime: String!
+}
+
+type CreatePostResult {
+  _id: String!
+  author: User!
+  content: String!
+  tags: String
+  category: String!
+  createdAt: String!
+  success: Boolean!
+}
+
+type DeletePostResult {
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
+  userWhoAmI: User!
   login(username: String!, password: String!): LoginResponse!
   jwtTest(test_arg: String!): LoginResponse!
-  getFriendRequestByRequestUserId: FriendRequestArray!
+  getSentFriendRequests: FriendRequestArray!
+  getReceiveFriendRequests: FriendRequestArray!
+
+  """Deprecated"""
+  getPostsForTimeline(getPostsData: GetPosts!): GetPostsResult!
+  getPosts(getPostsData: GetPosts!): GetPostsResult!
+}
+
+input GetPosts {
+  filter: filter
+  count: Int!
+}
+
+input filter {
+  userId: String
+  category: String
+  before: String
 }
 
 type Mutation {
@@ -80,6 +125,8 @@ type Mutation {
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
+  createPost(createPostData: CreatePost!): CreatePostResult!
+  deletePost(deletePostData: DeletePost!): DeletePostResult!
 }
 
 input UserUpdateRequest {
@@ -110,4 +157,14 @@ input DeleteFriendRequest {
 
 input AcceptFriendRequest {
   friendRequestId: String!
+}
+
+input CreatePost {
+  content: String!
+  tags: String
+  category: String
+}
+
+input DeletePost {
+  postId: String!
 }
