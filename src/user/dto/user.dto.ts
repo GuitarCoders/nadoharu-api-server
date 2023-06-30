@@ -26,7 +26,7 @@ export class UserSafeDto{
     friends: string[];
 }
 
-@InputType('')
+@InputType('UserCreate')
 export class UserCreateRequestDto{
 
     @Field(() => String)
@@ -42,7 +42,7 @@ export class UserCreateRequestDto{
     password: string;
 }
 
-@InputType()
+@InputType('UserUpdate')
 export class UserUpdateRequestDto{
     
     @Field(() => String)
@@ -55,7 +55,7 @@ export class UserUpdateRequestDto{
     password: string;
 }
 
-@ObjectType()
+@ObjectType('UserUpdateResult')
 export class UserUpdateResultDto extends UserSafeDto{
 
     @Field(() => String)
@@ -63,7 +63,7 @@ export class UserUpdateResultDto extends UserSafeDto{
 
 }
 
-@InputType()
+@InputType('UserDeleteRequest')
 export class UserDeleteRequestDto{
     
     @Field(() => Boolean)
@@ -72,7 +72,7 @@ export class UserDeleteRequestDto{
 }
 
 /** 유저 삭제 결과 모델 */
-@ObjectType()
+@ObjectType('UserDeleteResult')
 export class UserDeleteResultDto{
     @Field(() => Boolean)
     deleteStatus: boolean;
