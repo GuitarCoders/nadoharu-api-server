@@ -4,11 +4,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
 
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
-import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UsersSafeDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+    userDocumentToUserSafe(doc: UserDocument): UserSafeDto{
+        return {
+            _id: doc._id.toString(),
+            name: doc.name,
+            email: doc.email,
+            account_id: doc.account_id,
+            about_me: doc.about_me,
+        }
+    }
 
     async getUserByAccountId(account_id: string): Promise<UserDocument> {
         try {
@@ -171,4 +181,15 @@ export class UserService {
 
 
     }
+
+    // async getFriends(
+    //     targetUserId: string
+    // ): Promise<UsersSafeDto> {
+    //     try{
+    //         const targetUserDocument = await this.getUserById(targetUserId);
+    //         const targetFriendsDocument = targetUserDocument.friends
+    //     } catch (err) {
+
+    //     }
+    // }
 }
