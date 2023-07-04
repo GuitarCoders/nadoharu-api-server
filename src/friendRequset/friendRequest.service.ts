@@ -31,7 +31,6 @@ export class FriendRequestService {
             email: doc.email,
             account_id: doc.account_id,
             about_me: doc.about_me,
-            friends: doc.friends?.map(objectId => objectId.toString())
         }
     }
 
