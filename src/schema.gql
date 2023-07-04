@@ -8,20 +8,18 @@ type User {
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
 }
 
-type UserUpdateResultDto {
+type UserUpdateResult {
   _id: String!
   name: String!
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
   status: String!
 }
 
-type UserDeleteResultDto {
+type UserDeleteResult {
   deleteStatus: Boolean!
 }
 
@@ -31,7 +29,6 @@ type LoginResponse {
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
   status: String!
   jwt_token: String!
 }
@@ -98,7 +95,6 @@ type Query {
   userById(id: String!): User!
   userWhoAmI: User!
   login(username: String!, password: String!): LoginResponse!
-  jwtTest(test_arg: String!): LoginResponse!
   getSentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray!
 
@@ -119,9 +115,9 @@ input filter {
 }
 
 type Mutation {
-  updateUser(updateUserData: UserUpdateRequestDto!): UserUpdateResultDto!
-  createUser(createUserData: UserCreateRequestDto!): User!
-  deleteUser(deleteUserData: UserDeleteRequestDto!): UserDeleteResultDto!
+  updateUser(updateUserData: UserUpdate!): UserUpdateResult!
+  createUser(createUserData: UserCreate!): User!
+  deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
@@ -129,20 +125,20 @@ type Mutation {
   deletePost(deletePostData: DeletePost!): DeletePostResult!
 }
 
-input UserUpdateRequestDto {
+input UserUpdate {
   name: String!
   about_me: String!
   password: String!
 }
 
-input UserCreateRequestDto {
+input UserCreate {
   name: String!
   account_id: String!
   email: String!
   password: String!
 }
 
-input UserDeleteRequestDto {
+input UserDeleteRequest {
   deleteConfirm: Boolean!
 }
 

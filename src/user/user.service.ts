@@ -28,8 +28,7 @@ export class UserService {
                 name: result.name,
                 email: result.email,
                 account_id: result.account_id,
-                about_me: result.about_me,
-                friends: result.friends?.map(id => id.toString())
+                about_me: result.about_me
             }
             return resultUserSafe;
         } catch (err) {
@@ -56,7 +55,6 @@ export class UserService {
                 email: result.email,
                 account_id: result.account_id,
                 about_me: result.about_me,
-                friends: result.friends?.map(id => id.toString())
             }
             return resultUserSafe;
         } catch (err) {
@@ -85,7 +83,6 @@ export class UserService {
                 email: targetUser.email,
                 account_id: targetUser.account_id,
                 about_me: targetUser.about_me,
-                friends: targetUser.friends?.map(id => id.toString()),
                 status: "success"
             } 
             
@@ -116,8 +113,7 @@ export class UserService {
                 name : createdUser.name,
                 email : createdUser.email,
                 account_id : createdUser.account_id,
-                about_me: createdUser.about_me,
-                friends: createdUser.friends.map(id => id.toString())
+                about_me: createdUser.about_me
             }
 
             return createdUserSafe;

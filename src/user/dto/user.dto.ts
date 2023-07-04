@@ -3,6 +3,7 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { isNullableType } from "graphql";
 import { ObjectId } from "mongoose";
+import { UserDocument } from "../schemas/user.schema";
 
 @ObjectType('User')
 export class UserSafeDto{
@@ -21,9 +22,6 @@ export class UserSafeDto{
     
     @Field(() => String)
     about_me: string;
-    
-    @Field(() => [String])
-    friends: string[];
 }
 
 @InputType('UserCreate')
