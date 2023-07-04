@@ -182,14 +182,21 @@ export class UserService {
 
     }
 
-    // async getFriends(
-    //     targetUserId: string
-    // ): Promise<UsersSafeDto> {
-    //     try{
-    //         const targetUserDocument = await this.getUserById(targetUserId);
-    //         const targetFriendsDocument = targetUserDocument.friends
-    //     } catch (err) {
+    async getFriends(
+        targetUserId: string
+    ): Promise<UsersSafeDto> {
+        try{
+            const targetUserDocument = await this.getUserById(targetUserId);
+            const targetFriendsDocument = (await targetUserDocument.populate('friends')).friends;
 
-    //     }
-    // }
+            const result = [];
+            targetFriendsDocument.forEach(item => {
+                result.push(this.userDocumentToUserSafe(item));
+            })
+
+            return {Users: result};
+        } catch (err) {
+
+        }
+    }
 }

@@ -81,3 +81,9 @@ export class UserDeleteResultDto{
     @Field(() => Boolean)
     deleteStatus: boolean;
 }
+
+@InputType('getFriendsData')
+export class getFriendDto{
+    @Field(() => String)
+    targetUserId: string;
+}
