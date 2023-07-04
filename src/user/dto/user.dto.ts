@@ -24,6 +24,12 @@ export class UserSafeDto{
     about_me: string;
 }
 
+@ObjectType('Users')
+export class UsersSafeDto{
+    @Field(() => [UserSafeDto])
+    Users: UserSafeDto[];
+}
+
 @InputType('UserCreate')
 export class UserCreateRequestDto{
 

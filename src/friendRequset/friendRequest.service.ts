@@ -24,6 +24,7 @@ export class FriendRequestService {
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
+    //TODO: 이 함수는 user.service로 넘어감. 여기서 지우고 의존성을 user로 넘기자
     userDocumentToUserSafe(doc: UserDocument): UserSafeDto{
         return {
             _id: doc._id.toString(),
@@ -111,7 +112,7 @@ export class FriendRequestService {
             })
             console.log(alreadyFriendRequests);
             if(alreadyFriendRequests.length > 0) {
-                throw new Error('이미 친구를 신청한 대상입니다.')
+                throw new Error('이미 친구를 신청한 대상입니다.');
             }
 
             const createdFriendRequest = new this.friendRequestModel(
