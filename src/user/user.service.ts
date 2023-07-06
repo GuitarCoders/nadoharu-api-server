@@ -166,9 +166,9 @@ export class UserService {
             const requestUser = await this.getUserById(reqUserId);
 
             // acceptUser.friends.push(requestUser._id);
-            acceptUser.updateOne({$addToSet: requestUser._id});
+            await acceptUser.updateOne({$addToSet: {friends: requestUser._id}});
             // requestUser.friends.push(acceptUser._id);
-            requestUser.updateOne({$addToSet: acceptUser._id});
+            await requestUser.updateOne({$addToSet: {friends: acceptUser._id}});
 
             // await acceptUser.save();
             // await requestUser.save();
