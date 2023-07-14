@@ -156,6 +156,8 @@ export class UserService {
     }
 
     //TODO : Promise type 결정하기
+    //TODO : 사용하지 않음
+    /** @deprecated 해당 기능은 Friend부분이 처리합니다. */
     async addFriend(
         acceptUserId: string, 
         reqUserId: string)
@@ -180,23 +182,5 @@ export class UserService {
         }
 
 
-    }
-
-    async getFriends(
-        targetUserId: string
-    ): Promise<UsersSafeDto> {
-        try{
-            const targetUserDocument = await this.getUserById(targetUserId);
-            const targetFriendsDocument = (await targetUserDocument.populate('friends')).friends;
-
-            const result = [];
-            targetFriendsDocument.forEach(item => {
-                result.push(this.userDocumentToUserSafe(item));
-            })
-
-            return {Users: result};
-        } catch (err) {
-
-        }
     }
 }

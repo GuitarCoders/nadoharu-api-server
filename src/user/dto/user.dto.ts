@@ -3,6 +3,7 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { isNullableType } from "graphql";
 import { ObjectId } from "mongoose";
+import { Int } from "type-graphql";
 import { UserDocument } from "../schemas/user.schema";
 
 @ObjectType('User')
@@ -80,10 +81,4 @@ export class UserDeleteRequestDto{
 export class UserDeleteResultDto{
     @Field(() => Boolean)
     deleteStatus: boolean;
-}
-
-@InputType('getFriendsData')
-export class getFriendDto{
-    @Field(() => String)
-    targetUserId: string;
 }

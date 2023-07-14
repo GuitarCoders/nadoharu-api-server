@@ -21,43 +21,44 @@ export class PostService {
         }
     }
 
-    async getPostsForTimeline(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
-        try{
-            const user = await this.userService.getUserById(userId);
-            const friends = user.friends;
-            const resultPosts = await this.PostModel
-                .find({})
-                .where('author')
-                .in([user._id, ...friends])
-                .sort({createdAt: -1})
-                .populate('author');
+    /** @Deprecated getPosts가 해당 함수의 기능을 포함합니다. */
+    //TODO : Friends 기능이 완성되면 해당 코드 수정
+    // async getPostsForTimeline(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
+    //     try{
+    //         const user = await this.userService.getUserById(userId);
+    //         const friends = user.friends;
+    //         const resultPosts = await this.PostModel
+    //             .find({})
+    //             .where('author')
+    //             .in([user._id, ...friends])
+    //             .sort({createdAt: -1})
+    //             .populate('author');
 
-            const result: PostDto[] = []
-            resultPosts.forEach(item => {
-                result.push({
-                    _id: item._id.toString(),
-                    author: item.author,
-                    content: item.content,
-                    category: item.category,
-                    createdAt: item.createdAt.toISOString()
-                })
-            })
+    //         const result: PostDto[] = []
+    //         resultPosts.forEach(item => {
+    //             result.push({
+    //                 _id: item._id.toString(),
+    //                 author: item.author,
+    //                 content: item.content,
+    //                 category: item.category,
+    //                 createdAt: item.createdAt.toISOString()
+    //             })
+    //         })
 
-            const lastDateTime = resultPosts.at(0).createdAt.toISOString();
+    //         const lastDateTime = resultPosts.at(0).createdAt.toISOString();
 
-            return {
-                posts: result,
-                lastDateTime: lastDateTime
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    //         return {
+    //             posts: result,
+    //             lastDateTime: lastDateTime
+    //         }
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    // }
 
-    // TODO : 테스트가 끝나면 return type 정상화하기
     async getPosts(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
         try {
-            const friends = (await this.userService.getUserById(userId)).friends;
+            const friends = (await this.userService.getUserById(userId));
             const inQueryModel = this.PostModel.find({});
 
             if ( data.filter?.userId ){
@@ -66,7 +67,7 @@ export class PostService {
                     inQueryModel.where('category').equals(data.filter.category);
                 }
             } else {
-                inQueryModel.where('author').in([userId, ...friends]);
+                inQueryModel.where('author').in([userId]);
             }
 
             if( data.filter?.before){

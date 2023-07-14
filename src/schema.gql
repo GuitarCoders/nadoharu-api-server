@@ -10,6 +10,10 @@ type User {
   about_me: String!
 }
 
+type Users {
+  Users: [User!]!
+}
+
 type UserUpdateResult {
   _id: String!
   name: String!
@@ -97,9 +101,7 @@ type Query {
   login(username: String!, password: String!): LoginResponse!
   getSentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray!
-
-  """Deprecated"""
-  getPostsForTimeline(getPostsData: GetPosts!): GetPostsResult!
+  getFriends: Users!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
 }
 

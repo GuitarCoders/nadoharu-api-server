@@ -10,6 +10,8 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { FriendRequestModule } from './friendRequset/friendRequest.module';
 import { PostModule } from './post/post.module';
+import { FriendModule } from './friend/friend.module';
+import { TestModule } from './test/test.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -32,6 +34,8 @@ console.log(process.env.NODE_ENV);
     AuthModule,
     FriendRequestModule,
     PostModule,
+    FriendModule,
+    TestModule,
   ],
   providers: [AppService],
 })

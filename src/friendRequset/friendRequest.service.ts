@@ -12,15 +12,15 @@ import {
     AcceptFriendRequestDto,
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
-import { UserService } from 'src/user/user.service';
 import { UserSafeDto } from 'src/user/dto/user.dto';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { GraphQLError } from 'graphql';
+import { FriendService } from 'src/friend/friend.service';
 
 @Injectable()
 export class FriendRequestService {
     constructor(
-        private userService: UserService,
+        private friendService: FriendService,
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
@@ -151,6 +151,9 @@ export class FriendRequestService {
     async deleteFriendRequest(deleteFriendRequestDto: DeleteFriendRequestDto): Promise<DeleteFriendRequestResultDto>{
         try {
             const targetFriendRequest = await this.getFriendRequestById(deleteFriendRequestDto.friendRequestId);
+            if(!targetFriendRequest) {
+                console.log("해당친추없음");
+            }
             await targetFriendRequest.deleteOne();
 
             return {
@@ -173,9 +176,10 @@ export class FriendRequestService {
 
             console.log(targetFriendRequest);
 
+            if(!targetFriendRequest) {throw new Error('해당 친구신청이 존재하지 않습니다.')}
             if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
 
-            this.userService.addFriend(
+            this.friendService.addFriend(
                 targetFriendRequest.requestUser._id.toString(),
                 targetFriendRequest.receiveUser._id.toString()
             )
