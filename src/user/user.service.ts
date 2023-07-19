@@ -20,6 +20,15 @@ export class UserService {
         }
     }
 
+    async getAllUsers(): Promise<UserDocument[]> {
+        try {
+            const result = await this.userModel.find();
+            return result;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async getUserByAccountId(account_id: string): Promise<UserDocument> {
         try {
             const result = await this.userModel.findOne({account_id : account_id});

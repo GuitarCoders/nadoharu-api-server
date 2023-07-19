@@ -1,4 +1,5 @@
 import { Field, ObjectType, InputType, Int } from "@nestjs/graphql";
+import { UserSafeDto } from "src/user/dto/user.dto";
 
 
 @ObjectType('FriendTest')
@@ -7,8 +8,26 @@ export class test{
     result: string;
 }
 
+@ObjectType('Friend')
+export class FriendDto{
+    @Field(() => String)
+    _id: string;
+
+    @Field(() => UserSafeDto)
+    user: UserSafeDto;
+
+    @Field(() => String)
+    createdAt: string;
+}
+
+@ObjectType('Friends')
+export class FriendsDto{
+    @Field(() => [FriendDto])
+    friends: FriendDto[];
+}
+
 @InputType('getFriendsData')
-export class getFriendDto{
+export class getFriendsDto{
     @Field(() => String, {nullable: true})
     targetUserId?: string;
 

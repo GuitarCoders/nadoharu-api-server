@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
@@ -9,6 +10,7 @@ import { Post, PostDocument } from './schemas/post.schema';
 export class PostService {
     constructor(
         private userService: UserService,
+        private friendService: FriendService,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
 
@@ -21,44 +23,51 @@ export class PostService {
         }
     }
 
-    /** @Deprecated getPosts가 해당 함수의 기능을 포함합니다. */
-    //TODO : Friends 기능이 완성되면 해당 코드 수정
-    // async getPostsForTimeline(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
-    //     try{
-    //         const user = await this.userService.getUserById(userId);
-    //         const friends = user.friends;
-    //         const resultPosts = await this.PostModel
-    //             .find({})
-    //             .where('author')
-    //             .in([user._id, ...friends])
-    //             .sort({createdAt: -1})
-    //             .populate('author');
+    async getPostsForTimeline(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
+        try{
+            const user = await this.userService.getUserById(userId);
+            const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
+                return item.friend._id.toString();
+            });
 
-    //         const result: PostDto[] = []
-    //         resultPosts.forEach(item => {
-    //             result.push({
-    //                 _id: item._id.toString(),
-    //                 author: item.author,
-    //                 content: item.content,
-    //                 category: item.category,
-    //                 createdAt: item.createdAt.toISOString()
-    //             })
-    //         })
+            console.log(friends);
+            const resultPosts = await this.PostModel
+                .find({})
+                .where('author')
+                .in([user._id, ...friends])
+                .sort({createdAt: -1})
+                .populate('author');
 
-    //         const lastDateTime = resultPosts.at(0).createdAt.toISOString();
+            const result: PostDto[] = []
+            resultPosts.forEach(item => {
+                result.push({
+                    _id: item._id.toString(),
+                    author: item.author,
+                    content: item.content,
+                    category: item.category,
+                    createdAt: item.createdAt.toISOString()
+                })
+            })
 
-    //         return {
-    //             posts: result,
-    //             lastDateTime: lastDateTime
-    //         }
-    //     } catch (err) {
-    //         console.error(err);
-    //     }
-    // }
+            const lastDateTime = resultPosts.at(0).createdAt.toISOString();
 
+            return {
+                posts: result,
+                lastDateTime: lastDateTime
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    
     async getPosts(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
         try {
-            const friends = (await this.userService.getUserById(userId));
+            const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
+                console.log(item.friend._id.toString());
+                return item.friend._id.toString();
+            });
+            console.log(friends);
             const inQueryModel = this.PostModel.find({});
 
             if ( data.filter?.userId ){
@@ -67,7 +76,7 @@ export class PostService {
                     inQueryModel.where('category').equals(data.filter.category);
                 }
             } else {
-                inQueryModel.where('author').in([userId]);
+                inQueryModel.where('author').in([userId, ...friends]);
             }
 
             if( data.filter?.before){
@@ -75,18 +84,14 @@ export class PostService {
             }
 
             const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(data.count).populate('author');
-            const result: PostDto[] = []
-            resultPostModels.forEach(item => {
-                result.push({
-                    _id: item._id.toString(),
-                    author: item.author,
-                    content: item.content,
-                    tags: item.tags,
-                    category: item.category,
-                    createdAt: item.createdAt.toISOString()
-                })
-            })
-            console.log(result);
+            const result: PostDto[] = resultPostModels.map( item => ({
+                _id: item._id.toString(),
+                author: item.author,
+                content: item.content,
+                tags: item.tags,
+                category: item.category,
+                createdAt: item.createdAt.toISOString()
+            }));
 
             return { posts:result, lastDateTime: resultPostModels.at(-1).createdAt.toISOString() };
         } catch (err) {
