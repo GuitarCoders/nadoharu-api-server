@@ -3,9 +3,11 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { isNullableType } from "graphql";
 import { ObjectId } from "mongoose";
+import { Int } from "type-graphql";
+import { UserDocument } from "../schemas/user.schema";
 
 @ObjectType('User')
-export class UserSafe{
+export class UserSafeDto{
     
     @Field(() => String)
     _id: string;
@@ -21,13 +23,16 @@ export class UserSafe{
     
     @Field(() => String)
     about_me: string;
-    
-    @Field(() => [String])
-    friends: string[];
 }
 
-@InputType()
-export class UserCreateRequest{
+@ObjectType('Users')
+export class UsersSafeDto{
+    @Field(() => [UserSafeDto])
+    Users: UserSafeDto[];
+}
+
+@InputType('UserCreate')
+export class UserCreateRequestDto{
 
     @Field(() => String)
     name: string;
@@ -42,8 +47,8 @@ export class UserCreateRequest{
     password: string;
 }
 
-@InputType()
-export class UserUpdateRequest{
+@InputType('UserUpdate')
+export class UserUpdateRequestDto{
     
     @Field(() => String)
     name: string;
@@ -55,16 +60,16 @@ export class UserUpdateRequest{
     password: string;
 }
 
-@ObjectType()
-export class UserUpdateResult extends UserSafe{
+@ObjectType('UserUpdateResult')
+export class UserUpdateResultDto extends UserSafeDto{
 
     @Field(() => String)
     status: string;
 
 }
 
-@InputType()
-export class UserDeleteRequest{
+@InputType('UserDeleteRequest')
+export class UserDeleteRequestDto{
     
     @Field(() => Boolean)
     deleteConfirm: boolean;
@@ -72,8 +77,8 @@ export class UserDeleteRequest{
 }
 
 /** 유저 삭제 결과 모델 */
-@ObjectType()
-export class UserDeleteResult{
+@ObjectType('UserDeleteResult')
+export class UserDeleteResultDto{
     @Field(() => Boolean)
     deleteStatus: boolean;
 }

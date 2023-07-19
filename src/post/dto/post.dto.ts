@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
-import { UserSafe } from "src/user/models/user.model";
+import { UserSafeDto } from "src/user/dto/user.dto";
 import { UserDocument } from "src/user/schemas/user.schema";
 import { Int } from "type-graphql";
 
@@ -9,7 +9,7 @@ export class PostDto{
     @Field(() => String)
     _id: string;
 
-    @Field(() => UserSafe)
+    @Field(() => UserSafeDto)
     author: UserDocument;
 
     @Field(() => String)

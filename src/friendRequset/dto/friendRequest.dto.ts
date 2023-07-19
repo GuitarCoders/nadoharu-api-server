@@ -1,16 +1,16 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
-import { UserSafe } from "src/user/models/user.model";
+import { UserSafeDto } from "src/user/dto/user.dto";
 
 @ObjectType('FriendRequest')
 export class FriendRequestDto{
     @Field(() => String)
     _id: string;
 
-    @Field(() => UserSafe)
-    requestUser: UserSafe;
+    @Field(() => UserSafeDto)
+    requestUser: UserSafeDto;
 
-    @Field(() => UserSafe)
-    receiveUser: UserSafe;
+    @Field(() => UserSafeDto)
+    receiveUser: UserSafeDto;
 
     @Field(() => String)
     requestMessage: string;

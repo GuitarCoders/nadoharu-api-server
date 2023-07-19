@@ -31,14 +31,15 @@ export class PostResolver {
         return await this.PostService.deletePost(user._id, reqData);
     }
 
-    @Query(() => GetPostsResultDto, { name: "getPostsForTimeline", description: "Deprecated"})
-    @UseGuards(GqlAuthGuard)
-    async getPostsForTimeline(
-        @CurrentUser() user: UserJwtPayload,
-        @Args('getPostsData') reqData: GetPostsDto
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPostsForTimeline(user._id, reqData);
-    }
+    //TODO : 해당 쿼리가 필요한지 확인
+    // @Query(() => GetPostsResultDto, { name: "getPostsForTimeline", description: "Deprecated"})
+    // @UseGuards(GqlAuthGuard)
+    // async getPostsForTimeline(
+    //     @CurrentUser() user: UserJwtPayload,
+    //     @Args('getPostsData') reqData: GetPostsDto
+    // ): Promise<GetPostsResultDto> {
+    //     return await this.PostService.getPostsForTimeline(user._id, reqData);
+    // }
 
     @Query(() => GetPostsResultDto, { name: "getPosts"})
     @UseGuards(GqlAuthGuard)

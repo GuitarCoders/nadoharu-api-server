@@ -23,21 +23,4 @@ export class AuthResolver {
         console.log("auth resolver");
         return await this.authService.login({account_id: id, password: pwd});
     }
-    
-    @Query(() => LoginResponse,{ name: 'jwtTest'})
-    @UseGuards(GqlAuthGuard)
-    async jwtGuardTest(
-        @Args('test_arg') arg: string
-    ): Promise<LoginResponse> {
-        return {
-            _id: "a",
-            name: "test",
-            account_id: "test",
-            email: "test@test.com",
-            about_me: "hihi",
-            friends: [],
-            status: "test",
-            jwt_token: "testToken"
-        }
-    }
 }

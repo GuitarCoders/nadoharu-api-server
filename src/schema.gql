@@ -8,7 +8,6 @@ type User {
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
 }
 
 type UserUpdateResult {
@@ -17,7 +16,6 @@ type UserUpdateResult {
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
   status: String!
 }
 
@@ -31,7 +29,6 @@ type LoginResponse {
   email: String!
   account_id: String!
   about_me: String!
-  friends: [String!]!
   status: String!
   jwt_token: String!
 }
@@ -65,6 +62,16 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
+type Friend {
+  _id: String!
+  user: User!
+  createdAt: String!
+}
+
+type Friends {
+  friends: [Friend!]!
+}
+
 type Post {
   _id: String!
   author: User!
@@ -93,18 +100,25 @@ type DeletePostResult {
   success: Boolean!
 }
 
+type addAllUserInFriendResult {
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
   userWhoAmI: User!
   login(username: String!, password: String!): LoginResponse!
-  jwtTest(test_arg: String!): LoginResponse!
   getSentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray!
-
-  """Deprecated"""
-  getPostsForTimeline(getPostsData: GetPosts!): GetPostsResult!
+  getFriends(filter: getFriendsData!): Friends!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
+}
+
+input getFriendsData {
+  targetUserId: String
+  limit: Int!
+  skip: Int
 }
 
 input GetPosts {
@@ -119,23 +133,24 @@ input filter {
 }
 
 type Mutation {
-  updateUser(updateUserData: UserUpdateRequest!): UserUpdateResult!
-  createUser(createUserData: UserCreateRequest!): User!
+  updateUser(updateUserData: UserUpdate!): UserUpdateResult!
+  createUser(createUserData: UserCreate!): User!
   deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
   createPost(createPostData: CreatePost!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
+  addAllUserInFriend: addAllUserInFriendResult!
 }
 
-input UserUpdateRequest {
+input UserUpdate {
   name: String!
   about_me: String!
   password: String!
 }
 
-input UserCreateRequest {
+input UserCreate {
   name: String!
   account_id: String!
   email: String!

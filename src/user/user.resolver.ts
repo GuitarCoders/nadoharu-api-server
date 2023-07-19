@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import mongoose, { LeanDocument } from 'mongoose';
 
 import { User, UserDocument } from './schemas/user.schema';
-import { UserCreateRequest, UserDeleteRequest, UserDeleteResult, UserSafe, UserUpdateRequest, UserUpdateResult } from './models/user.model';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UserUpdateRequestDto, UserUpdateResultDto, UsersSafeDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
@@ -15,44 +15,45 @@ export class UserResolver {
         private readonly UserService: UserService
     ) {}
 
-    @Query(() => UserSafe, { name: 'userByAccountId'})
+    @Query(() => UserSafeDto, { name: 'userByAccountId'})
     @UseGuards(GqlAuthGuard)
-    async getUserByAccountId(@Args('account_id') account_id: string): Promise<UserSafe> {
+    async getUserByAccountId(@Args('account_id') account_id: string): Promise<UserSafeDto> {
         return await this.UserService.getUserByAccountIdSafe(account_id);
     }
 
-    @Query(() => UserSafe, { name: 'userById'})
+    @Query(() => UserSafeDto, { name: 'userById'})
     @UseGuards(GqlAuthGuard)
-    async getUserById(@Args('id') id: string): Promise<UserSafe> {
+    async getUserById(@Args('id') id: string): Promise<UserSafeDto> {
         return await this.UserService.getUserByIdSafe(id);
     }
 
-    @Query(() => UserSafe, { name: 'userWhoAmI'})
+    @Query(() => UserSafeDto, { name: 'userWhoAmI'})
     @UseGuards(GqlAuthGuard)
-    async getUserWhoAmI(@CurrentUser() user: UserJwtPayload): Promise<UserSafe> {
+    async getUserWhoAmI(@CurrentUser() user: UserJwtPayload): Promise<UserSafeDto> {
         return await this.UserService.getUserByIdSafe(user._id);
     }
 
-    @Mutation(() => UserUpdateResult, { name: 'updateUser'})
+    @Mutation(() => UserUpdateResultDto, { name: 'updateUser'})
     @UseGuards(GqlAuthGuard)
     async updateUser(
         @CurrentUser() user: UserJwtPayload,
-        @Args('updateUserData') reqUser: UserUpdateRequest
-    ): Promise<UserUpdateResult> {
+        @Args('updateUserData') reqUser: UserUpdateRequestDto
+    ): Promise<UserUpdateResultDto> {
         return await this.UserService.updateUserById(user._id, reqUser);
     }
 
-    @Mutation(() => UserSafe, { name: 'createUser'})
-    async createUser(@Args('createUserData') reqUser: UserCreateRequest): Promise<UserSafe> {
+    @Mutation(() => UserSafeDto, { name: 'createUser'})
+    async createUser(@Args('createUserData') reqUser: UserCreateRequestDto): Promise<UserSafeDto> {
         return await this.UserService.createUser(reqUser);
     }
 
-    @Mutation(() => UserDeleteResult, { name: 'deleteUser'})
+    @Mutation(() => UserDeleteResultDto, { name: 'deleteUser'})
     @UseGuards(GqlAuthGuard)
     async deleteUser(
         @CurrentUser() user: UserJwtPayload,
-        @Args('deleteUserData') deleteConfirm: UserDeleteRequest
-    ): Promise<UserDeleteResult> {
+        @Args('deleteUserData') deleteConfirm: UserDeleteRequestDto
+    ): Promise<UserDeleteResultDto> {
         return await this.UserService.deleteUser(user._id, deleteConfirm);
     }
+
 }

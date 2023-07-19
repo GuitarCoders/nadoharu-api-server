@@ -12,26 +12,26 @@ import {
     AcceptFriendRequestDto,
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
-import { UserService } from 'src/user/user.service';
-import { UserSafe } from 'src/user/models/user.model';
+import { UserSafeDto } from 'src/user/dto/user.dto';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { GraphQLError } from 'graphql';
+import { FriendService } from 'src/friend/friend.service';
 
 @Injectable()
 export class FriendRequestService {
     constructor(
-        private userService: UserService,
+        private friendService: FriendService,
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
-    userDocumentToUserSafe(doc: UserDocument): UserSafe{
+    //TODO: 이 함수는 user.service로 넘어감. 여기서 지우고 의존성을 user로 넘기자
+    userDocumentToUserSafe(doc: UserDocument): UserSafeDto{
         return {
             _id: doc._id.toString(),
             name: doc.name,
             email: doc.email,
             account_id: doc.account_id,
             about_me: doc.about_me,
-            friends: doc.friends?.map(objectId => objectId.toString())
         }
     }
 
@@ -112,7 +112,7 @@ export class FriendRequestService {
             })
             console.log(alreadyFriendRequests);
             if(alreadyFriendRequests.length > 0) {
-                throw new Error('이미 친구를 신청한 대상입니다.')
+                throw new Error('이미 친구를 신청한 대상입니다.');
             }
 
             const createdFriendRequest = new this.friendRequestModel(
@@ -151,6 +151,9 @@ export class FriendRequestService {
     async deleteFriendRequest(deleteFriendRequestDto: DeleteFriendRequestDto): Promise<DeleteFriendRequestResultDto>{
         try {
             const targetFriendRequest = await this.getFriendRequestById(deleteFriendRequestDto.friendRequestId);
+            if(!targetFriendRequest) {
+                console.log("해당친추없음");
+            }
             await targetFriendRequest.deleteOne();
 
             return {
@@ -173,9 +176,10 @@ export class FriendRequestService {
 
             console.log(targetFriendRequest);
 
+            if(!targetFriendRequest) {throw new Error('해당 친구신청이 존재하지 않습니다.')}
             if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
 
-            this.userService.addFriend(
+            this.friendService.addFriend(
                 targetFriendRequest.requestUser._id.toString(),
                 targetFriendRequest.receiveUser._id.toString()
             )

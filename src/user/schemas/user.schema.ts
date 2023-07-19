@@ -36,11 +36,6 @@ export class User{
         type: mongoose.Schema.Types.String
     })
     about_me: string;
-
-    @Prop({ 
-        type: [mongoose.Schema.Types.ObjectId], ref: 'User' 
-    })
-    friends: mongoose.Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
