@@ -12,6 +12,7 @@ import { FriendRequestModule } from './friendRequset/friendRequest.module';
 import { PostModule } from './post/post.module';
 import { FriendModule } from './friend/friend.module';
 import { TestModule } from './test/test.module';
+import { CommentModule } from './comment/comment.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -36,6 +37,7 @@ console.log(process.env.NODE_ENV);
     PostModule,
     FriendModule,
     TestModule,
+    CommentModule,
   ],
   providers: [AppService],
 })
