@@ -112,6 +112,11 @@ type Comment {
   createdAt: String!
 }
 
+type Comments {
+  comments: [Comment!]!
+  lastDateTime: String!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -121,6 +126,7 @@ type Query {
   getReceiveFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
+  getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }
 
 input getFriendsData {
@@ -130,14 +136,19 @@ input getFriendsData {
 }
 
 input GetPosts {
-  filter: filter
+  filter: getPostFilter
   count: Int!
 }
 
-input filter {
+input getPostFilter {
   userId: String
   category: String
   before: String
+}
+
+input commentFilter {
+  skip: Int
+  limit: Int!
 }
 
 type Mutation {

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
-import { addCommentDto, CommentDto } from './dto/comment.dto';
+import { addCommentDto, CommentDto, commentFilter, CommentsDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class CommentService {
         })
 
         await createdComment.save();
-
+    
         const resultComment: CommentDto = {
             _id: createdComment._id.toString(),
             content: createdComment.content,
@@ -35,5 +35,33 @@ export class CommentService {
 
         return resultComment
         
+    }
+
+    async getCommentsByPostId(targetPostId: string, options: commentFilter): Promise<CommentsDto>{
+        try {
+            // const commentDocuments = await this.CommentModel.find({post: targetPostId}).sort({createdAt: 1}).populate('commenter');
+
+            const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
+            if(options.skip) {
+                commentQuery.skip(options.skip);
+            }
+            commentQuery.limit(options.limit);
+
+            const commentDocuments = await commentQuery.populate('commenter');
+            
+            const result: CommentDto[] = commentDocuments.map(item => ({
+                _id: item._id.toString(),
+                content: item.content,
+                postId: item.post._id.toString(),
+                Commenter: this.UserService.userDocumentToUserSafe(item.commenter),
+                createdAt: item.createdAt.toISOString()
+            }))
+            return {
+                comments: result,
+                lastDateTime: commentDocuments.at(-1).createdAt.toISOString()
+            };
+        } catch (err) {
+            console.log(err);
+        }
     }
 }
