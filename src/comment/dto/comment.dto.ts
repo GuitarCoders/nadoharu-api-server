@@ -47,3 +47,9 @@ export class commentFilter{
     @Field(() => Int)
     limit: number;
 }
+
+@ObjectType('deleteCommentResult')
+export class deleteCommentResultDto{
+    @Field(() => Boolean)
+    success: boolean;
+}

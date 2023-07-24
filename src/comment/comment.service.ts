@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
-import { addCommentDto, CommentDto, commentFilter, CommentsDto } from './dto/comment.dto';
+import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
 
 @Injectable()
@@ -61,7 +61,22 @@ export class CommentService {
                 lastDateTime: commentDocuments.at(-1).createdAt.toISOString()
             };
         } catch (err) {
-            console.log(err);
+            console.error(err);
+        }
+    }
+
+    async deleteCommentById(targetCommentId: string, requestUserId: string): Promise<deleteCommentResultDto>{
+        try{
+            const targetCommentDocument = await this.CommentModel.findById(targetCommentId);
+            if(targetCommentDocument.commenter._id.toString() !== requestUserId){
+                throw new Error("댓글 작성자와 삭제 요청자가 일치하지 않습니다.")
+            }
+
+            await targetCommentDocument.delete();
+
+            return {success: true}
+        } catch (err) {
+            console.error(err);
         }
     }
 }

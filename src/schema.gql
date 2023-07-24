@@ -117,6 +117,10 @@ type Comments {
   lastDateTime: String!
 }
 
+type deleteCommentResult {
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -162,6 +166,7 @@ type Mutation {
   deletePost(deletePostData: DeletePost!): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
   addCommentToPost(targetPostId: String!, content: String!): Comment!
+  deleteCommentById(targetCommentId: String!): deleteCommentResult!
 }
 
 input UserUpdate {

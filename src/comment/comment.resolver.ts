@@ -5,7 +5,7 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { PostDto } from 'src/post/dto/post.dto';
 import { CommentService } from './comment.service';
-import { CommentDto, commentFilter, CommentsDto } from './dto/comment.dto';
+import { CommentDto, commentFilter, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
 
 @Resolver()
 export class CommentResolver {
@@ -34,6 +34,16 @@ export class CommentResolver {
             {
                 targetPostId: targetPostId,
                 content: content
-        })
+            }
+        )
+    }
+
+    @Mutation(() => deleteCommentResultDto, {name: "deleteCommentById"})
+    @UseGuards(GqlAuthGuard)
+    async deleteCommentById(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('targetCommentId') targetCommentId: string
+    ): Promise<deleteCommentResultDto> {
+        return await this.CommentService.deleteCommentById(targetCommentId, user._id);
     }
 }
