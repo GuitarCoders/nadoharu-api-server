@@ -104,6 +104,14 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
+type Comment {
+  _id: String!
+  content: String!
+  postId: String!
+  Commenter: User!
+  createdAt: String!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -142,6 +150,7 @@ type Mutation {
   createPost(createPostData: CreatePost!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
+  addCommentToPost(targetPostId: String!, content: String!): Comment!
 }
 
 input UserUpdate {
