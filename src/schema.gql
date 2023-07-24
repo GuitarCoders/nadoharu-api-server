@@ -104,6 +104,23 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
+type Comment {
+  _id: String!
+  content: String!
+  postId: String!
+  Commenter: User!
+  createdAt: String!
+}
+
+type Comments {
+  comments: [Comment!]!
+  lastDateTime: String!
+}
+
+type deleteCommentResult {
+  success: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -113,6 +130,7 @@ type Query {
   getReceiveFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
+  getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }
 
 input getFriendsData {
@@ -122,14 +140,19 @@ input getFriendsData {
 }
 
 input GetPosts {
-  filter: filter
+  filter: getPostFilter
   count: Int!
 }
 
-input filter {
+input getPostFilter {
   userId: String
   category: String
   before: String
+}
+
+input commentFilter {
+  skip: Int
+  limit: Int!
 }
 
 type Mutation {
@@ -142,6 +165,8 @@ type Mutation {
   createPost(createPostData: CreatePost!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
+  addCommentToPost(targetPostId: String!, content: String!): Comment!
+  deleteCommentById(targetCommentId: String!): deleteCommentResult!
 }
 
 input UserUpdate {
