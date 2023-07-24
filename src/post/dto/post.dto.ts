@@ -31,7 +31,7 @@ export class PostArrayDto{
     Posts: PostDto[];
 }
 
-@InputType('filter')
+@InputType('getPostFilter')
 export class Filter{
     @Field(() => String, { nullable: true })
     userId?: string;
@@ -50,7 +50,10 @@ export class Filter{
 export class GetPostsDto{
     @Field(
         () => (Filter),
-        { nullable: true }
+        { 
+            nullable: true, 
+            name: 'filter'
+        }
     )
     filter?: Filter;
 
