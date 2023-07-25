@@ -15,25 +15,31 @@ export class CommentService {
     ) {}
 
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
-        const targetPost = await this.PostService.getPostById(addData.targetPostId);
-        if(!targetPost) throw new Error("댓글을 작성할 대상 글이 존재하지 않습니다.");
-        const createdComment = new this.CommentModel({
-            content: addData.content,
-            post: addData.targetPostId,
-            commenter: commenterUserId,
-        })
+        try {
 
-        await createdComment.save();
+            const targetPost = await this.PostService.getPostById(addData.targetPostId);
+            if(!targetPost) throw new Error("댓글을 작성할 대상 글이 존재하지 않습니다.");
+            const createdComment = new this.CommentModel({
+                content: addData.content,
+                post: addData.targetPostId,
+                commenter: commenterUserId,
+            })
     
-        const resultComment: CommentDto = {
-            _id: createdComment._id.toString(),
-            content: createdComment.content,
-            postId: createdComment.post._id.toString(),
-            Commenter: this.UserService.userDocumentToUserSafe((await createdComment.populate('commenter')).commenter),
-            createdAt: createdComment.createdAt.toISOString()
-        }
+            await createdComment.save();
+        
+            const resultComment: CommentDto = {
+                _id: createdComment._id.toString(),
+                content: createdComment.content,
+                postId: createdComment.post._id.toString(),
+                Commenter: this.UserService.userDocumentToUserSafe((await createdComment.populate('commenter')).commenter),
+                createdAt: createdComment.createdAt.toISOString()
+            }
+    
+            return resultComment
 
-        return resultComment
+        } catch (err) {
+            console.error(err);
+        }
         
     }
 
