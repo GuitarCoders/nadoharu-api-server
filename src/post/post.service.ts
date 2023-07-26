@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Query } from 'mongoose';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
@@ -40,43 +40,6 @@ export class PostService {
         }
     }
 
-    async getPostsForTimeline(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
-        try{
-            const user = await this.userService.getUserById(userId);
-            const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
-                return item.friend._id.toString();
-            });
-
-            console.log(friends);
-            const resultPosts = await this.PostModel
-                .find({})
-                .where('author')
-                .in([user._id, ...friends])
-                .sort({createdAt: -1})
-                .populate('author');
-
-            const result: PostDto[] = []
-            resultPosts.forEach(item => {
-                result.push({
-                    _id: item._id.toString(),
-                    author: item.author,
-                    content: item.content,
-                    category: item.category,
-                    createdAt: item.createdAt.toISOString()
-                })
-            })
-
-            const lastDateTime = resultPosts.at(0).createdAt.toISOString();
-
-            return {
-                posts: result,
-                lastDateTime: lastDateTime
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
     
     async getPosts(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
         try {
@@ -100,6 +63,8 @@ export class PostService {
                 inQueryModel.lt('createdAt', data.filter.before);
             }
 
+            const leftCount = await (new (inQueryModel.toConstructor())).count();
+
             const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(data.count).populate('author');
             const result: PostDto[] = resultPostModels.map( item => ({
                 _id: item._id.toString(),
@@ -110,7 +75,13 @@ export class PostService {
                 createdAt: item.createdAt.toISOString()
             }));
 
-            return { posts:result, lastDateTime: resultPostModels.at(-1).createdAt.toISOString() };
+            const lastDateTime =  resultPostModels.at(-1).createdAt
+
+            return { 
+                posts:result, 
+                lastDateTime: lastDateTime.toISOString(),
+                hasNext: (leftCount > data.count)
+            };
         } catch (err) {
             console.error(err);
         }

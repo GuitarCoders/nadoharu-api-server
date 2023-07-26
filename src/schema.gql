@@ -84,6 +84,7 @@ type Post {
 type GetPostsResult {
   posts: [Post!]!
   lastDateTime: String!
+  hasNext: Boolean!
 }
 
 type CreatePostResult {

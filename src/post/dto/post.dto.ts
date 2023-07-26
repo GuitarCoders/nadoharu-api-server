@@ -69,6 +69,9 @@ export class GetPostsResultDto{
 
     @Field(() => String)
     lastDateTime: string;
+
+    @Field(() => Boolean)
+    hasNext: boolean;
 }
 
 @InputType('CreatePost')

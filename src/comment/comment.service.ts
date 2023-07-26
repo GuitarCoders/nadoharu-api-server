@@ -64,7 +64,7 @@ export class CommentService {
             }))
             return {
                 comments: result,
-                lastDateTime: commentDocuments.at(-1).createdAt.toISOString()
+                lastDateTime: commentDocuments.at(-1).createdAt.toISOString(),
             };
         } catch (err) {
             console.error(err);
