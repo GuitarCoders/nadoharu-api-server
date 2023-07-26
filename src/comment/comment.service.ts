@@ -17,7 +17,7 @@ export class CommentService {
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
         try {
 
-            const targetPost = await this.PostService.getPostById(addData.targetPostId);
+            const targetPost = await this.PostService.getPostDocumentById(addData.targetPostId);
             if(!targetPost) throw new Error("댓글을 작성할 대상 글이 존재하지 않습니다.");
             const createdComment = new this.CommentModel({
                 content: addData.content,

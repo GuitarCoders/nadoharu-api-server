@@ -14,10 +14,27 @@ export class PostService {
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
 
-    async getPostById(postId: string): Promise<PostDocument>{
+    async getPostDocumentById(postId: string): Promise<PostDocument>{
         try{
             const result = await this.PostModel.findById(postId);
             return result;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async getPostById(postId: string): Promise<PostDto>{
+        try{
+            const result = await this.getPostDocumentById(postId)
+            console.log(result);
+            return {
+                _id: result._id.toString(),
+                content: result.content,
+                tags: result.tags,
+                category: result.category,
+                author: (await result.populate('author')).author,
+                createdAt: result.createdAt.toISOString()
+            }
         } catch (err) {
             console.error(err);
         }

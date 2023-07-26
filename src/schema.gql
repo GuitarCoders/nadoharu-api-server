@@ -129,6 +129,7 @@ type Query {
   getSentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
+  getPost(postId: String!): Post!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }

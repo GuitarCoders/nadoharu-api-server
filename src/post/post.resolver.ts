@@ -4,7 +4,7 @@ import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { Arg } from 'type-graphql';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, Filter, GetPostsDto, GetPostsResultDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, Filter, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
 import { PostService } from './post.service';
 
 @Resolver()
@@ -13,6 +13,24 @@ export class PostResolver {
         private readonly PostService: PostService
     ) {}
 
+    @Query(() => PostDto, { name: "getPost"})
+    @UseGuards(GqlAuthGuard)
+    async getPost(
+        @CurrentUser() user:UserJwtPayload,
+        @Args('postId') targetPostId: string
+    ): Promise<PostDto> {
+        return await this.PostService.getPostById(targetPostId);
+    }
+    
+    @Query(() => GetPostsResultDto, { name: "getPosts"})
+    @UseGuards(GqlAuthGuard)
+    async getPosts(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('getPostsData') reqData: GetPostsDto
+    ): Promise<GetPostsResultDto> {
+        return await this.PostService.getPosts(user._id, reqData);
+    }
+        
     @Mutation(() => CreatePostResultDto,{ name: "createPost" })
     @UseGuards(GqlAuthGuard)
     async createPost(
@@ -41,12 +59,4 @@ export class PostResolver {
     //     return await this.PostService.getPostsForTimeline(user._id, reqData);
     // }
 
-    @Query(() => GetPostsResultDto, { name: "getPosts"})
-    @UseGuards(GqlAuthGuard)
-    async Test(
-        @CurrentUser() user: UserJwtPayload,
-        @Args('getPostsData') reqData: GetPostsDto
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, reqData);
-    }
 }
