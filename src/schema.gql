@@ -115,7 +115,7 @@ type Comment {
 
 type Comments {
   comments: [Comment!]!
-  lastDateTime: String!
+  hasNext: Boolean!
 }
 
 type deleteCommentResult {

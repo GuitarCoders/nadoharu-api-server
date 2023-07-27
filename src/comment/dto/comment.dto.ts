@@ -26,8 +26,8 @@ export class CommentsDto{
     @Field(() => [CommentDto])
     comments: CommentDto[];
 
-    @Field(() => String)
-    lastDateTime: String;
+    @Field(() => Boolean)
+    hasNext: boolean;
 }
 
 @InputType('addCommentData')
