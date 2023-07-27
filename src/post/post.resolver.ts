@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
-import { Arg } from 'type-graphql';
+import { Arg, Int } from 'type-graphql';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, Filter, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
 import { PostService } from './post.service';
 
@@ -29,6 +29,16 @@ export class PostResolver {
         @Args('getPostsData') reqData: GetPostsDto
     ): Promise<GetPostsResultDto> {
         return await this.PostService.getPosts(user._id, reqData);
+    }
+
+    @Query(() => GetPostsResultDto, { name: "getPostsFromMe"})
+    @UseGuards(GqlAuthGuard)
+    async getPostsFromMe(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('count', {type: () => Int}) count: number,
+        @Args('before', {type: () => String, nullable: true}) before?: string
+    ): Promise<GetPostsResultDto> {
+        return await this.PostService.getPosts(user._id, {count: count, filter:{userId: user._id, before:before}});
     }
         
     @Mutation(() => CreatePostResultDto,{ name: "createPost" })

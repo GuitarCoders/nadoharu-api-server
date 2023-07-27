@@ -132,6 +132,7 @@ type Query {
   getFriends(filter: getFriendsData!): Friends!
   getPost(postId: String!): Post!
   getPosts(getPostsData: GetPosts!): GetPostsResult!
+  getPostsFromMe(count: Int!, before: String): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }
 
