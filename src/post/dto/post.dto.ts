@@ -67,8 +67,8 @@ export class GetPostsResultDto{
     @Field(() => [PostDto])
     posts: PostDto[];
 
-    @Field(() => String)
-    lastDateTime: string;
+    @Field(() => String, {nullable: true})
+    lastDateTime?: string;
 
     @Field(() => Boolean)
     hasNext: boolean;

@@ -83,7 +83,7 @@ type Post {
 
 type GetPostsResult {
   posts: [Post!]!
-  lastDateTime: String!
+  lastDateTime: String
   hasNext: Boolean!
 }
 

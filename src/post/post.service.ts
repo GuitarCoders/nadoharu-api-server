@@ -75,11 +75,11 @@ export class PostService {
                 createdAt: item.createdAt.toISOString()
             }));
 
-            const lastDateTime =  resultPostModels.at(-1).createdAt
+            const lastDateTime = resultPostModels.at(-1)?.createdAt.toISOString();
 
             return { 
                 posts:result, 
-                lastDateTime: lastDateTime.toISOString(),
+                lastDateTime: lastDateTime,
                 hasNext: (leftCount > data.count)
             };
         } catch (err) {
