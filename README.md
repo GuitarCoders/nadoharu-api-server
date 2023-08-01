@@ -1,5 +1,5 @@
 <h1 align="center">
-  ☀️ 나도하루 프론트엔드
+  ☀️ 나도하루 API Server
 </h1>
 
 Nest.JS와 GraphQL을 사용해보고 싶어 만든 마이크로 블로그형 SNS '나도하루'의 API Server입니다. 
