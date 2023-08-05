@@ -88,4 +88,14 @@ export class CommentService {
             console.error(err);
         }
     }
+
+    async getCommentsCount(targetPostId: string): Promise<number>{
+        try{
+            const commentCount = await this.CommentModel.find({post: targetPostId}).count();
+
+            return commentCount;
+        } catch (err) {
+            console.error(err);
+        }
+    }
 }

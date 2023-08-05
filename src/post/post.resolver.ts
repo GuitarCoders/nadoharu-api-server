@@ -26,9 +26,10 @@ export class PostResolver {
     @UseGuards(GqlAuthGuard)
     async getPosts(
         @CurrentUser() user: UserJwtPayload,
+        @Args('targetUserId', {nullable: true}) targetUserId: string,
         @Args('getPostsData') reqData: GetPostsDto
     ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, reqData);
+        return await this.PostService.getPosts(user._id, reqData, targetUserId);
     }
 
     @Query(() => GetPostsResultDto, { name: "getPostsFromMe"})
@@ -38,7 +39,7 @@ export class PostResolver {
         @Args('count', {type: () => Int}) count: number,
         @Args('before', {type: () => String, nullable: true}) before?: string
     ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, {count: count, filter:{userId: user._id, before:before}});
+        return await this.PostService.getPosts(user._id, {count: count, filter:{before:before}}, user._id);
     }
         
     @Mutation(() => CreatePostResultDto,{ name: "createPost" })

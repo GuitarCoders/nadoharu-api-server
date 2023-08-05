@@ -131,7 +131,7 @@ type Query {
   getReceiveFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
   getPost(postId: String!): Post!
-  getPosts(getPostsData: GetPosts!): GetPostsResult!
+  getPosts(targetUserId: String, getPostsData: GetPosts!): GetPostsResult!
   getPostsFromMe(count: Int!, before: String): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }
@@ -148,7 +148,6 @@ input GetPosts {
 }
 
 input getPostFilter {
-  userId: String
   category: String
   before: String
 }

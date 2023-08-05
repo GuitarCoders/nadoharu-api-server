@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Query } from 'mongoose';
+import { CommentService } from 'src/comment/comment.service';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
@@ -9,7 +10,6 @@ import { Post, PostDocument } from './schemas/post.schema';
 @Injectable()
 export class PostService {
     constructor(
-        private userService: UserService,
         private friendService: FriendService,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
@@ -33,6 +33,7 @@ export class PostService {
                 tags: result.tags,
                 category: result.category,
                 author: (await result.populate('author')).author,
+                // commentsCount: await this.commentService.getCommentsCount(result._id.toString()),
                 createdAt: result.createdAt.toISOString()
             }
         } catch (err) {
@@ -41,7 +42,7 @@ export class PostService {
     }
 
     
-    async getPosts(userId: string, data: GetPostsDto): Promise<GetPostsResultDto>{
+    async getPosts(userId: string, data: GetPostsDto, targetUserId?:string): Promise<GetPostsResultDto>{
         try {
             const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
@@ -50,9 +51,9 @@ export class PostService {
             console.log(friends);
             const inQueryModel = this.PostModel.find({});
 
-            if ( data.filter?.userId ){
-                inQueryModel.where('author').equals(data.filter.userId);
-                if ( data.filter.category ){
+            if ( targetUserId ){
+                inQueryModel.where('author').equals(targetUserId);
+                if ( data.filter?.category ){
                     inQueryModel.where('category').equals(data.filter.category);
                 }
             } else {
@@ -66,13 +67,16 @@ export class PostService {
             const leftCount = await (new (inQueryModel.toConstructor())).count();
 
             const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(data.count).populate('author');
-            const result: PostDto[] = resultPostModels.map( item => ({
-                _id: item._id.toString(),
-                author: item.author,
-                content: item.content,
-                tags: item.tags,
-                category: item.category,
-                createdAt: item.createdAt.toISOString()
+            const result: PostDto[] = await Promise.all(resultPostModels.map( async item => {
+                return {
+                    _id: item._id.toString(),
+                    author: item.author,
+                    content: item.content,
+                    tags: item.tags,
+                    category: item.category,
+                    // commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
+                    createdAt: item.createdAt.toISOString()
+                }
             }));
 
             const lastDateTime = resultPostModels.at(-1)?.createdAt.toISOString();
@@ -109,6 +113,7 @@ export class PostService {
                 category: createdPostResult.category,
                 author: createdPostResult.author,
                 createdAt: createdPostResult.createdAt.toISOString(),
+                // commentsCount: 0,
                 success: true,
             }
         } catch (err) {
