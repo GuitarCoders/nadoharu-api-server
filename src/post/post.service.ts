@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Query } from 'mongoose';
 import { CommentService } from 'src/comment/comment.service';
@@ -8,11 +9,17 @@ import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto,
 import { Post, PostDocument } from './schemas/post.schema';
 
 @Injectable()
-export class PostService {
+export class PostService implements OnModuleInit {
+    private commentService: CommentService;
     constructor(
         private friendService: FriendService,
+        private moduleRef: ModuleRef,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
+
+    onModuleInit() {
+        this.commentService = this.moduleRef.get(CommentService, {strict: false});
+    }
 
     async getPostDocumentById(postId: string): Promise<PostDocument>{
         try{
@@ -33,7 +40,7 @@ export class PostService {
                 tags: result.tags,
                 category: result.category,
                 author: (await result.populate('author')).author,
-                // commentsCount: await this.commentService.getCommentsCount(result._id.toString()),
+                commentsCount: await this.commentService.getCommentsCount(result._id.toString()),
                 createdAt: result.createdAt.toISOString()
             }
         } catch (err) {
@@ -74,7 +81,7 @@ export class PostService {
                     content: item.content,
                     tags: item.tags,
                     category: item.category,
-                    // commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
+                    commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
                     createdAt: item.createdAt.toISOString()
                 }
             }));
@@ -113,7 +120,7 @@ export class PostService {
                 category: createdPostResult.category,
                 author: createdPostResult.author,
                 createdAt: createdPostResult.createdAt.toISOString(),
-                // commentsCount: 0,
+                commentsCount: 0,
                 success: true,
             }
         } catch (err) {

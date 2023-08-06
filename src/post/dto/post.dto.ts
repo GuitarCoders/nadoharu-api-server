@@ -21,8 +21,8 @@ export class PostDto{
     @Field(() => String)
     category: string;
 
-    // @Field(() => Int)
-    // commentsCount: number;
+    @Field(() => Int)
+    commentsCount: number;
 
     @Field(() => String)
     createdAt: string;

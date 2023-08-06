@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
@@ -7,12 +8,17 @@ import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentRes
 import { Comment } from './schemas/comment.schema';
 
 @Injectable()
-export class CommentService {
+export class CommentService implements OnModuleInit {
+    private PostService: PostService;
     constructor(
         private readonly UserService: UserService,
-        private readonly PostService: PostService,
+        private moduleRef: ModuleRef,
         @InjectModel(Comment.name) private CommentModel: Model<Comment>
     ) {}
+
+    onModuleInit() {
+        this.PostService = this.moduleRef.get(PostService, {strict: false});
+    }
 
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
         try {

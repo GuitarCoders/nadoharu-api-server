@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CommentResolver } from './comment.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -9,7 +9,7 @@ import { UserModule } from 'src/user/user.module';
 @Module({
   imports:[
     MongooseModule.forFeature([{name: Comment.name, schema: CommentSchema}]),
-    PostModule,
+    forwardRef(() => PostModule),
     UserModule
   ],
   providers: [CommentService, CommentResolver],

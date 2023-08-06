@@ -30,11 +30,18 @@ export class Post {
     category: string;
 
     @Prop({
+        required: false,
+        type: mongoose.Schema.Types.Number
+    })
+    hasCommentCount: number;
+
+    @Prop({
         required: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     })
     author: UserDocument;
+
     
     @Prop({
         type: mongoose.Schema.Types.Date

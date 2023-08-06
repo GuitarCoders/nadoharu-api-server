@@ -72,39 +72,6 @@ type Friends {
   friends: [Friend!]!
 }
 
-type Post {
-  _id: String!
-  author: User!
-  content: String!
-  tags: String
-  category: String!
-  createdAt: String!
-}
-
-type GetPostsResult {
-  posts: [Post!]!
-  lastDateTime: String
-  hasNext: Boolean!
-}
-
-type CreatePostResult {
-  _id: String!
-  author: User!
-  content: String!
-  tags: String
-  category: String!
-  createdAt: String!
-  success: Boolean!
-}
-
-type DeletePostResult {
-  success: Boolean!
-}
-
-type addAllUserInFriendResult {
-  success: Boolean!
-}
-
 type Comment {
   _id: String!
   content: String!
@@ -120,6 +87,41 @@ type Comments {
 }
 
 type deleteCommentResult {
+  success: Boolean!
+}
+
+type Post {
+  _id: String!
+  author: User!
+  content: String!
+  tags: String
+  category: String!
+  commentsCount: Int!
+  createdAt: String!
+}
+
+type GetPostsResult {
+  posts: [Post!]!
+  lastDateTime: String
+  hasNext: Boolean!
+}
+
+type CreatePostResult {
+  _id: String!
+  author: User!
+  content: String!
+  tags: String
+  category: String!
+  commentsCount: Int!
+  createdAt: String!
+  success: Boolean!
+}
+
+type DeletePostResult {
+  success: Boolean!
+}
+
+type addAllUserInFriendResult {
   success: Boolean!
 }
 
@@ -167,9 +169,9 @@ type Mutation {
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
   createPost(createPostData: CreatePost!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
-  addAllUserInFriend: addAllUserInFriendResult!
   addCommentToPost(targetPostId: String!, content: String!): Comment!
   deleteCommentById(targetCommentId: String!): deleteCommentResult!
+  addAllUserInFriend: addAllUserInFriendResult!
 }
 
 input UserUpdate {
