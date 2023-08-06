@@ -47,16 +47,17 @@ export class CommentService {
         try {
             // const commentDocuments = await this.CommentModel.find({post: targetPostId}).sort({createdAt: 1}).populate('commenter');
 
-            const commentCount = await this.CommentModel.find({post: targetPostId}).count();
+            const commentTotalCount = await this.CommentModel.find({post: targetPostId}).count();
             
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
             if(options.skip) {
                 commentQuery.skip(options.skip);
             }
             commentQuery.limit(options.limit);
+
             const commentDocuments = await commentQuery.populate('commenter');
 
-            console.log(`commentCount: ${commentCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
+            console.log(`commentCount: ${commentTotalCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
             
             const result: CommentDto[] = commentDocuments.map(item => ({
                 _id: item._id.toString(),
@@ -67,7 +68,8 @@ export class CommentService {
             }))
             return {
                 comments: result,
-                hasNext: commentCount > (options.skip?options.skip:0 + options.limit)
+                hasNext: commentTotalCount > (options.skip?options.skip:0 + options.limit),
+                totalCount: commentTotalCount 
             };
         } catch (err) {
             console.error(err);

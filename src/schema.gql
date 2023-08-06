@@ -116,6 +116,7 @@ type Comment {
 type Comments {
   comments: [Comment!]!
   hasNext: Boolean!
+  totalCount: Int!
 }
 
 type deleteCommentResult {

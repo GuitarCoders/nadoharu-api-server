@@ -28,6 +28,9 @@ export class CommentsDto{
 
     @Field(() => Boolean)
     hasNext: boolean;
+
+    @Field(() => Int)
+    totalCount: Number;
 }
 
 @InputType('addCommentData')
