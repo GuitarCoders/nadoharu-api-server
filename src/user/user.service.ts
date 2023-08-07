@@ -31,7 +31,7 @@ export class UserService {
 
     async findUsers(search: string): Promise<UsersSafeDto> {
         try {
-            const result = await this.userModel.find({name: { $regex: new RegExp(`${search}`)}});
+            const result = await this.userModel.find({name: { $regex: new RegExp(`${search}`, 'i')}});
 
             console.log(result);
             
