@@ -72,12 +72,31 @@ type Friends {
   friends: [Friend!]!
 }
 
+type Comment {
+  _id: String!
+  content: String!
+  postId: String!
+  Commenter: User!
+  createdAt: String!
+}
+
+type Comments {
+  comments: [Comment!]!
+  hasNext: Boolean!
+  totalCount: Int!
+}
+
+type deleteCommentResult {
+  success: Boolean!
+}
+
 type Post {
   _id: String!
   author: User!
   content: String!
   tags: String
   category: String!
+  commentsCount: Int!
   createdAt: String!
 }
 
@@ -93,6 +112,7 @@ type CreatePostResult {
   content: String!
   tags: String
   category: String!
+  commentsCount: Int!
   createdAt: String!
   success: Boolean!
 }
@@ -105,23 +125,6 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
-type Comment {
-  _id: String!
-  content: String!
-  postId: String!
-  Commenter: User!
-  createdAt: String!
-}
-
-type Comments {
-  comments: [Comment!]!
-  hasNext: Boolean!
-}
-
-type deleteCommentResult {
-  success: Boolean!
-}
-
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -131,7 +134,7 @@ type Query {
   getReceiveFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
   getPost(postId: String!): Post!
-  getPosts(getPostsData: GetPosts!): GetPostsResult!
+  getPosts(targetUserId: String, getPostsData: GetPosts!): GetPostsResult!
   getPostsFromMe(count: Int!, before: String): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
 }
@@ -148,7 +151,6 @@ input GetPosts {
 }
 
 input getPostFilter {
-  userId: String
   category: String
   before: String
 }
@@ -167,9 +169,9 @@ type Mutation {
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
   createPost(createPostData: CreatePost!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
-  addAllUserInFriend: addAllUserInFriendResult!
   addCommentToPost(targetPostId: String!, content: String!): Comment!
   deleteCommentById(targetCommentId: String!): deleteCommentResult!
+  addAllUserInFriend: addAllUserInFriendResult!
 }
 
 input UserUpdate {

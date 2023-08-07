@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
@@ -7,12 +8,17 @@ import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentRes
 import { Comment } from './schemas/comment.schema';
 
 @Injectable()
-export class CommentService {
+export class CommentService implements OnModuleInit {
+    private PostService: PostService;
     constructor(
         private readonly UserService: UserService,
-        private readonly PostService: PostService,
+        private moduleRef: ModuleRef,
         @InjectModel(Comment.name) private CommentModel: Model<Comment>
     ) {}
+
+    onModuleInit() {
+        this.PostService = this.moduleRef.get(PostService, {strict: false});
+    }
 
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
         try {
@@ -47,16 +53,17 @@ export class CommentService {
         try {
             // const commentDocuments = await this.CommentModel.find({post: targetPostId}).sort({createdAt: 1}).populate('commenter');
 
-            const commentCount = await this.CommentModel.find({post: targetPostId}).count();
+            const commentTotalCount = await this.CommentModel.find({post: targetPostId}).count();
             
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
             if(options.skip) {
                 commentQuery.skip(options.skip);
             }
             commentQuery.limit(options.limit);
+
             const commentDocuments = await commentQuery.populate('commenter');
 
-            console.log(`commentCount: ${commentCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
+            console.log(`commentCount: ${commentTotalCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
             
             const result: CommentDto[] = commentDocuments.map(item => ({
                 _id: item._id.toString(),
@@ -67,7 +74,8 @@ export class CommentService {
             }))
             return {
                 comments: result,
-                hasNext: commentCount > (options.skip?options.skip:0 + options.limit)
+                hasNext: commentTotalCount > (options.skip?options.skip:0 + options.limit),
+                totalCount: commentTotalCount 
             };
         } catch (err) {
             console.error(err);
@@ -84,6 +92,16 @@ export class CommentService {
             await targetCommentDocument.delete();
 
             return {success: true}
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async getCommentsCount(targetPostId: string): Promise<number>{
+        try{
+            const commentCount = await this.CommentModel.find({post: targetPostId}).count();
+
+            return commentCount;
         } catch (err) {
             console.error(err);
         }

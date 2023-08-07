@@ -21,6 +21,9 @@ export class PostDto{
     @Field(() => String)
     category: string;
 
+    @Field(() => Int)
+    commentsCount: number;
+
     @Field(() => String)
     createdAt: string;
 }
@@ -33,9 +36,6 @@ export class PostArrayDto{
 
 @InputType('getPostFilter')
 export class Filter{
-    @Field(() => String, { nullable: true })
-    userId?: string;
-
     @Field(() => String, { nullable: true })
     category?: string;
 

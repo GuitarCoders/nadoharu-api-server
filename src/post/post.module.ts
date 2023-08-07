@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CommentModule } from 'src/comment/comment.module';
 import { FriendModule } from 'src/friend/friend.module';
 import { UserModule } from 'src/user/user.module';
 import { PostResolver } from './post.resolver';
@@ -10,6 +11,7 @@ import { Post, PostSchema } from './schemas/post.schema';
   imports: [
     UserModule,
     FriendModule,
+    forwardRef(() => CommentModule),
     MongooseModule.forFeature([{name: Post.name, schema: PostSchema}])
   ],
   providers: [PostResolver, PostService],
