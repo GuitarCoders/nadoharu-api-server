@@ -19,7 +19,7 @@ export class TestResolver {
     async addAllUserInFriend(
         @CurrentUser() user: UserJwtPayload,
     ): Promise<result> {
-        const allUserDocuments = await this.userService.getAllUsers();
+        const allUserDocuments = await this.userService.getUsers();
 
         const filteredUserDocuments = allUserDocuments.filter(item => (user._id !== item._id.toString()));
 
