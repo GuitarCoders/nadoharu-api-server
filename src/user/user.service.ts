@@ -20,10 +20,25 @@ export class UserService {
         }
     }
 
-    async getAllUsers(): Promise<UserDocument[]> {
+    async getUsers(search?: string): Promise<UserDocument[]> {
         try {
             const result = await this.userModel.find();
             return result;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async findUsers(search: string): Promise<UsersSafeDto> {
+        try {
+            const findRegExp = new RegExp(`${search}`, 'i');
+            const result = await this.userModel.find({ $or: [
+                {name: { $regex: findRegExp }},
+                {account_id: { $regex: findRegExp} }
+            ]});
+            
+            
+            return {Users: result.map( item => this.userDocumentToUserSafe(item))};
         } catch (err) {
             console.error(err);
         }

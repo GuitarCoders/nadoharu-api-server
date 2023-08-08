@@ -33,6 +33,15 @@ export class UserResolver {
         return await this.UserService.getUserByIdSafe(user._id);
     }
 
+    @Query(() => UsersSafeDto, { name: 'users'})
+    @UseGuards(GqlAuthGuard)
+    async getUsers(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('search') search: string
+    ): Promise<UsersSafeDto> {
+        return await this.UserService.findUsers(search);
+    }
+
     @Mutation(() => UserUpdateResultDto, { name: 'updateUser'})
     @UseGuards(GqlAuthGuard)
     async updateUser(
