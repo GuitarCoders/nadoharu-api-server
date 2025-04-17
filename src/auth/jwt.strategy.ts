@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: any) { //웬만하면 타입을 만들어주자
+    async validate(payload: any) { // TODO : 웬만하면 타입을 만들어주자
         return { _id: payload._id, account_id: payload.account_id };
     }
 }

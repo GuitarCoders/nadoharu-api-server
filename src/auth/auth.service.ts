@@ -13,38 +13,17 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    //인증 관련 Object, Model 구성정보 만들기 (constructor)
     constructor(
         private userService: UserService,
         private jwtService: JwtService
     ) {}
 
     async validateUser(reqLogin: LoginRequest): Promise<UserSafeDto> {
-        const loginUser = await this.userService.getUserByAccountId(reqLogin.account_id);
-        const isValidPwd = await Bcrypt.compare(reqLogin.password, loginUser.pwd_hash);
-
-        if (loginUser && isValidPwd) {
-            const result = {
-                _id: loginUser._id.toString(),
-                name: loginUser.name,
-                email: loginUser.email,
-                account_id: loginUser.account_id,
-                about_me: loginUser.about_me,
-            }
-            return result
-        }
-
-        return null;
-    }
-
-    async login(reqLogin: LoginRequest): Promise<LoginResponse> {
         try {
-            
             const loginUser = await this.userService.getUserByAccountId(reqLogin.account_id);
-
             // TODO : loginUser가 값을 받아오지 못할 경우(아이디 없음)에 대한 처리
             if (!loginUser) {
-                // TODK : 상세한 에러 전달
+                // TODO : 상세한 에러 전달
                 throw new Error("계정 정보가 일치하지 않음");
             }
 
@@ -52,6 +31,30 @@ export class AuthService {
                 // TODO : 상세한 에러 전달
                 throw new Error("비밀번호 오류"); 
             }
+            //TODO : 아래 내용은 적절히 지우자
+            const isValidPwd = await Bcrypt.compare(reqLogin.password, loginUser.pwd_hash);
+
+            if (loginUser && isValidPwd) {
+                const result = {
+                    _id: loginUser._id.toString(),
+                    name: loginUser.name,
+                    email: loginUser.email,
+                    account_id: loginUser.account_id,
+                    about_me: loginUser.about_me,
+                }
+                return result
+            }
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+        
+    }
+
+    async login(reqLogin: LoginRequest): Promise<LoginResponse> {
+        try {
+            
+            const loginUser = await this.validateUser(reqLogin);
 
             const jwtPayload = {
                 _id: loginUser._id,
@@ -59,11 +62,7 @@ export class AuthService {
             }
 
             const resUser: LoginResponse = {
-                _id: loginUser._id.toString(),
-                name: loginUser.name,
-                email: loginUser.email,
-                account_id: loginUser.account_id,
-                about_me: loginUser.about_me,
+                ... loginUser, 
                 status: "success",
                 jwt_token: this.jwtService.sign(jwtPayload)
             }
@@ -72,24 +71,7 @@ export class AuthService {
 
         } catch (err) {
             console.error(err);
-            const resUser: LoginResponse = {
-                _id: "",
-                name: "",
-                email: "",
-                account_id: "",
-                about_me: "",
-                status: "failed",
-                jwt_token: ""
-            }
-
-            return resUser;
         }
     }
 
-    // async login(user: any) {
-    //     const payload = { username: user.username, sub: user.userId};
-    //     return {
-    //         access_token: this.jwtService.sign(payload)
-    //     };
-    // }
 }
