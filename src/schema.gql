@@ -131,7 +131,13 @@ type addAllUserInFriendResult {
 
 type UserInfo {
   user: User!
-  isFriend: Boolean!
+  isFriend: FriendState!
+}
+
+enum FriendState {
+  FRIEND
+  ME
+  STRANGER
 }
 
 type Query {
