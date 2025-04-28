@@ -129,6 +129,11 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
+type UserInfo {
+  user: User!
+  isFriend: Boolean!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -142,6 +147,7 @@ type Query {
   getPosts(targetUserId: String, getPostsData: GetPosts!): GetPostsResult!
   getPostsFromMe(count: Int!, before: String): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
+  getUserInfo(userId: String!): UserInfo!
 }
 
 input getFriendsData {
