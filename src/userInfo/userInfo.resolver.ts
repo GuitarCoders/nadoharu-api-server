@@ -13,7 +13,7 @@ export class UserInfoResolver {
         private readonly UserInfoService: UserInfoService
     ) {}
 
-    @Query(() => UserInfoDto, { name: 'getUserInfo'})
+    @Query(() => UserInfoDto, { name: 'userInfo'})
     @UseGuards(GqlAuthGuard)
     async getUserInfo(
         @CurrentUser() user:UserJwtPayload,
