@@ -16,7 +16,7 @@ export class UserInfoService {
         search: string
     ): Promise<UserInfosDto> {
         try {
-            const users = await this.UserService.findUsers(search)
+            const users = await this.UserService.findUsers(search);
             const userInfoPromises: Promise<UserInfoDto>[] = users.Users.map(async(user) => {
                 const isFriend = await this.getFriendState(requestUserId, user._id);
                 return {

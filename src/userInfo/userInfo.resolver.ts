@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
-import { UserInfoDto } from "./dto/userInfo.dto";
+import { UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "src/auth/gql-auth.guard";
 import { UserJwtPayload } from "src/auth/models/auth.model";
@@ -16,9 +16,18 @@ export class UserInfoResolver {
     @Query(() => UserInfoDto, { name: 'userInfo'})
     @UseGuards(GqlAuthGuard)
     async getUserInfo(
-        @CurrentUser() user:UserJwtPayload,
+        @CurrentUser() user: UserJwtPayload,
         @Args('userId') userId: string
     ): Promise<UserInfoDto> {
         return this.UserInfoService.getUserInfo(user._id, userId);
+    }
+
+    @Query(() => UserInfosDto, { name: 'userInfos'})
+    @UseGuards(GqlAuthGuard)
+    async getUserInfos(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('search') search: string
+    ): Promise<UserInfosDto> {
+        return this.UserInfoService.getUserInfos(user._id, search);
     }
 }
