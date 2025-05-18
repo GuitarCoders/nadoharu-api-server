@@ -78,4 +78,23 @@ export class FriendService {
 
         }
     }
+
+    async checkFriend(userId_1: string, userId_2: string): Promise<boolean> {
+        try {
+            const friendDocument = await this.FriendModel.findOne({
+                owner: userId_1,
+                friend: userId_2
+            })
+
+            console.log(friendDocument);
+
+            if(!friendDocument){
+                return false;
+            } else {
+                return true;
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
 }
