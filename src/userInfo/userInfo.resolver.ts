@@ -30,4 +30,12 @@ export class UserInfoResolver {
     ): Promise<UserInfosDto> {
         return this.UserInfoService.getUserInfos(user._id, search);
     }
+
+    @Query(() => UserInfoDto, { name: 'me'})
+    @UseGuards(GqlAuthGuard)
+    async getTokenOwnerUserInfo(
+        @CurrentUser() user: UserJwtPayload
+    ): Promise<UserInfoDto> {
+        return this.UserInfoService.getUserInfo(user._id, user._id);
+    }
 }

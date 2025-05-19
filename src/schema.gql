@@ -161,6 +161,7 @@ type Query {
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfosDto!
+  me: UserInfo!
 }
 
 input getFriendsData {
