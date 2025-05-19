@@ -3,12 +3,14 @@ import { FriendService } from "src/friend/friend.service";
 import { UserService } from "src/user/user.service";
 import { UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { FriendState } from "./enums/userInfo.enum";
+import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 
 @Injectable()
 export class UserInfoService {
     constructor (
         private UserService: UserService,
-        private FriendService: FriendService
+        private FriendService: FriendService,
+        private FriendRequestService: FriendRequestService
     ) {}
 
     async getUserInfos(
@@ -16,12 +18,21 @@ export class UserInfoService {
         search: string
     ): Promise<UserInfosDto> {
         try {
-            const users = await this.UserService.findUsers(search)
+            const users = await this.UserService.findUsers(search);
+            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
             const userInfoPromises: Promise<UserInfoDto>[] = users.Users.map(async(user) => {
+                
                 const isFriend = await this.getFriendState(requestUserId, user._id);
+                const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
+                    (friendRequest) => (friendRequest.receiveUser._id === user._id)
+                ) === -1 ? false : true;
+                const friendCount = await this.FriendService.getFriendCount(user._id);
+
                 return {
                     user,
-                    isFriend
+                    isFriend,
+                    isFriendRequested,
+                    friendCount
                 }
             });
             const userInfos: UserInfoDto[] = await Promise.all(userInfoPromises);
@@ -35,6 +46,18 @@ export class UserInfoService {
         }
     }
 
+    async getUserInfoByAccountId (
+        requestUserId: string,
+        accountId: string
+    ): Promise<UserInfoDto> {
+        try {
+            const targetUserId = (await this.UserService.getUserByAccountIdSafe(accountId))._id;
+            return await this.getUserInfo(requestUserId, targetUserId)
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     async getUserInfo(
         requestUserId: string, 
         targetUserId: string
@@ -42,10 +65,17 @@ export class UserInfoService {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);
+            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
+            const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
+                    (friendRequest) => (friendRequest.receiveUser._id === targetUserId)
+                ) === -1 ? false : true;
+            const friendCount = await this.FriendService.getFriendCount(targetUserId);
             
             return {
                 user: targetUser,
-                isFriend
+                isFriend,
+                isFriendRequested,
+                friendCount
             }
             
         } catch (err) {
