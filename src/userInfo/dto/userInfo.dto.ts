@@ -2,7 +2,7 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { FriendState } from "../enums/userInfo.enum";
 
-@ObjectType()
+@ObjectType('UserInfos')
 export class UserInfosDto {
     @Field(() => [UserInfoDto])
     users: UserInfoDto[];
