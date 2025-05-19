@@ -97,4 +97,16 @@ export class FriendService {
             console.error(err);
         }
     }
+
+    async getFriendCount(userId: string) {
+        try {
+            const friendCount = await this.FriendModel.count({
+                owner:userId
+            });
+
+            return friendCount;
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }

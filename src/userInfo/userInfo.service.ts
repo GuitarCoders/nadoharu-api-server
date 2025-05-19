@@ -19,9 +19,11 @@ export class UserInfoService {
             const users = await this.UserService.findUsers(search);
             const userInfoPromises: Promise<UserInfoDto>[] = users.Users.map(async(user) => {
                 const isFriend = await this.getFriendState(requestUserId, user._id);
+                const friendCount = await this.FriendService.getFriendCount(user._id);
                 return {
                     user,
-                    isFriend
+                    isFriend,
+                    friendCount
                 }
             });
             const userInfos: UserInfoDto[] = await Promise.all(userInfoPromises);
@@ -42,10 +44,12 @@ export class UserInfoService {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);
+            const friendCount = await this.FriendService.getFriendCount(targetUserId);
             
             return {
                 user: targetUser,
-                isFriend
+                isFriend,
+                friendCount
             }
             
         } catch (err) {
