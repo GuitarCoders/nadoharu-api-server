@@ -162,6 +162,7 @@ type Query {
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfosDto!
   me: UserInfo!
+  userInfoByAccountId(accountId: String!): UserInfo!
 }
 
 input getFriendsData {

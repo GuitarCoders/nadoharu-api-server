@@ -46,6 +46,18 @@ export class UserInfoService {
         }
     }
 
+    async getUserInfoByAccountId (
+        requestUserId: string,
+        accountId: string
+    ): Promise<UserInfoDto> {
+        try {
+            const targetUserId = (await this.UserService.getUserByAccountIdSafe(accountId))._id;
+            return await this.getUserInfo(requestUserId, targetUserId)
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     async getUserInfo(
         requestUserId: string, 
         targetUserId: string

@@ -38,4 +38,13 @@ export class UserInfoResolver {
     ): Promise<UserInfoDto> {
         return this.UserInfoService.getUserInfo(user._id, user._id);
     }
+
+    @Query(() => UserInfoDto, { name: 'userInfoByAccountId'})
+    @UseGuards(GqlAuthGuard)
+    async getUserInfoByAccountId(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('accountId') accountId: string 
+    ): Promise<UserInfoDto> {
+        return this.UserInfoService.getUserInfoByAccountId(user._id, accountId);
+    }
 }
