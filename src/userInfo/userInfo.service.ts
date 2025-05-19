@@ -53,8 +53,10 @@ export class UserInfoService {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);
-            const requestedFriendRequest = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
-            const isFriendRequested = requestedFriendRequest != null;
+            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
+            const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
+                    (friendRequest) => (friendRequest.receiveUser._id === targetUserId)
+                ) === -1 ? false : true;
             const friendCount = await this.FriendService.getFriendCount(targetUserId);
             
             return {
