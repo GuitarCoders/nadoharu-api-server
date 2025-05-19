@@ -22,3 +22,21 @@ export class UserInfoDto {
     @Field(() => Int)
     friendCount: Number;
 }
+
+@ObjectType('AboutMe')
+export class AboutMeDto{
+    @Field(() => UserSafeDto)
+    user: UserSafeDto;
+
+    @Field(() => FriendState)
+    isFriend: FriendState;
+
+    @Field(() => Boolean)
+    isFriendRequested: boolean;
+
+    @Field(() => Int)
+    friendCount: Number;
+
+    @Field(() => Int)
+    receivedFriendRequestCount: Number;
+}

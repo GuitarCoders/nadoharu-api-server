@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { FriendService } from "src/friend/friend.service";
 import { UserService } from "src/user/user.service";
-import { UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
+import { AboutMeDto, UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { FriendState } from "./enums/userInfo.enum";
 import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 
@@ -58,10 +58,27 @@ export class UserInfoService {
         }
     }
 
+    async getUserInfoAboutMe(
+        requestUserId: string
+    ): Promise<AboutMeDto> {
+        try {
+            const userInfoAboutMe = await this.getUserInfo(requestUserId, requestUserId);
+            const receivedFriendRequestCount
+                = await this.FriendRequestService.getReceivedFriendRequestCount(requestUserId);
+
+            return {
+                ...userInfoAboutMe,
+                receivedFriendRequestCount
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     async getUserInfo(
         requestUserId: string, 
         targetUserId: string
-    ): Promise<UserInfoDto>{
+    ): Promise<UserInfoDto> {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);

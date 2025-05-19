@@ -99,6 +99,12 @@ export class FriendRequestService {
         }
     }
 
+    async getReceivedFriendRequestCount(receivedUserId: string): Promise<number> {
+        return await this.friendRequestModel.count({
+            receiveUser: receivedUserId
+        });
+    }
+
     // TODO : 파라미터를 두개 받는게 유연한건지 한번 생각해보자.
     async createFriendRequest(
         requestUserId: string,

@@ -129,7 +129,7 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
-type UserInfosDto {
+type UserInfos {
   users: [UserInfo!]!
 }
 
@@ -146,6 +146,14 @@ enum FriendState {
   STRANGER
 }
 
+type AboutMe {
+  user: User!
+  isFriend: FriendState!
+  isFriendRequested: Boolean!
+  friendCount: Int!
+  receivedFriendRequestCount: Int!
+}
+
 type Query {
   userByAccountId(account_id: String!): User!
   userById(id: String!): User!
@@ -160,8 +168,8 @@ type Query {
   getPostsFromMe(count: Int!, before: String): GetPostsResult!
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
   userInfo(userId: String!): UserInfo!
-  userInfos(search: String!): UserInfosDto!
-  me: UserInfo!
+  userInfos(search: String!): UserInfos!
+  me: AboutMe!
   userInfoByAccountId(accountId: String!): UserInfo!
 }
 
