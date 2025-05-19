@@ -136,6 +136,7 @@ type UserInfosDto {
 type UserInfo {
   user: User!
   isFriend: FriendState!
+  isFriendRequested: Boolean!
   friendCount: Int!
 }
 

@@ -16,6 +16,9 @@ export class UserInfoDto {
     @Field(() => FriendState)
     isFriend: FriendState;
 
+    @Field(() => Boolean)
+    isFriendRequested: boolean;
+
     @Field(() => Int)
     friendCount: Number;
 }

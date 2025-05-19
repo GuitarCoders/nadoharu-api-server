@@ -3,12 +3,14 @@ import { FriendService } from "src/friend/friend.service";
 import { UserService } from "src/user/user.service";
 import { UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { FriendState } from "./enums/userInfo.enum";
+import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 
 @Injectable()
 export class UserInfoService {
     constructor (
         private UserService: UserService,
-        private FriendService: FriendService
+        private FriendService: FriendService,
+        private FriendRequestService: FriendRequestService
     ) {}
 
     async getUserInfos(
@@ -17,12 +19,19 @@ export class UserInfoService {
     ): Promise<UserInfosDto> {
         try {
             const users = await this.UserService.findUsers(search);
+            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
             const userInfoPromises: Promise<UserInfoDto>[] = users.Users.map(async(user) => {
+                
                 const isFriend = await this.getFriendState(requestUserId, user._id);
+                const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
+                    (friendRequest) => (friendRequest.receiveUser._id === user._id)
+                ) === -1 ? false : true;
                 const friendCount = await this.FriendService.getFriendCount(user._id);
+
                 return {
                     user,
                     isFriend,
+                    isFriendRequested,
                     friendCount
                 }
             });
@@ -44,11 +53,14 @@ export class UserInfoService {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);
+            const requestedFriendRequest = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
+            const isFriendRequested = requestedFriendRequest != null;
             const friendCount = await this.FriendService.getFriendCount(targetUserId);
             
             return {
                 user: targetUser,
                 isFriend,
+                isFriendRequested,
                 friendCount
             }
             
