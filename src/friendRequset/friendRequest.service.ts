@@ -12,11 +12,10 @@ import {
     AcceptFriendRequestDto,
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
-import { UserSafeDto } from 'src/user/dto/user.dto';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { GraphQLError } from 'graphql';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
+import { NadoharuGraphQLError } from 'src/errors/nadoharuGraphQLError';
 
 @Injectable()
 export class FriendRequestService {
@@ -109,7 +108,9 @@ export class FriendRequestService {
             })
             console.log(alreadyFriendRequests);
             if(alreadyFriendRequests.length > 0) {
-                throw new Error('이미 친구를 신청한 대상입니다.');
+                // throw new Error('이미 친구를 신청한 대상입니다.');
+                // throw new GraphQLError('이미 친구를 신청한 대상입니다.');
+                throw new NadoharuGraphQLError('DUPLICATED_FRIEND_REQUEST');
             }
 
             const createdFriendRequest = new this.friendRequestModel(
@@ -136,12 +137,10 @@ export class FriendRequestService {
                 success: true
             }
         } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
             console.error(err);
-            //TODO: 에러 코드를 프론트엔드 작업자와 합의하여 보낼 것 (처리하기 쉽게)
-            //TODO: 에러에 분기를 만들자
-            // throw new GraphQLError(
-            //     '이미 친구를 신청한 대상입니다.'
-            // );
         }
     }
 
