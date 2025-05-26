@@ -25,12 +25,8 @@ export class FriendRequestArrayDto{
     friendRequests: FriendRequestDto[]; 
 }
 
-//TODO: 이거 그냥 고민해보자 주석 달아놓은거.
 @InputType('CreateFriendRequest')
 export class CreateFriendRequestDto{
-    // @Field(() => String)
-    // requestUserId: string;
-
     @Field(() => String)
     receiveUserId: string;
     

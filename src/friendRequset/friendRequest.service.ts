@@ -95,7 +95,6 @@ export class FriendRequestService {
         });
     }
 
-    // TODO : 파라미터를 두개 받는게 유연한건지 한번 생각해보자.
     async createFriendRequest(
         requestUserId: string,
         createFriendRequestDto: CreateFriendRequestDto
