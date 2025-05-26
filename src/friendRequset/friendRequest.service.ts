@@ -108,8 +108,6 @@ export class FriendRequestService {
             })
             console.log(alreadyFriendRequests);
             if(alreadyFriendRequests.length > 0) {
-                // throw new Error('이미 친구를 신청한 대상입니다.');
-                // throw new GraphQLError('이미 친구를 신청한 대상입니다.');
                 throw new NadoharuGraphQLError('DUPLICATED_FRIEND_REQUEST');
             }
 
