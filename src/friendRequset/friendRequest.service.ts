@@ -16,24 +16,15 @@ import { UserSafeDto } from 'src/user/dto/user.dto';
 import { User, UserDocument } from 'src/user/schemas/user.schema';
 import { GraphQLError } from 'graphql';
 import { FriendService } from 'src/friend/friend.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FriendRequestService {
     constructor(
         private friendService: FriendService,
+        private userService: UserService,
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
-
-    //TODO: 이 함수는 user.service로 넘어감. 여기서 지우고 의존성을 user로 넘기자
-    userDocumentToUserSafe(doc: UserDocument): UserSafeDto{
-        return {
-            _id: doc._id.toString(),
-            name: doc.name,
-            email: doc.email,
-            account_id: doc.account_id,
-            about_me: doc.about_me,
-        }
-    }
 
     async getFriendRequestById(id: string): Promise<FriendRequestDocument> {
         try{
@@ -56,8 +47,8 @@ export class FriendRequestService {
             result.forEach( item => {
                 resultToArray.push({
                     _id: item._id.toString(),
-                    requestUser: this.userDocumentToUserSafe(item.requestUser),
-                    receiveUser: this.userDocumentToUserSafe(item.receiveUser),
+                    requestUser: this.userService.userDocumentToUserSafe(item.requestUser),
+                    receiveUser: this.userService.userDocumentToUserSafe(item.receiveUser),
                     requestMessage: item.requestMessage,
                     createdAt: item.createdAt.toISOString()
                 })
@@ -84,8 +75,8 @@ export class FriendRequestService {
             result.forEach( item => {
                 resultToArray.push({
                     _id: item._id.toString(),
-                    requestUser: this.userDocumentToUserSafe(item.requestUser),
-                    receiveUser: this.userDocumentToUserSafe(item.receiveUser),
+                    requestUser: this.userService.userDocumentToUserSafe(item.requestUser),
+                    receiveUser: this.userService.userDocumentToUserSafe(item.receiveUser),
                     requestMessage: item.requestMessage,
                     createdAt: item.createdAt.toISOString()
                 })
@@ -138,8 +129,8 @@ export class FriendRequestService {
             // return {...createdFriendResult, success: true}
             return {
                 _id: createdFriendResult._id.toString(),
-                requestUser: this.userDocumentToUserSafe(createdFriendResult.requestUser),
-                receiveUser: this.userDocumentToUserSafe(createdFriendResult.receiveUser),
+                requestUser: this.userService.userDocumentToUserSafe(createdFriendResult.requestUser),
+                receiveUser: this.userService.userDocumentToUserSafe(createdFriendResult.receiveUser),
                 requestMessage: createdFriendResult.requestMessage,
                 createdAt: createdFriendResult.createdAt.toISOString(),
                 success: true
