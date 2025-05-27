@@ -25,12 +25,29 @@ export class FriendRequestService {
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
-    async getFriendRequestById(id: string): Promise<FriendRequestDocument> {
+    async getFriendRequestById(requestUserId: string, id: string): Promise<FriendRequestDocument> {
         try{
-            const result = await this.friendRequestModel.findById(id);
+            const result = await this.friendRequestModel.findById(id)
+                .populate('requestUser')
+                .populate('receiveUser');;
+
+            if (!result) {
+                throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_EXIST');
+            }
+            
+            if (
+                result.requestUser._id.toString() !== requestUserId
+                &&
+                result.receiveUser._id.toString() !== requestUserId
+            ) {
+                throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_OWNED');
+            }
 
             return result;
         } catch(err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
             console.error(err);
         }
     }
@@ -111,7 +128,7 @@ export class FriendRequestService {
             })
             
             if(alreadyFriendRequests.length > 0) {
-                throw new NadoharuGraphQLError('DUPLICATED_FRIEND_REQUEST');
+                throw new NadoharuGraphQLError('FRIEND_REQUEST_DUPLICATED');
             }
 
             const createdFriendRequest = new this.friendRequestModel(
@@ -145,18 +162,22 @@ export class FriendRequestService {
         }
     }
 
-    async deleteFriendRequest(deleteFriendRequestDto: DeleteFriendRequestDto): Promise<DeleteFriendRequestResultDto>{
+    async deleteFriendRequest(requestUserId: string, deleteFriendRequestDto: DeleteFriendRequestDto): Promise<DeleteFriendRequestResultDto>{
         try {
-            const targetFriendRequest = await this.getFriendRequestById(deleteFriendRequestDto.friendRequestId);
-            if(!targetFriendRequest) {
-                console.log("해당친추없음");
-            }
+            const targetFriendRequest = await this.getFriendRequestById(
+                requestUserId,
+                deleteFriendRequestDto.friendRequestId
+            );
+            
             await targetFriendRequest.deleteOne();
 
             return {
                 success: true
             }
         } catch(err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
             console.error(err);
         }
     }
@@ -166,15 +187,14 @@ export class FriendRequestService {
         acceptFriendRequestDto: AcceptFriendRequestDto
     ): Promise<AcceptFriendRequestResultDto> {
         try{
-            const targetFriendRequest = await this.friendRequestModel
-                .findById(acceptFriendRequestDto.friendRequestId)
-                .populate('requestUser')
-                .populate('receiveUser');
+            const targetFriendRequest = await this.getFriendRequestById(
+                acceptUserId,
+                acceptFriendRequestDto.friendRequestId
+            );
 
-            console.log(targetFriendRequest);
-
-            if(!targetFriendRequest) {throw new Error('해당 친구신청이 존재하지 않습니다.')}
-            if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {throw new Error('다른사람의 친구신청을 승낙할 수 없습니다.')}
+            if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {
+                throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_RECEIVED');
+            }
 
             this.friendService.addFriend(
                 targetFriendRequest.requestUser._id.toString(),
@@ -185,6 +205,9 @@ export class FriendRequestService {
 
             return {success: true}
         } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
             console.log(err)
             return {success: false}
         }
