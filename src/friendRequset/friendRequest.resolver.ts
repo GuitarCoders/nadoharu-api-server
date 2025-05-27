@@ -72,7 +72,7 @@ export class FriendRequestResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('deleteFriendRequestData') reqData: DeleteFriendRequestDto
     ): Promise<DeleteFriendRequestResultDto> {
-        return await this.FriendRequestService.deleteFriendRequest(reqData);
+        return await this.FriendRequestService.deleteFriendRequest(user._id, reqData);
     }
 
     @Mutation(() => AcceptFriendRequestResultDto, { name: 'acceptFriendRequest' })
