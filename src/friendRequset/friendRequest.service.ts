@@ -101,11 +101,15 @@ export class FriendRequestService {
     ): Promise<CreateFriendRequestResultDto> {
         try{
 
+            if(requestUserId === createFriendRequestDto.receiveUserId) {
+                throw new NadoharuGraphQLError('FRIEND_REQUEST_TO_ME');
+            }
+
             const alreadyFriendRequests = await this.friendRequestModel.find({
                 requestUser: requestUserId,
                 receiveUser: createFriendRequestDto.receiveUserId
             })
-            console.log(alreadyFriendRequests);
+            
             if(alreadyFriendRequests.length > 0) {
                 throw new NadoharuGraphQLError('DUPLICATED_FRIEND_REQUEST');
             }

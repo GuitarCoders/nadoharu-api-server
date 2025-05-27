@@ -13,7 +13,21 @@ export class FriendRequestResolver {
         private readonly FriendRequestService: FriendRequestService
     ) {}
 
-    @Query(() => FriendRequestArrayDto, { name: 'getSentFriendRequests'})
+    /**
+    * @deprecated The method should not be used
+    */
+    @Query(() => FriendRequestArrayDto, {
+        name: 'getSentFriendRequests',
+        deprecationReason: '쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. sentFriendRequests 쿼리가 해당 쿼리를 완벽히 대체합니다.'
+    })
+    @UseGuards(GqlAuthGuard)
+    async getSentFriendRequestsDeprecated(
+        @CurrentUser() user: UserJwtPayload,
+    ): Promise<FriendRequestArrayDto> {
+        return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id);
+    }
+
+    @Query(() => FriendRequestArrayDto, { name: 'sentFriendRequests'})
     @UseGuards(GqlAuthGuard)
     async getSentFriendRequests(
         @CurrentUser() user: UserJwtPayload,
@@ -21,9 +35,23 @@ export class FriendRequestResolver {
         return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id);
     }
 
-    @Query(() => FriendRequestArrayDto, { name: 'getReceiveFriendRequests'})
+    /**
+    * @deprecated Deprecated due to naming mistake. Use `getRecievedFriendRequests()`
+    */
+    @Query(() => FriendRequestArrayDto, { 
+        name: 'getReceiveFriendRequests', 
+        deprecationReason: '쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.'}
+    )
     @UseGuards(GqlAuthGuard)
     async getReceiveFriendRequests(
+        @CurrentUser() user: UserJwtPayload,
+    ): Promise<FriendRequestArrayDto> {
+        return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id);
+    }
+
+    @Query(() => FriendRequestArrayDto, { name: 'receivedFriendRequests'})
+    @UseGuards(GqlAuthGuard)
+    async getReceivedFriendRequests(
         @CurrentUser() user: UserJwtPayload,
     ): Promise<FriendRequestArrayDto> {
         return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id);
