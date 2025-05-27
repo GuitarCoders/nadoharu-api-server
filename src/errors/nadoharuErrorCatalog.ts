@@ -7,6 +7,10 @@ export const NadoharuErrorCatalog = {
         code: 'DUPLICATED_FRIEND_REQUEST',
         defaultMessage: '이미 친구신청을 요청한 대상입니다.'
     },
+    FRIEND_REQUEST_TO_ME: {
+        code: 'FRIEND_REQUEST_TO_ME',
+        defaultMessage: '자기 자신에게 친구신청을 할 수 없습니다.'
+    }
 } as const;
 
 export type NadoharuErrorType = keyof typeof NadoharuErrorCatalog;

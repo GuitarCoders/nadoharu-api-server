@@ -160,8 +160,10 @@ type Query {
   userWhoAmI: User!
   users(search: String!): Users!
   login(username: String!, password: String!): LoginResponse!
-  getSentFriendRequests: FriendRequestArray!
-  getReceiveFriendRequests: FriendRequestArray!
+  getSentFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. sentFriendRequests 쿼리가 해당 쿼리를 완벽히 대체합니다.")
+  sentFriendRequests: FriendRequestArray!
+  getReceiveFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.")
+  receivedFriendRequests: FriendRequestArray!
   getFriends(filter: getFriendsData!): Friends!
   getPost(postId: String!): Post!
   getPosts(targetUserId: String, getPostsData: GetPosts!): GetPostsResult!
