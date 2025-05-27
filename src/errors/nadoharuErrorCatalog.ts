@@ -10,7 +10,18 @@ export const NadoharuErrorCatalog = {
     FRIEND_REQUEST_TO_ME: {
         code: 'FRIEND_REQUEST_TO_ME',
         defaultMessage: '자기 자신에게 친구신청을 할 수 없습니다.'
+    },
+    FRIEND_REQUEST_NOT_OWNED: {
+        code: 'FRIEND_REQUEST_NOT_OWNED',
+        defaultMessage: '해당 친구신청에 접근할 권한이 없습니다.'
+    },
+    FRIEND_REQUEST_NOT_EXIST: {
+        code: 'FRIEND_REQUEST_NOT_EXIST',
+        defaultMessage: '해당 친구신청이 존재하지 않습니다.'
     }
+
+
+
 } as const;
 
 export type NadoharuErrorType = keyof typeof NadoharuErrorCatalog;
