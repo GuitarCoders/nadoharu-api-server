@@ -13,7 +13,10 @@ export class PaginationOffsetInput {
 @InputType()
 export class PaginationTimeInput {
     @Field(() => String, {nullable: true})
-    before?: string;
+    timeCursor?: string;
+
+    @Field(() => PaginationOrder, {nullable: true})
+    order: PaginationOrder;
 
     @Field(() => Int, {nullable: true})
     limit?: number;
@@ -31,5 +34,5 @@ export class PageTimeInfo extends PageInfo {
     timeCursor: string
 
     @Field(() => PaginationOrder)
-    paginationOrder: PaginationOrder
+    boundaryType: PaginationOrder
 }

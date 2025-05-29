@@ -59,8 +59,8 @@ export class PostService implements OnModuleInit {
         try {
             const postsQuery = this.PostModel.find({author: targetUserId})
 
-            if (pagination.before) {
-                postsQuery.lt('createdAt', pagination.before);
+            if (pagination.timeCursor) {
+                postsQuery.lt('createdAt', pagination.timeCursor);
             }
             if (filter.category) {
                 postsQuery.where('category', filter.category);
@@ -93,7 +93,7 @@ export class PostService implements OnModuleInit {
                 posts: posts,
                 pageInfo: {
                     timeCursor: lastDateTime,
-                    paginationOrder: PaginationOrder.OLDEST,
+                    boundaryType: PaginationOrder.OLDEST,
                     hasNext: docsCount > limit
                 }
             };
@@ -118,8 +118,8 @@ export class PostService implements OnModuleInit {
             inQueryModel.where('author').in([userId, ...friends]);
 
 
-            if( pagination.before ){
-                inQueryModel.lt('createdAt', pagination.before);
+            if( pagination.timeCursor ){
+                inQueryModel.lt('createdAt', pagination.timeCursor);
             }
 
             const leftCount = await (new (inQueryModel.toConstructor())).count();
@@ -143,7 +143,7 @@ export class PostService implements OnModuleInit {
                 posts:result, 
                 pageInfo: {
                     timeCursor: lastDateTime,
-                    paginationOrder: PaginationOrder.OLDEST,
+                    boundaryType: PaginationOrder.OLDEST,
                     hasNext: (leftCount > pagination.limit)
                 }
             };

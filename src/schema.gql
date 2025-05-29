@@ -97,7 +97,7 @@ type deleteCommentResult {
 type PageTimeInfo {
   hasNext: Boolean!
   timeCursor: String!
-  paginationOrder: PaginationDateType!
+  boundaryType: PaginationDateType!
 }
 
 enum PaginationDateType {
@@ -200,7 +200,8 @@ input PostFilter {
 }
 
 input PaginationTimeInput {
-  before: String
+  timeCursor: String
+  order: PaginationDateType
   limit: Int
 }
 
