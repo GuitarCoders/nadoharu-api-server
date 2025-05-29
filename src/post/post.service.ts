@@ -1,12 +1,14 @@
 import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Query } from 'mongoose';
+import { Model, Query, Types } from 'mongoose';
 import { CommentService } from 'src/comment/comment.service';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsResultDto, PostDto, PostFilterInput } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
+import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationOrder } from 'src/pagination/enum/pagination.enum';
 
 @Injectable()
 export class PostService implements OnModuleInit {
@@ -48,8 +50,63 @@ export class PostService implements OnModuleInit {
         }
     }
 
+
+    async getPostsByUserId(
+        targetUserId: string,
+        filter: PostFilterInput,
+        pagination: PaginationTimeInput
+    ): Promise<PostsQueryResultDto> {
+        try {
+            const postsQuery = this.PostModel.find({author: targetUserId})
+
+            if (pagination.before) {
+                postsQuery.lt('createdAt', pagination.before);
+            }
+            if (filter.category) {
+                postsQuery.where('category', filter.category);
+            }
+
+            const docsCount = await postsQuery.clone().count();
+            const limit = pagination.limit || 10;
+
+            postsQuery
+                .sort({createdAt: -1})
+                .limit(limit)
+                .populate('author');
+            
+            const postDocuments = await postsQuery;
+            const posts = await Promise.all(
+                postDocuments.map(async item => ({
+                    _id: item._id.toString(),
+                    author: item.author,
+                    content: item.content,
+                    tags: item.tags,
+                    category: item.category,
+                    commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
+                    createdAt: item.createdAt.toISOString()
+                }))
+            )            
+
+            const lastDateTime = postDocuments.at(-1)?.createdAt.toISOString();
+
+            return {
+                posts: posts,
+                pageInfo: {
+                    timeCursor: lastDateTime,
+                    paginationOrder: PaginationOrder.OLDEST,
+                    hasNext: docsCount > limit
+                }
+            };
+        } catch (e) {
+            console.error(e);
+        }
+    }
     
-    async getPosts(userId: string, filter: PostFilterInput, targetUserId?:string): Promise<GetPostsResultDto>{
+    async getPostsForTimeline(
+        userId: string, 
+        filter: PostFilterInput, 
+        pagination: PaginationTimeInput
+    ): Promise<PostsQueryResultDto>{
         try {
             const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
@@ -58,22 +115,16 @@ export class PostService implements OnModuleInit {
             console.log(friends);
             const inQueryModel = this.PostModel.find({});
 
-            if ( targetUserId ){
-                inQueryModel.where('author').equals(targetUserId);
-                if ( filter.category ){
-                    inQueryModel.where('category').equals(filter.category);
-                }
-            } else {
-                inQueryModel.where('author').in([userId, ...friends]);
-            }
+            inQueryModel.where('author').in([userId, ...friends]);
 
-            if( filter.before){
-                inQueryModel.lt('createdAt', filter.before);
+
+            if( pagination.before ){
+                inQueryModel.lt('createdAt', pagination.before);
             }
 
             const leftCount = await (new (inQueryModel.toConstructor())).count();
 
-            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(filter.limit).populate('author');
+            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(pagination.limit).populate('author');
             const result: PostDto[] = await Promise.all(resultPostModels.map( async item => {
                 return {
                     _id: item._id.toString(),
@@ -90,8 +141,11 @@ export class PostService implements OnModuleInit {
 
             return { 
                 posts:result, 
-                lastDateTime: lastDateTime,
-                hasNext: (leftCount > filter.limit)
+                pageInfo: {
+                    timeCursor: lastDateTime,
+                    paginationOrder: PaginationOrder.OLDEST,
+                    hasNext: (leftCount > pagination.limit)
+                }
             };
         } catch (err) {
             console.error(err);

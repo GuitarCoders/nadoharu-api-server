@@ -6,13 +6,15 @@ import { UserModule } from 'src/user/user.module';
 import { PostResolver } from './post.resolver';
 import { PostService } from './post.service';
 import { Post, PostSchema } from './schemas/post.schema';
+import { PaginationModule } from 'src/pagination/pagination.module';
 
 @Module({
   imports: [
     UserModule,
     FriendModule,
     forwardRef(() => CommentModule),
-    MongooseModule.forFeature([{name: Post.name, schema: PostSchema}])
+    MongooseModule.forFeature([{name: Post.name, schema: PostSchema}]),
+    PaginationModule
   ],
   providers: [PostResolver, PostService],
   exports: [PostService]

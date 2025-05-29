@@ -1,8 +1,8 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { PageTimeInfo } from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { UserDocument } from "src/user/schemas/user.schema";
 import { Int } from "type-graphql";
-
 
 @ObjectType('Post')
 export class PostDto{
@@ -39,26 +39,17 @@ export class PostFilterInput{
     @Field(() => String, { nullable: true })
     category?: string;
 
-    @Field(() => String, { nullable: true })
-    before?: string;
-
-    @Field(() => Int, { nullable : true })
-    limit?: number;
-
     // @Field(() => String, { nullable: true })
     // search?: string;
 }
 
-@ObjectType('GetPostsResult')
-export class GetPostsResultDto{
+@ObjectType('PostsQueryResult')
+export class PostsQueryResultDto {
     @Field(() => [PostDto])
     posts: PostDto[];
 
-    @Field(() => String, {nullable: true})
-    lastDateTime?: string;
-
-    @Field(() => Boolean)
-    hasNext: boolean;
+    @Field(() => PageTimeInfo)
+    pageInfo: PageTimeInfo
 }
 
 @InputType('CreatePostInput')

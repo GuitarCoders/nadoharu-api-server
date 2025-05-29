@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { UserSafeDto } from "src/user/dto/user.dto";
-import { FriendState } from "../enums/userInfo.enum";
+import { FriendState } from "../enum/userInfo.enum";
 
 @ObjectType('UserInfos')
 export class UserInfosDto {

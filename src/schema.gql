@@ -94,6 +94,17 @@ type deleteCommentResult {
   success: Boolean!
 }
 
+type PageTimeInfo {
+  hasNext: Boolean!
+  timeCursor: String!
+  paginationOrder: PaginationDateType!
+}
+
+enum PaginationDateType {
+  LATEST
+  OLDEST
+}
+
 type Post {
   _id: String!
   author: User!
@@ -104,10 +115,9 @@ type Post {
   createdAt: String!
 }
 
-type GetPostsResult {
+type PostsQueryResult {
   posts: [Post!]!
-  lastDateTime: String
-  hasNext: Boolean!
+  pageInfo: PageTimeInfo!
 }
 
 type CreatePostResult {
@@ -167,8 +177,9 @@ type Query {
   friends(filter: FriendsFilter!): Friends!
   getFriends(filter: FriendsFilter!): Friends! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. friends 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   post(postId: String!): Post!
-  posts(targetUserId: String, filter: PostFilter!): GetPostsResult!
-  postsByMe(filter: PostFilter!): GetPostsResult!
+  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
+  postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
+  postsByMe(filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
   getPost(postId: String!): Post! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. post 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. comments 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   comments(postId: String!, filter: commentFilter!): Comments!
@@ -186,6 +197,9 @@ input FriendsFilter {
 
 input PostFilter {
   category: String
+}
+
+input PaginationTimeInput {
   before: String
   limit: Int
 }

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { FriendService } from "src/friend/friend.service";
 import { UserService } from "src/user/user.service";
 import { AboutMeDto, UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
-import { FriendState } from "./enums/userInfo.enum";
+import { FriendState } from "./enum/userInfo.enum";
 import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 
 @Injectable()

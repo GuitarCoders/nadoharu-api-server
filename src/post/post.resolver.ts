@@ -4,8 +4,9 @@ import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { Arg, Int } from 'type-graphql';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostFilterInput, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostFilterInput, PostsQueryResultDto, PostDto, Test } from './dto/post.dto';
 import { PostService } from './post.service';
+import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class PostResolver {
@@ -22,23 +23,36 @@ export class PostResolver {
         return await this.PostService.getPostById(targetPostId);
     }
 
-    @Query(() => GetPostsResultDto, { name: "posts"})
+    @Query(() => PostsQueryResultDto, { name: "postsByUserId"})
     @UseGuards(GqlAuthGuard)
-    async getPosts(
+    async getPostsByUserId(
         @CurrentUser() user: UserJwtPayload,
-        @Args('targetUserId', {nullable: true}) targetUserId: string,
-        @Args('filter') filter: PostFilterInput
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, filter, targetUserId);
+        @Args('targetUserId') targetUserId: string,
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationTimeInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsByUserId(targetUserId, filter, pagination);
     }
 
-    @Query(() => GetPostsResultDto, { name: "postsByMe"})
+    @Query(() => PostsQueryResultDto, { name: "postsForTimeline"})
+    @UseGuards(GqlAuthGuard)
+    async getPostsForTimeline(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('targetUserId', {nullable: true}) targetUserId: string,
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationTimeInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsForTimeline(user._id, filter, pagination);
+    }
+
+    @Query(() => PostsQueryResultDto, { name: "postsByMe"})
     @UseGuards(GqlAuthGuard)
     async getPostsByMe(
         @CurrentUser() user: UserJwtPayload,
-        @Args('filter') filter: PostFilterInput
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, filter, user._id);
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationTimeInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsByUserId(user._id, filter, pagination);
     }
         
     @Mutation(() => CreatePostResultDto,{ name: "createPost" })
