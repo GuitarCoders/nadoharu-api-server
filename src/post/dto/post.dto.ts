@@ -34,33 +34,20 @@ export class PostArrayDto{
     Posts: PostDto[];
 }
 
-@InputType('getPostFilter')
-export class Filter{
+@InputType('PostFilter')
+export class PostFilterInput{
     @Field(() => String, { nullable: true })
     category?: string;
 
     @Field(() => String, { nullable: true })
     before?: string;
 
+    @Field(() => Int, { nullable : true })
+    limit?: number;
+
     // @Field(() => String, { nullable: true })
     // search?: string;
 }
-
-@InputType('GetPosts')
-export class GetPostsDto{
-    @Field(
-        () => (Filter),
-        { 
-            nullable: true, 
-            name: 'filter'
-        }
-    )
-    filter?: Filter;
-
-    @Field(() => Int)
-    count: number;
-}
-
 
 @ObjectType('GetPostsResult')
 export class GetPostsResultDto{
@@ -74,7 +61,7 @@ export class GetPostsResultDto{
     hasNext: boolean;
 }
 
-@InputType('CreatePost')
+@InputType('CreatePostInput')
 export class CreatePostDto{
     @Field(() => String)
     content: string;

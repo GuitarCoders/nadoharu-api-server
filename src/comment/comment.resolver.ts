@@ -13,9 +13,21 @@ export class CommentResolver {
         private readonly CommentService: CommentService
     ) {}
 
-    @Query(() => CommentsDto, {name: "getCommentByPostId"})
+    @Query(() => CommentsDto, {
+        name: "getCommentByPostId",
+        deprecationReason: '쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. comments 쿼리가 해당 쿼리를 완벽히 대체합니다.'
+    })
     @UseGuards(GqlAuthGuard)
-    async getCommentByPostId(
+    async getCommentByPostIdDeprecated (
+        @Args('postId') targetPostId: string,
+        @Args('filter') commentFilter: commentFilter
+    ): Promise<CommentsDto> {
+        return await this.CommentService.getCommentsByPostId(targetPostId, commentFilter);
+    }
+
+    @Query(() => CommentsDto, {name: "comments"})
+    @UseGuards(GqlAuthGuard)
+    async getCommentByPostId (
         @Args('postId') targetPostId: string,
         @Args('filter') commentFilter: commentFilter
     ): Promise<CommentsDto> {

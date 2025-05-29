@@ -26,8 +26,8 @@ export class FriendsDto{
     friends: FriendDto[];
 }
 
-@InputType('getFriendsData')
-export class getFriendsDto{
+@InputType('FriendsFilter')
+export class FriendsFilterInput{
     @Field(() => String, {nullable: true})
     targetUserId?: string;
 

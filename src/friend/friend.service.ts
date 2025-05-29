@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersSafeDto } from 'src/user/dto/user.dto';
 import { UserService } from 'src/user/user.service';
-import { FriendsDto, getFriendsDto } from './dto/friend.dto';
+import { FriendsDto, FriendsFilterInput } from './dto/friend.dto';
 import { Friend, FriendDocument } from './schemas/friend.schema';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class FriendService {
 
     async getFriends(
         targetUserId: string,
-        option: getFriendsDto
+        option: FriendsFilterInput
     ): Promise<FriendsDto> {
         try{
 

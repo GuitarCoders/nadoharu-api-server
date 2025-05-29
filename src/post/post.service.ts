@@ -5,7 +5,7 @@ import { Model, Query } from 'mongoose';
 import { CommentService } from 'src/comment/comment.service';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, GetPostsResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
 
 @Injectable()
@@ -49,7 +49,7 @@ export class PostService implements OnModuleInit {
     }
 
     
-    async getPosts(userId: string, data: GetPostsDto, targetUserId?:string): Promise<GetPostsResultDto>{
+    async getPosts(userId: string, filter: PostFilterInput, targetUserId?:string): Promise<GetPostsResultDto>{
         try {
             const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
@@ -60,20 +60,20 @@ export class PostService implements OnModuleInit {
 
             if ( targetUserId ){
                 inQueryModel.where('author').equals(targetUserId);
-                if ( data.filter?.category ){
-                    inQueryModel.where('category').equals(data.filter.category);
+                if ( filter.category ){
+                    inQueryModel.where('category').equals(filter.category);
                 }
             } else {
                 inQueryModel.where('author').in([userId, ...friends]);
             }
 
-            if( data.filter?.before){
-                inQueryModel.lt('createdAt', data.filter.before);
+            if( filter.before){
+                inQueryModel.lt('createdAt', filter.before);
             }
 
             const leftCount = await (new (inQueryModel.toConstructor())).count();
 
-            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(data.count).populate('author');
+            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(filter.limit).populate('author');
             const result: PostDto[] = await Promise.all(resultPostModels.map( async item => {
                 return {
                     _id: item._id.toString(),
@@ -91,7 +91,7 @@ export class PostService implements OnModuleInit {
             return { 
                 posts:result, 
                 lastDateTime: lastDateTime,
-                hasNext: (leftCount > data.count)
+                hasNext: (leftCount > filter.limit)
             };
         } catch (err) {
             console.error(err);
