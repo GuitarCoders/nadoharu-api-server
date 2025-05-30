@@ -76,24 +76,6 @@ type Friends {
   friends: [Friend!]!
 }
 
-type Comment {
-  _id: String!
-  content: String!
-  postId: String!
-  Commenter: User!
-  createdAt: String!
-}
-
-type Comments {
-  comments: [Comment!]!
-  hasNext: Boolean!
-  totalCount: Int!
-}
-
-type deleteCommentResult {
-  success: Boolean!
-}
-
 type PageTimeInfo {
   hasNext: Boolean!
   timeCursor: String!
@@ -129,6 +111,24 @@ type DeletePostResult {
 }
 
 type addAllUserInFriendResult {
+  success: Boolean!
+}
+
+type Comment {
+  _id: String!
+  content: String!
+  postId: String!
+  Commenter: User!
+  createdAt: String!
+}
+
+type Comments {
+  comments: [Comment!]!
+  hasNext: Boolean!
+  totalCount: Int!
+}
+
+type deleteCommentResult {
   success: Boolean!
 }
 
@@ -173,7 +173,6 @@ type Query {
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
   postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
   postsByMe(filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
-  getPost(postId: String!): Post! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. post 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   getCommentByPostId(postId: String!, filter: commentFilter!): Comments! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. comments 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   comments(postId: String!, filter: commentFilter!): Comments!
   userInfo(userId: String!): UserInfo!
@@ -212,9 +211,9 @@ type Mutation {
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
   createPost(input: CreatePostInput!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
+  addAllUserInFriend: addAllUserInFriendResult!
   addCommentToPost(targetPostId: String!, content: String!): Comment!
   deleteCommentById(targetCommentId: String!): deleteCommentResult!
-  addAllUserInFriend: addAllUserInFriendResult!
 }
 
 input UserUpdate {

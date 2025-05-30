@@ -14,18 +14,12 @@ import { PaginationService } from 'src/pagination/pagination.service';
 import { PostMapper } from './mapper/post.mapper';
 
 @Injectable()
-export class PostService implements OnModuleInit {
-    private commentService: CommentService;
+export class PostService{
     constructor(
         private friendService: FriendService,
-        private moduleRef: ModuleRef,
         private paginationService: PaginationService,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
-
-    onModuleInit() {
-        this.commentService = this.moduleRef.get(CommentService, {strict: false});
-    }
 
     async getPostDocumentById(postId: string): Promise<PostDocument>{
         try{

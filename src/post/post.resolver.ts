@@ -72,28 +72,4 @@ export class PostResolver {
     ): Promise<DeletePostResultDto> {
         return await this.PostService.deletePost(user._id, reqData);
     }
-
-    //TODO : 해당 쿼리가 필요한지 확인
-    // @Query(() => GetPostsResultDto, { name: "getPostsForTimeline", description: "Deprecated"})
-    // @UseGuards(GqlAuthGuard)
-    // async getPostsForTimeline(
-    //     @CurrentUser() user: UserJwtPayload,
-    //     @Args('getPostsData') reqData: GetPostsDto
-    // ): Promise<GetPostsResultDto> {
-    //     return await this.PostService.getPostsForTimeline(user._id, reqData);
-    // }
-
-
-    // ========== Deprecated resolvers ==========
-    @Query(() => PostDto, { 
-        name: "getPost",
-        deprecationReason: '쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. post 쿼리가 해당 쿼리를 완벽히 대체합니다.'
-    })
-    @UseGuards(GqlAuthGuard)
-    async getPostDeprecated(
-        @CurrentUser() user:UserJwtPayload,
-        @Args('postId') targetPostId: string
-    ): Promise<PostDto> {
-        return await this.PostService.getPostById(targetPostId);
-    }
 }

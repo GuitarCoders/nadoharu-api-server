@@ -8,17 +8,12 @@ import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentRes
 import { Comment } from './schemas/comment.schema';
 
 @Injectable()
-export class CommentService implements OnModuleInit {
-    private PostService: PostService;
+export class CommentService{
     constructor(
         private readonly UserService: UserService,
-        private moduleRef: ModuleRef,
+        private readonly PostService: PostService,
         @InjectModel(Comment.name) private CommentModel: Model<Comment>
     ) {}
-
-    onModuleInit() {
-        this.PostService = this.moduleRef.get(PostService, {strict: false});
-    }
 
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
         try {

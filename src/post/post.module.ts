@@ -12,9 +12,8 @@ import { PaginationModule } from 'src/pagination/pagination.module';
   imports: [
     UserModule,
     FriendModule,
-    forwardRef(() => CommentModule),
+    PaginationModule,
     MongooseModule.forFeature([{name: Post.name, schema: PostSchema}]),
-    PaginationModule
   ],
   providers: [PostResolver, PostService],
   exports: [PostService]
