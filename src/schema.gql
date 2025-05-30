@@ -97,10 +97,10 @@ type deleteCommentResult {
 type PageTimeInfo {
   hasNext: Boolean!
   timeCursor: String!
-  boundaryType: PaginationDateType!
+  boundaryType: PageBoundaryType!
 }
 
-enum PaginationDateType {
+enum PageBoundaryType {
   LATEST
   OLDEST
 }
@@ -201,7 +201,7 @@ input PostFilter {
 
 input PaginationTimeInput {
   timeCursor: String
-  order: PaginationDateType
+  timeUntil: String
   limit: Int
 }
 

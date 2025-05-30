@@ -1,10 +1,27 @@
 import { Injectable } from "@nestjs/common";
+import { Query } from "mongoose";
+import { PaginationTimeInput } from "./dto/pagination.dto";
 
 @Injectable()
 export class PaginationService {
-    getPagination(page: number = 1, limit: number = 10) {
-        const take = limit;
-        const skip = (page - 1) * limit;
-        return { take, skip };
+    buildPaginationQuery<ResultT, DocT>(
+        pagination: PaginationTimeInput, 
+        query: Query<ResultT, DocT>
+    ): {paginatedQuery: Query<ResultT, DocT>, countOnlyQuery: Query<ResultT, DocT>} {
+        if (pagination.timeCursor) {
+            query.lt('createdAt', pagination.timeCursor);
+        }
+        if (pagination.timeUntil) {
+            query.gt('createdAt', pagination.timeUntil);
+        }
+
+        const countOnlyQuery = query.clone();
+
+        query.limit(pagination.limit || 10);
+
+        return {
+            paginatedQuery: query,
+            countOnlyQuery: countOnlyQuery
+        }
     }
 }

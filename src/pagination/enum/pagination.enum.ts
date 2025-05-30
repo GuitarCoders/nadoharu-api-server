@@ -1,8 +1,14 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum PaginationOrder {
+export enum PageBoundaryType {
     LATEST,
     OLDEST
 }
 
-registerEnumType(PaginationOrder, { name: 'PaginationDateType' });
+export enum PaginationDirection {
+    BEFORE,
+    AFTER
+}
+
+registerEnumType(PageBoundaryType, {name: 'PageBoundaryType'});
+registerEnumType(PaginationDirection, {name: 'PaginationDirection'});

@@ -8,7 +8,9 @@ import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
 import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
-import { PaginationOrder } from 'src/pagination/enum/pagination.enum';
+import { PageBoundaryType, PaginationDirection } from 'src/pagination/enum/pagination.enum';
+import { GraphQLError } from 'graphql';
+import { PaginationService } from 'src/pagination/pagination.service';
 
 @Injectable()
 export class PostService implements OnModuleInit {
@@ -16,6 +18,7 @@ export class PostService implements OnModuleInit {
     constructor(
         private friendService: FriendService,
         private moduleRef: ModuleRef,
+        private paginationService: PaginationService,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
 
@@ -57,21 +60,18 @@ export class PostService implements OnModuleInit {
         pagination: PaginationTimeInput
     ): Promise<PostsQueryResultDto> {
         try {
-            const postsQuery = this.PostModel.find({author: targetUserId})
+            const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
 
-            if (pagination.timeCursor) {
-                postsQuery.lt('createdAt', pagination.timeCursor);
-            }
             if (filter.category) {
                 postsQuery.where('category', filter.category);
             }
 
-            const docsCount = await postsQuery.clone().count();
-            const limit = pagination.limit || 10;
+            const {countOnlyQuery: countQuery} 
+                = this.paginationService.buildPaginationQuery(pagination, postsQuery)
+
+            const docsCount = await countQuery.count();
 
             postsQuery
-                .sort({createdAt: -1})
-                .limit(limit)
                 .populate('author');
             
             const postDocuments = await postsQuery;
@@ -85,7 +85,7 @@ export class PostService implements OnModuleInit {
                     commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
                     createdAt: item.createdAt.toISOString()
                 }))
-            )            
+            )
 
             const lastDateTime = postDocuments.at(-1)?.createdAt.toISOString();
 
@@ -93,12 +93,15 @@ export class PostService implements OnModuleInit {
                 posts: posts,
                 pageInfo: {
                     timeCursor: lastDateTime,
-                    boundaryType: PaginationOrder.OLDEST,
-                    hasNext: docsCount > limit
+                    boundaryType: PageBoundaryType.OLDEST,
+                    hasNext: docsCount > postDocuments.length
                 }
             };
-        } catch (e) {
-            console.error(e);
+        } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
+            console.error(err);
         }
     }
     
@@ -143,7 +146,7 @@ export class PostService implements OnModuleInit {
                 posts:result, 
                 pageInfo: {
                     timeCursor: lastDateTime,
-                    boundaryType: PaginationOrder.OLDEST,
+                    boundaryType: PageBoundaryType.OLDEST,
                     hasNext: (leftCount > pagination.limit)
                 }
             };

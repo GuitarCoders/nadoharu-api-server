@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { PaginationOrder } from "../enum/pagination.enum";
+import { PageBoundaryType, PaginationDirection } from "../enum/pagination.enum";
 
 @InputType()
 export class PaginationOffsetInput {
@@ -15,8 +15,8 @@ export class PaginationTimeInput {
     @Field(() => String, {nullable: true})
     timeCursor?: string;
 
-    @Field(() => PaginationOrder, {nullable: true})
-    order: PaginationOrder;
+    @Field(() => String, {nullable: true})
+    timeUntil?: string;
 
     @Field(() => Int, {nullable: true})
     limit?: number;
@@ -33,6 +33,6 @@ export class PageTimeInfo extends PageInfo {
     @Field(() => String)
     timeCursor: string
 
-    @Field(() => PaginationOrder)
-    boundaryType: PaginationOrder
+    @Field(() => PageBoundaryType)
+    boundaryType: PageBoundaryType
 }
