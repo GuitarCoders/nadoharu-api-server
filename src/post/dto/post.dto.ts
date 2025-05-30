@@ -21,9 +21,6 @@ export class PostDto{
     @Field(() => String)
     category: string;
 
-    @Field(() => Int)
-    commentsCount: number;
-
     @Field(() => String)
     createdAt: string;
 }
@@ -65,7 +62,10 @@ export class CreatePostDto{
 }
 
 @ObjectType('CreatePostResult')
-export class CreatePostResultDto extends PostDto{
+export class CreatePostResultDto{
+    @Field(() => PostDto)
+    post: PostDto;
+
     @Field(() => Boolean)
     success: boolean;
 }

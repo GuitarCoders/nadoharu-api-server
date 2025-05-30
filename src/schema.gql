@@ -111,7 +111,6 @@ type Post {
   content: String!
   tags: String
   category: String!
-  commentsCount: Int!
   createdAt: String!
 }
 
@@ -121,13 +120,7 @@ type PostsQueryResult {
 }
 
 type CreatePostResult {
-  _id: String!
-  author: User!
-  content: String!
-  tags: String
-  category: String!
-  commentsCount: Int!
-  createdAt: String!
+  post: Post!
   success: Boolean!
 }
 

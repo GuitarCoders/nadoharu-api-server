@@ -11,6 +11,7 @@ import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
 import { PageBoundaryType, PaginationDirection } from 'src/pagination/enum/pagination.enum';
 import { GraphQLError } from 'graphql';
 import { PaginationService } from 'src/pagination/pagination.service';
+import { PostMapper } from './mapper/post.mapper';
 
 @Injectable()
 export class PostService implements OnModuleInit {
@@ -38,16 +39,7 @@ export class PostService implements OnModuleInit {
     async getPostById(postId: string): Promise<PostDto>{
         try{
             const result = await this.getPostDocumentById(postId)
-            console.log(result);
-            return {
-                _id: result._id.toString(),
-                content: result.content,
-                tags: result.tags,
-                category: result.category,
-                author: (await result.populate('author')).author,
-                commentsCount: await this.commentService.getCommentsCount(result._id.toString()),
-                createdAt: result.createdAt.toISOString()
-            }
+            return PostMapper.toPostDto(result);
         } catch (err) {
             console.error(err);
         }
@@ -75,17 +67,7 @@ export class PostService implements OnModuleInit {
                 .populate('author');
             
             const postDocuments = await postsQuery;
-            const posts = await Promise.all(
-                postDocuments.map(async item => ({
-                    _id: item._id.toString(),
-                    author: item.author,
-                    content: item.content,
-                    tags: item.tags,
-                    category: item.category,
-                    commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
-                    createdAt: item.createdAt.toISOString()
-                }))
-            )
+            const posts = postDocuments.map(item => PostMapper.toPostDto(item));
 
             const lastDateTime = postDocuments.at(-1)?.createdAt.toISOString();
 
@@ -128,17 +110,7 @@ export class PostService implements OnModuleInit {
             const leftCount = await (new (inQueryModel.toConstructor())).count();
 
             const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(pagination.limit).populate('author');
-            const result: PostDto[] = await Promise.all(resultPostModels.map( async item => {
-                return {
-                    _id: item._id.toString(),
-                    author: item.author,
-                    content: item.content,
-                    tags: item.tags,
-                    category: item.category,
-                    commentsCount: await this.commentService.getCommentsCount(item._id.toString()),
-                    createdAt: item.createdAt.toISOString()
-                }
-            }));
+            const result = resultPostModels.map(item => PostMapper.toPostDto(item));
 
             const lastDateTime = resultPostModels.at(-1)?.createdAt.toISOString();
 
@@ -171,13 +143,7 @@ export class PostService implements OnModuleInit {
 
             const createdPostResult = await createdPost.populate('author');
             return {
-                _id: createdPostResult._id.toString(),
-                content: createdPostResult.content,
-                tags: createdPostResult.tags,
-                category: createdPostResult.category,
-                author: createdPostResult.author,
-                createdAt: createdPostResult.createdAt.toISOString(),
-                commentsCount: 0,
+                post: PostMapper.toPostDto(createdPostResult),
                 success: true,
             }
         } catch (err) {
