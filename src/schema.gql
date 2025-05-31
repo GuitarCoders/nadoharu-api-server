@@ -118,7 +118,7 @@ type Comment {
   _id: String!
   content: String!
   postId: String!
-  Commenter: User!
+  commenter: User!
   createdAt: String!
 }
 

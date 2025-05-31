@@ -6,6 +6,7 @@ import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
 import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
+import { CommentMapper } from './mapper/comment.mapper';
 
 @Injectable()
 export class CommentService{
@@ -27,14 +28,12 @@ export class CommentService{
             })
     
             await createdComment.save();
-        
-            const resultComment: CommentDto = {
-                _id: createdComment._id.toString(),
-                content: createdComment.content,
-                postId: createdComment.post._id.toString(),
-                Commenter: this.UserService.userDocumentToUserSafe((await createdComment.populate('commenter')).commenter),
-                createdAt: createdComment.createdAt.toISOString()
-            }
+            await createdComment.populate('commenter');
+
+            const resultComment = CommentMapper.toCommentDto(
+                createdComment,
+                this.UserService.userDocumentToUserSafe(createdComment.commenter)
+            );
     
             return resultComment
 
@@ -59,14 +58,14 @@ export class CommentService{
             const commentDocuments = await commentQuery.populate('commenter');
 
             console.log(`commentCount: ${commentTotalCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
-            
-            const result: CommentDto[] = commentDocuments.map(item => ({
-                _id: item._id.toString(),
-                content: item.content,
-                postId: item.post._id.toString(),
-                Commenter: this.UserService.userDocumentToUserSafe(item.commenter),
-                createdAt: item.createdAt.toISOString()
-            }))
+    
+            const result = commentDocuments.map(item => (
+                CommentMapper.toCommentDto(
+                    item,
+                    this.UserService.userDocumentToUserSafe(item.commenter)
+                )
+            ));
+
             return {
                 comments: result,
                 hasNext: commentTotalCount > (options.skip?options.skip:0 + options.limit),

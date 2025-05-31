@@ -15,7 +15,7 @@ export class CommentDto{
     postId: string;
     
     @Field(() => UserSafeDto)
-    Commenter: UserSafeDto;
+    commenter: UserSafeDto;
 
     @Field(() => String)
     createdAt: String;
