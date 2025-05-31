@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Query } from "mongoose";
-import { PaginationTimeInput } from "./dto/pagination.dto";
+import { PageTimeInfo, PaginationTimeInput } from "./dto/pagination.dto";
+import { PageBoundaryType } from "./enum/pagination.enum";
 
 @Injectable()
 export class PaginationService {
@@ -22,6 +23,18 @@ export class PaginationService {
         return {
             paginatedQuery: query,
             countOnlyQuery: countOnlyQuery
+        }
+    }
+
+    getPageTimeInfo(
+        timeCursor: string,
+        totalCount: number,
+        pageCount: number
+    ): PageTimeInfo {
+        return {
+            timeCursor,
+            hasNext: totalCount > pageCount,
+            boundaryType: PageBoundaryType.OLDEST
         }
     }
 }

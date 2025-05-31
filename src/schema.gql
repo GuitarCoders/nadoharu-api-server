@@ -124,8 +124,7 @@ type Comment {
 
 type Comments {
   comments: [Comment!]!
-  hasNext: Boolean!
-  totalCount: Int!
+  pageInfo: PageTimeInfo!
 }
 
 type deleteCommentResult {
@@ -173,8 +172,7 @@ type Query {
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
   postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
   postsByMe(filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
-  getCommentByPostId(postId: String!, filter: commentFilter!): Comments! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. comments 쿼리가 해당 쿼리를 완벽히 대체합니다.")
-  comments(postId: String!, filter: commentFilter!): Comments!
+  comments(postId: String!, pagination: PaginationTimeInput!): Comments!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfos!
   me: AboutMe!
@@ -195,11 +193,6 @@ input PaginationTimeInput {
   timeCursor: String
   timeUntil: String
   limit: Int
-}
-
-input commentFilter {
-  skip: Int
-  limit: Int!
 }
 
 type Mutation {

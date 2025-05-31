@@ -67,11 +67,10 @@ export class PostService{
 
             return {
                 posts: posts,
-                pageInfo: {
-                    timeCursor: lastDateTime,
-                    boundaryType: PageBoundaryType.OLDEST,
-                    hasNext: docsCount > postDocuments.length
-                }
+                pageInfo: this.paginationService.getPageTimeInfo(
+                    lastDateTime,
+                    docsCount, posts.length
+                )
             };
         } catch (err) {
             if (err instanceof GraphQLError) {
@@ -110,11 +109,10 @@ export class PostService{
 
             return { 
                 posts:result, 
-                pageInfo: {
-                    timeCursor: lastDateTime,
-                    boundaryType: PageBoundaryType.OLDEST,
-                    hasNext: (leftCount > pagination.limit)
-                }
+                pageInfo: this.paginationService.getPageTimeInfo(
+                    lastDateTime,
+                    leftCount, result.length
+                )
             };
         } catch (err) {
             console.error(err);
