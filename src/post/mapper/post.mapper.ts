@@ -2,14 +2,14 @@ import { PostDto, PostsQueryResultDto } from "../dto/post.dto";
 import { PostDocument } from "../schemas/post.schema";
 
 export class PostMapper {
-    static toPostDto(Post: PostDocument): PostDto {
+    static toPostDto(post: PostDocument): PostDto {
         return {
-            _id: Post._id.toString(),
-            author: Post.author,
-            content: Post.content,
-            tags: Post.tags,
-            category: Post.category,
-            createdAt: Post.createdAt.toISOString()
+            _id: post._id.toString(),
+            author: post.author,
+            content: post.content,
+            tags: post.tags,
+            category: post.category,
+            createdAt: post.createdAt.toISOString()
         }
     }
 }
