@@ -1,6 +1,6 @@
 import { Field, InputType,  ObjectType } from "@nestjs/graphql";
 import { before } from "node:test";
-import { PageInfo, PageTimeInfo } from "src/pagination/dto/pagination.dto";
+import { PageInfo} from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { Int } from "type-graphql";
 
@@ -27,8 +27,8 @@ export class CommentsDto{
     @Field(() => [CommentDto])
     comments: CommentDto[];
 
-    @Field(() => PageTimeInfo)
-    pageInfo: PageTimeInfo;
+    @Field(() => PageInfo)
+    pageInfo: PageInfo;
 }
 
 @InputType('addCommentData')

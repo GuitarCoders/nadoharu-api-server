@@ -76,15 +76,14 @@ type Friends {
   friends: [Friend!]!
 }
 
-type PageTimeInfo {
-  hasNext: Boolean!
-  timeCursor: String
-  boundaryType: PageBoundaryType!
+type Cursor {
+  time: String!
+  id: String!
 }
 
-enum PageBoundaryType {
-  LATEST
-  OLDEST
+type PageInfo {
+  hasNext: Boolean!
+  cursor: Cursor
 }
 
 type Post {
@@ -98,7 +97,7 @@ type Post {
 
 type PostsQueryResult {
   posts: [Post!]!
-  pageInfo: PageTimeInfo!
+  pageInfo: PageInfo!
 }
 
 type CreatePostResult {
@@ -124,7 +123,7 @@ type Comment {
 
 type Comments {
   comments: [Comment!]!
-  pageInfo: PageTimeInfo!
+  pageInfo: PageInfo!
 }
 
 type deleteCommentResult {
@@ -169,10 +168,10 @@ type Query {
   friends(filter: FriendsFilter!): Friends!
   getFriends(filter: FriendsFilter!): Friends! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. friends 쿼리가 해당 쿼리를 완벽히 대체합니다.")
   post(postId: String!): Post!
-  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
-  postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
-  postsByMe(filter: PostFilter!, pagination: PaginationTimeInput!): PostsQueryResult!
-  comments(postId: String!, pagination: PaginationTimeInput!): Comments!
+  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  comments(postId: String!, pagination: PaginationInput!): Comments!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfos!
   me: AboutMe!
@@ -189,10 +188,15 @@ input PostFilter {
   category: String
 }
 
-input PaginationTimeInput {
-  timeCursor: String
-  timeUntil: String
+input PaginationInput {
+  cursor: CursorInput
+  until: CursorInput
   limit: Int
+}
+
+input CursorInput {
+  time: String!
+  id: String!
 }
 
 type Mutation {

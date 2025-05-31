@@ -1,5 +1,4 @@
-import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
@@ -7,9 +6,8 @@ import { UserService } from 'src/user/user.service';
 import { addCommentDto, CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
 import { CommentMapper } from './mapper/comment.mapper';
-import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { PaginationService } from 'src/pagination/pagination.service';
-import { PageBoundaryType, } from 'src/pagination/enum/pagination.enum';
 
 @Injectable()
 export class CommentService{
@@ -47,10 +45,8 @@ export class CommentService{
         
     }
 
-    async getCommentsByPostId(targetPostId: string, pagination: PaginationTimeInput): Promise<CommentsDto>{
+    async getCommentsByPostId(targetPostId: string, pagination: PaginationInput): Promise<CommentsDto>{
         try {
-            // const commentDocuments = await this.CommentModel.find({post: targetPostId}).sort({createdAt: 1}).populate('commenter');
-
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
             
             const {countOnlyQuery} = this.PaginationService.buildPaginationQuery(pagination, commentQuery);
@@ -68,7 +64,7 @@ export class CommentService{
             return {
                 comments: commentArray,
                 pageInfo: this.PaginationService.getPageTimeInfo(
-                    commentArray.at(-1)?.createdAt,
+                    commentDocuments.at(-1),
                     count, commentDocuments.length
                 )
             };

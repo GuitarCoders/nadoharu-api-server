@@ -1,26 +1,28 @@
 import { Injectable } from "@nestjs/common";
-import { Query } from "mongoose";
-import { PageTimeInfo, PaginationTimeInput } from "./dto/pagination.dto";
-import { PageBoundaryType } from "./enum/pagination.enum";
+import { Document, Model, Query } from "mongoose";
+import { Cursor, PageInfo, PaginationInput } from "./dto/pagination.dto";
 
 @Injectable()
 export class PaginationService {
     buildPaginationQuery<ResultT, DocT>(
-        pagination: PaginationTimeInput, 
+        pagination: PaginationInput, 
         query: Query<ResultT, DocT>
     ): {paginatedQuery: Query<ResultT, DocT>, countOnlyQuery: Query<ResultT, DocT>} {
-        
+
         query.sort({createdAt: -1});
-        if (pagination.timeCursor) {
-            query.lt('createdAt', pagination.timeCursor);
+        if (pagination.cursor) {
+            query.lt('createdAt', pagination.cursor.time);
+            query.lt('_id', pagination.cursor.id);
         }
-        if (pagination.timeUntil) {
-            query.gt('createdAt', pagination.timeUntil);
+
+        if (pagination.until) {
+            query.gt('createdAt', pagination.until.time);
+            query.gt('_id', pagination.cursor.id);
         }
 
         const countOnlyQuery = query.clone();
 
-        query.limit(pagination.limit || 10);
+        query.limit(pagination.limit || 30);
 
         return {
             paginatedQuery: query,
@@ -28,15 +30,19 @@ export class PaginationService {
         }
     }
 
+
     getPageTimeInfo(
-        timeCursor: string,
+        lastDoc: Document,
         totalCount: number,
         pageCount: number
-    ): PageTimeInfo {
+    ): PageInfo {
         return {
-            timeCursor,
-            hasNext: totalCount > pageCount,
-            boundaryType: PageBoundaryType.OLDEST
+            cursor: lastDoc ? {
+                id: lastDoc.get('id'),
+                time: (lastDoc.get('createdAt') as Date).toISOString()
+            } : null,
+            hasNext: totalCount > pageCount
         }
     }
+
 }

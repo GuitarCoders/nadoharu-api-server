@@ -6,7 +6,7 @@ import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { PostDto } from 'src/post/dto/post.dto';
 import { CommentService } from './comment.service';
 import { CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
-import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class CommentResolver {
@@ -18,7 +18,7 @@ export class CommentResolver {
     @UseGuards(GqlAuthGuard)
     async getCommentByPostId (
         @Args('postId') targetPostId: string,
-        @Args('pagination') pagination: PaginationTimeInput
+        @Args('pagination') pagination: PaginationInput
     ): Promise<CommentsDto> {
         return await this.CommentService.getCommentsByPostId(targetPostId, pagination);
     }

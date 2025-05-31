@@ -7,8 +7,7 @@ import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
-import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
-import { PageBoundaryType, PaginationDirection } from 'src/pagination/enum/pagination.enum';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { GraphQLError } from 'graphql';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { PostMapper } from './mapper/post.mapper';
@@ -43,7 +42,7 @@ export class PostService{
     async getPostsByUserId(
         targetUserId: string,
         filter: PostFilterInput,
-        pagination: PaginationTimeInput
+        pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         try {
             const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
@@ -52,10 +51,10 @@ export class PostService{
                 postsQuery.where('category', filter.category);
             }
 
-            const {countOnlyQuery: countQuery} 
+            const {countOnlyQuery} 
                 = this.paginationService.buildPaginationQuery(pagination, postsQuery)
 
-            const docsCount = await countQuery.count();
+            const docsCount = await countOnlyQuery.count();
 
             postsQuery
                 .populate('author');
@@ -68,7 +67,7 @@ export class PostService{
             return {
                 posts: posts,
                 pageInfo: this.paginationService.getPageTimeInfo(
-                    lastDateTime,
+                    postDocuments.at(-1),
                     docsCount, posts.length
                 )
             };
@@ -83,7 +82,7 @@ export class PostService{
     async getPostsForTimeline(
         userId: string, 
         filter: PostFilterInput, 
-        pagination: PaginationTimeInput
+        pagination: PaginationInput
     ): Promise<PostsQueryResultDto>{
         try {
             const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
@@ -95,10 +94,8 @@ export class PostService{
 
             inQueryModel.where('author').in([userId, ...friends]);
 
-
-            if( pagination.timeCursor ){
-                inQueryModel.lt('createdAt', pagination.timeCursor);
-            }
+            const {countOnlyQuery} 
+                = this.paginationService.buildPaginationQuery(pagination, inQueryModel);
 
             const leftCount = await (new (inQueryModel.toConstructor())).count();
 
@@ -110,7 +107,7 @@ export class PostService{
             return { 
                 posts:result, 
                 pageInfo: this.paginationService.getPageTimeInfo(
-                    lastDateTime,
+                    resultPostModels.at(-1),
                     leftCount, result.length
                 )
             };

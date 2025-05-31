@@ -6,7 +6,7 @@ import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { Arg, Int } from 'type-graphql';
 import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostFilterInput, PostsQueryResultDto, PostDto, Test } from './dto/post.dto';
 import { PostService } from './post.service';
-import { PaginationTimeInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class PostResolver {
@@ -29,7 +29,7 @@ export class PostResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('targetUserId') targetUserId: string,
         @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationTimeInput
+        @Args('pagination') pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsByUserId(targetUserId, filter, pagination);
     }
@@ -40,7 +40,7 @@ export class PostResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('targetUserId', {nullable: true}) targetUserId: string,
         @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationTimeInput
+        @Args('pagination') pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsForTimeline(user._id, filter, pagination);
     }
@@ -50,7 +50,7 @@ export class PostResolver {
     async getPostsByMe(
         @CurrentUser() user: UserJwtPayload,
         @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationTimeInput
+        @Args('pagination') pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsByUserId(user._id, filter, pagination);
     }

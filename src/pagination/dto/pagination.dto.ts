@@ -1,22 +1,30 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { PageBoundaryType, PaginationDirection } from "../enum/pagination.enum";
 
 @InputType()
-export class PaginationOffsetInput {
-    @Field(() => Int, {nullable: true})
-    skip?: number;
+export class CursorInput {
+    @Field(() => String)
+    time: string;
 
-    @Field(() => Int, {nullable: true})
-    limit?: number;
+    @Field(() => String)
+    id: string;
+}
+
+@ObjectType()
+export class Cursor {
+    @Field(() => String)
+    time: string;
+
+    @Field(() => String)
+    id: string;
 }
 
 @InputType()
-export class PaginationTimeInput {
-    @Field(() => String, {nullable: true})
-    timeCursor?: string;
+export class PaginationInput {
+    @Field(() => CursorInput, {nullable: true})
+    cursor?: CursorInput;
 
-    @Field(() => String, {nullable: true})
-    timeUntil?: string;
+    @Field(() => CursorInput, {nullable: true})
+    until?: CursorInput;
 
     @Field(() => Int, {nullable: true})
     limit?: number;
@@ -26,13 +34,7 @@ export class PaginationTimeInput {
 export class PageInfo {
     @Field(() => Boolean)
     hasNext: boolean
-}
 
-@ObjectType()
-export class PageTimeInfo extends PageInfo {
-    @Field(() => String, {nullable: true})
-    timeCursor?: string
-
-    @Field(() => PageBoundaryType)
-    boundaryType: PageBoundaryType
+    @Field(() => Cursor, {nullable: true})
+    cursor?: Cursor
 }
