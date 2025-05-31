@@ -30,8 +30,8 @@ export class PageInfo {
 
 @ObjectType()
 export class PageTimeInfo extends PageInfo {
-    @Field(() => String)
-    timeCursor: string
+    @Field(() => String, {nullable: true})
+    timeCursor?: string
 
     @Field(() => PageBoundaryType)
     boundaryType: PageBoundaryType

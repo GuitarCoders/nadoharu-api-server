@@ -9,6 +9,8 @@ export class PaginationService {
         pagination: PaginationTimeInput, 
         query: Query<ResultT, DocT>
     ): {paginatedQuery: Query<ResultT, DocT>, countOnlyQuery: Query<ResultT, DocT>} {
+        
+        query.sort({createdAt: -1});
         if (pagination.timeCursor) {
             query.lt('createdAt', pagination.timeCursor);
         }

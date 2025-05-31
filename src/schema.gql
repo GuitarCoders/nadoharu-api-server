@@ -78,7 +78,7 @@ type Friends {
 
 type PageTimeInfo {
   hasNext: Boolean!
-  timeCursor: String!
+  timeCursor: String
   boundaryType: PageBoundaryType!
 }
 

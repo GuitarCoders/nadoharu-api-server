@@ -68,7 +68,7 @@ export class CommentService{
             return {
                 comments: commentArray,
                 pageInfo: this.PaginationService.getPageTimeInfo(
-                    commentArray.at(-1).createdAt,
+                    commentArray.at(-1)?.createdAt,
                     count, commentDocuments.length
                 )
             };
