@@ -16,12 +16,17 @@ import { GraphQLError } from 'graphql';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { NadoharuGraphQLError } from 'src/errors/nadoharuGraphQLError';
+import { PaginationService } from 'src/pagination/pagination.service';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { FriendRequestMapper } from './mapper/friendRequest.mapper';
 
 @Injectable()
 export class FriendRequestService {
     constructor(
-        private friendService: FriendService,
-        private userService: UserService,
+        private readonly FriendService: FriendService,
+        private readonly UserService: UserService,
+        private readonly PaginationService: PaginationService,
+        private readonly FriendRequestMapper: FriendRequestMapper,
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
@@ -36,9 +41,9 @@ export class FriendRequestService {
             }
             
             if (
-                result.requestUser._id.toString() !== requestUserId
+                result.requester._id.toString() !== requestUserId
                 &&
-                result.receiveUser._id.toString() !== requestUserId
+                result.receiver._id.toString() !== requestUserId
             ) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_OWNED');
             }
@@ -52,25 +57,30 @@ export class FriendRequestService {
         }
     }
 
-    async getFriendRequestsByRequestUserId(requestUserId: string): Promise<FriendRequestArrayDto> {
+    async getFriendRequestsByRequestUserId(
+        requesterId: string,
+        pagination: PaginationInput
+    ): Promise<FriendRequestArrayDto> {
         try{
-            const result = await this.friendRequestModel
-                .find({requestUser: requestUserId})
-                .populate('requestUser')
-                .populate('receiveUser');
 
-            const resultToArray: FriendRequestDto[] = new Array();
-            result.forEach( item => {
-                resultToArray.push({
-                    _id: item._id.toString(),
-                    requestUser: this.userService.userDocumentToUserSafe(item.requestUser),
-                    receiveUser: this.userService.userDocumentToUserSafe(item.receiveUser),
-                    requestMessage: item.requestMessage,
-                    createdAt: item.createdAt.toISOString()
-                })
-            })
+            const friendRequestQuery 
+                = this.friendRequestModel
+                    .find({requestUser: requesterId})
+                    .sort({createdAt: -1})
+                    .populate('requestUser')
+                    .populate('receiveUser');
 
-            return {friendRequests: resultToArray};
+            const { countOnlyQuery } 
+                = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
+
+            const friendRequestCount = await countOnlyQuery.count();
+            const friendRequestDocuments = await friendRequestQuery;
+                
+            const friendRequests = friendRequestDocuments.map(
+                item => this.FriendRequestMapper.toFriendRequestDto(item)
+            );
+
+            return {friendRequests};
         } catch(err) {
             
             console.error(err);
@@ -91,8 +101,8 @@ export class FriendRequestService {
             result.forEach( item => {
                 resultToArray.push({
                     _id: item._id.toString(),
-                    requestUser: this.userService.userDocumentToUserSafe(item.requestUser),
-                    receiveUser: this.userService.userDocumentToUserSafe(item.receiveUser),
+                    requester: this.UserService.userDocumentToUserSafe(item.requester),
+                    receiver: this.UserService.userDocumentToUserSafe(item.receiver),
                     requestMessage: item.requestMessage,
                     createdAt: item.createdAt.toISOString()
                 })
@@ -118,13 +128,13 @@ export class FriendRequestService {
     ): Promise<CreateFriendRequestResultDto> {
         try{
 
-            if(requestUserId === createFriendRequestDto.receiveUserId) {
+            if(requestUserId === createFriendRequestDto.receiver) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_TO_ME');
             }
 
             const alreadyFriendRequests = await this.friendRequestModel.find({
                 requestUser: requestUserId,
-                receiveUser: createFriendRequestDto.receiveUserId
+                receiveUser: createFriendRequestDto.receiver
             })
             
             if(alreadyFriendRequests.length > 0) {
@@ -134,7 +144,7 @@ export class FriendRequestService {
             const createdFriendRequest = new this.friendRequestModel(
                 {
                     requestUser: requestUserId,
-                    receiveUser: createFriendRequestDto.receiveUserId,
+                    receiveUser: createFriendRequestDto.receiver,
                     requestMessage: createFriendRequestDto.requestMessage
                 }
             );
@@ -148,8 +158,8 @@ export class FriendRequestService {
             // return {...createdFriendResult, success: true}
             return {
                 _id: createdFriendResult._id.toString(),
-                requestUser: this.userService.userDocumentToUserSafe(createdFriendResult.requestUser),
-                receiveUser: this.userService.userDocumentToUserSafe(createdFriendResult.receiveUser),
+                requester: this.UserService.userDocumentToUserSafe(createdFriendResult.requester),
+                receiver: this.UserService.userDocumentToUserSafe(createdFriendResult.receiver),
                 requestMessage: createdFriendResult.requestMessage,
                 createdAt: createdFriendResult.createdAt.toISOString(),
                 success: true
@@ -192,13 +202,13 @@ export class FriendRequestService {
                 acceptFriendRequestDto.friendRequestId
             );
 
-            if(acceptUserId !== targetFriendRequest.receiveUser._id.toString()) {
+            if(acceptUserId !== targetFriendRequest.receiver._id.toString()) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_RECEIVED');
             }
 
-            this.friendService.addFriend(
-                targetFriendRequest.requestUser._id.toString(),
-                targetFriendRequest.receiveUser._id.toString()
+            this.FriendService.addFriend(
+                targetFriendRequest.requester._id.toString(),
+                targetFriendRequest.receiver._id.toString()
             )
 
             await targetFriendRequest.deleteOne();
@@ -211,5 +221,14 @@ export class FriendRequestService {
             console.log(err)
             return {success: false}
         }
+    }
+
+    async hasSentFriendRequest(fromId: string, toId: string) {
+        const friendRequestDocuments = await this.friendRequestModel.find({requester: fromId, receiver: toId});
+        if (friendRequestDocuments?.length !== 0) {
+            return true;
+        } else {
+            return false;
+        } 
     }
 }

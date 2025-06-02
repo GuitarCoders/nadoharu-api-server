@@ -39,8 +39,8 @@ type LoginResponse {
 
 type FriendRequest {
   _id: String!
-  requestUser: User!
-  receiveUser: User!
+  requester: User!
+  receiver: User!
   requestMessage: String!
   createdAt: String!
 }
@@ -51,8 +51,8 @@ type FriendRequestArray {
 
 type CreateFriendRequestResult {
   _id: String!
-  requestUser: User!
-  receiveUser: User!
+  requester: User!
+  receiver: User!
   requestMessage: String!
   createdAt: String!
   success: Boolean!
@@ -162,10 +162,8 @@ type Query {
   userWhoAmI: User!
   users(search: String!): Users!
   login(username: String!, password: String!): LoginResponse!
-  getSentFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. sentFriendRequests 쿼리가 해당 쿼리를 완벽히 대체합니다.")
-  sentFriendRequests: FriendRequestArray!
-  getReceiveFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.")
-  receivedFriendRequests: FriendRequestArray!
+  sentFriendRequests(pagination: PaginationInput!): FriendRequestArray!
+  receivedFriendRequests(pagination: PaginationInput!): FriendRequestArray!
   friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
   post(postId: String!): Post!
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
@@ -225,7 +223,7 @@ input UserDeleteRequest {
 }
 
 input CreateFriendRequest {
-  receiveUserId: String!
+  receiver: String!
   requestMessage: String!
 }
 

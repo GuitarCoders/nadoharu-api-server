@@ -41,7 +41,7 @@ export class PostResolver {
         @Args('filter') filter: PostFilterInput,
         @Args('pagination') pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostService.getPostsForTimeline(user._id, filter, pagination);
+        return await this.PostService.getPostsForTimeline(user._id, pagination);
     }
 
     @Query(() => PostsQueryResultDto, { name: "postsByMe"})

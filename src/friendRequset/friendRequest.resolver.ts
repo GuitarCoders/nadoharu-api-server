@@ -6,6 +6,7 @@ import { AcceptFriendRequestDto, AcceptFriendRequestResultDto, CreateFriendReque
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { FriendRequest } from './schemas/friendRequest.schema';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class FriendRequestResolver {
@@ -13,46 +14,20 @@ export class FriendRequestResolver {
         private readonly FriendRequestService: FriendRequestService
     ) {}
 
-    /**
-    * @deprecated The method should not be used
-    */
-    @Query(() => FriendRequestArrayDto, {
-        name: 'getSentFriendRequests',
-        deprecationReason: '쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. sentFriendRequests 쿼리가 해당 쿼리를 완벽히 대체합니다.'
-    })
-    @UseGuards(GqlAuthGuard)
-    async getSentFriendRequestsDeprecated(
-        @CurrentUser() user: UserJwtPayload,
-    ): Promise<FriendRequestArrayDto> {
-        return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id);
-    }
-
     @Query(() => FriendRequestArrayDto, { name: 'sentFriendRequests'})
     @UseGuards(GqlAuthGuard)
     async getSentFriendRequests(
         @CurrentUser() user: UserJwtPayload,
+        @Args('pagination') pagination: PaginationInput 
     ): Promise<FriendRequestArrayDto> {
-        return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id);
-    }
-
-    /**
-    * @deprecated Deprecated due to naming mistake. Use `getRecievedFriendRequests()`
-    */
-    @Query(() => FriendRequestArrayDto, { 
-        name: 'getReceiveFriendRequests', 
-        deprecationReason: '쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.'}
-    )
-    @UseGuards(GqlAuthGuard)
-    async getReceiveFriendRequests(
-        @CurrentUser() user: UserJwtPayload,
-    ): Promise<FriendRequestArrayDto> {
-        return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id);
+        return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id, pagination);
     }
 
     @Query(() => FriendRequestArrayDto, { name: 'receivedFriendRequests'})
     @UseGuards(GqlAuthGuard)
     async getReceivedFriendRequests(
         @CurrentUser() user: UserJwtPayload,
+        @Args('pagination') pagination: PaginationInput
     ): Promise<FriendRequestArrayDto> {
         return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id);
     }

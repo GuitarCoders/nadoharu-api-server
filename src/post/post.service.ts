@@ -80,7 +80,6 @@ export class PostService{
     
     async getPostsForTimeline(
         userId: string, 
-        filter: PostFilterInput, 
         pagination: PaginationInput
     ): Promise<PostsQueryResultDto>{
         try {
@@ -88,7 +87,6 @@ export class PostService{
                 console.log(item.friend._id.toString());
                 return item.friend._id.toString();
             });
-            console.log(friends);
             const postsQuery 
                 = this.PostModel
                     .find({})
