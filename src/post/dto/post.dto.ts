@@ -1,8 +1,8 @@
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { PageInfo } from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { UserDocument } from "src/user/schemas/user.schema";
 import { Int } from "type-graphql";
-
 
 @ObjectType('Post')
 export class PostDto{
@@ -21,9 +21,6 @@ export class PostDto{
     @Field(() => String)
     category: string;
 
-    @Field(() => Int)
-    commentsCount: number;
-
     @Field(() => String)
     createdAt: string;
 }
@@ -34,47 +31,25 @@ export class PostArrayDto{
     Posts: PostDto[];
 }
 
-@InputType('getPostFilter')
-export class Filter{
+@InputType('PostFilter')
+export class PostFilterInput{
     @Field(() => String, { nullable: true })
     category?: string;
-
-    @Field(() => String, { nullable: true })
-    before?: string;
 
     // @Field(() => String, { nullable: true })
     // search?: string;
 }
 
-@InputType('GetPosts')
-export class GetPostsDto{
-    @Field(
-        () => (Filter),
-        { 
-            nullable: true, 
-            name: 'filter'
-        }
-    )
-    filter?: Filter;
-
-    @Field(() => Int)
-    count: number;
-}
-
-
-@ObjectType('GetPostsResult')
-export class GetPostsResultDto{
+@ObjectType('PostsQueryResult')
+export class PostsQueryResultDto {
     @Field(() => [PostDto])
     posts: PostDto[];
 
-    @Field(() => String, {nullable: true})
-    lastDateTime?: string;
-
-    @Field(() => Boolean)
-    hasNext: boolean;
+    @Field(() => PageInfo)
+    pageInfo: PageInfo
 }
 
-@InputType('CreatePost')
+@InputType('CreatePostInput')
 export class CreatePostDto{
     @Field(() => String)
     content: string;
@@ -87,7 +62,10 @@ export class CreatePostDto{
 }
 
 @ObjectType('CreatePostResult')
-export class CreatePostResultDto extends PostDto{
+export class CreatePostResultDto{
+    @Field(() => PostDto)
+    post: PostDto;
+
     @Field(() => Boolean)
     success: boolean;
 }

@@ -1,24 +1,22 @@
-import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
-import { addCommentDto, CommentDto, commentFilter, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
+import { addCommentDto, CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
+import { CommentMapper } from './mapper/comment.mapper';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationService } from 'src/pagination/pagination.service';
 
 @Injectable()
-export class CommentService implements OnModuleInit {
-    private PostService: PostService;
+export class CommentService{
     constructor(
         private readonly UserService: UserService,
-        private moduleRef: ModuleRef,
+        private readonly PostService: PostService,
+        private readonly PaginationService: PaginationService,
         @InjectModel(Comment.name) private CommentModel: Model<Comment>
     ) {}
-
-    onModuleInit() {
-        this.PostService = this.moduleRef.get(PostService, {strict: false});
-    }
 
     async addCommentToPost(commenterUserId: string, addData: addCommentDto): Promise<CommentDto>{
         try {
@@ -32,14 +30,12 @@ export class CommentService implements OnModuleInit {
             })
     
             await createdComment.save();
-        
-            const resultComment: CommentDto = {
-                _id: createdComment._id.toString(),
-                content: createdComment.content,
-                postId: createdComment.post._id.toString(),
-                Commenter: this.UserService.userDocumentToUserSafe((await createdComment.populate('commenter')).commenter),
-                createdAt: createdComment.createdAt.toISOString()
-            }
+            await createdComment.populate('commenter');
+
+            const resultComment = CommentMapper.toCommentDto(
+                createdComment,
+                this.UserService.userDocumentToUserSafe(createdComment.commenter)
+            );
     
             return resultComment
 
@@ -49,33 +45,28 @@ export class CommentService implements OnModuleInit {
         
     }
 
-    async getCommentsByPostId(targetPostId: string, options: commentFilter): Promise<CommentsDto>{
+    async getCommentsByPostId(targetPostId: string, pagination: PaginationInput): Promise<CommentsDto>{
         try {
-            // const commentDocuments = await this.CommentModel.find({post: targetPostId}).sort({createdAt: 1}).populate('commenter');
-
-            const commentTotalCount = await this.CommentModel.find({post: targetPostId}).count();
-            
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
-            if(options.skip) {
-                commentQuery.skip(options.skip);
-            }
-            commentQuery.limit(options.limit);
-
-            const commentDocuments = await commentQuery.populate('commenter');
-
-            console.log(`commentCount: ${commentTotalCount} | skip+limit: ${options.skip?options.skip:0+options.limit}`);
             
-            const result: CommentDto[] = commentDocuments.map(item => ({
-                _id: item._id.toString(),
-                content: item.content,
-                postId: item.post._id.toString(),
-                Commenter: this.UserService.userDocumentToUserSafe(item.commenter),
-                createdAt: item.createdAt.toISOString()
-            }))
+            const {countOnlyQuery} = this.PaginationService.buildPaginationQuery(pagination, commentQuery);
+
+            const count = await countOnlyQuery.count();
+            const commentDocuments = await commentQuery.populate('commenter');
+    
+            const commentArray = commentDocuments.map(item => (
+                CommentMapper.toCommentDto(
+                    item,
+                    this.UserService.userDocumentToUserSafe(item.commenter)
+                )
+            ));
+
             return {
-                comments: result,
-                hasNext: commentTotalCount > (options.skip?options.skip:0 + options.limit),
-                totalCount: commentTotalCount 
+                comments: commentArray,
+                pageInfo: this.PaginationService.getPageTimeInfo(
+                    commentDocuments.at(-1),
+                    count, commentDocuments.length
+                )
             };
         } catch (err) {
             console.error(err);

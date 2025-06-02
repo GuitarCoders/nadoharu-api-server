@@ -1,5 +1,6 @@
 import { Field, InputType,  ObjectType } from "@nestjs/graphql";
 import { before } from "node:test";
+import { PageInfo} from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { Int } from "type-graphql";
 
@@ -15,10 +16,10 @@ export class CommentDto{
     postId: string;
     
     @Field(() => UserSafeDto)
-    Commenter: UserSafeDto;
+    commenter: UserSafeDto;
 
     @Field(() => String)
-    createdAt: String;
+    createdAt: string;
 }
 
 @ObjectType('Comments')
@@ -26,11 +27,8 @@ export class CommentsDto{
     @Field(() => [CommentDto])
     comments: CommentDto[];
 
-    @Field(() => Boolean)
-    hasNext: boolean;
-
-    @Field(() => Int)
-    totalCount: Number;
+    @Field(() => PageInfo)
+    pageInfo: PageInfo;
 }
 
 @InputType('addCommentData')
@@ -40,15 +38,6 @@ export class addCommentDto{
   
     @Field(() => String)
     content: string;
-}
-
-@InputType('commentFilter')
-export class commentFilter{
-    @Field(() => Int, {nullable: true})
-    skip?: number;
-
-    @Field(() => Int)
-    limit: number;
 }
 
 @ObjectType('deleteCommentResult')

@@ -7,10 +7,10 @@ export class FriendRequestDto{
     _id: string;
 
     @Field(() => UserSafeDto)
-    requestUser: UserSafeDto;
+    requester: UserSafeDto;
 
     @Field(() => UserSafeDto)
-    receiveUser: UserSafeDto;
+    receiver: UserSafeDto;
 
     @Field(() => String)
     requestMessage: string;
@@ -28,7 +28,7 @@ export class FriendRequestArrayDto{
 @InputType('CreateFriendRequest')
 export class CreateFriendRequestDto{
     @Field(() => String)
-    receiveUserId: string;
+    receiver: string;
     
     @Field(() => String)
     requestMessage: string;

@@ -1,4 +1,5 @@
 import { Field, ObjectType, InputType, Int } from "@nestjs/graphql";
+import { PageInfo } from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 
 
@@ -26,8 +27,17 @@ export class FriendsDto{
     friends: FriendDto[];
 }
 
-@InputType('getFriendsData')
-export class getFriendsDto{
+@ObjectType('FriendsQueryResult')
+export class FriendsQueryResultDto {
+    @Field(() => [FriendDto])
+    friends: FriendDto[];
+
+    @Field(() => PageInfo)
+    pageInfo: PageInfo;
+}
+
+@InputType('FriendsFilter')
+export class FriendsFilterInput{
     @Field(() => String, {nullable: true})
     targetUserId?: string;
 

@@ -14,6 +14,7 @@ import { FriendModule } from './friend/friend.module';
 import { TestModule } from './test/test.module';
 import { CommentModule } from './comment/comment.module';
 import { UserInfoModule } from './userInfo/userInfo.module';
+import { PaginationModule } from './pagination/pagination.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -39,7 +40,8 @@ console.log(process.env.NODE_ENV);
     FriendModule,
     TestModule,
     CommentModule,
-    UserInfoModule
+    UserInfoModule,
+    PaginationModule
   ],
   providers: [AppService],
 })

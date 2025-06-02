@@ -3,13 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersSafeDto } from 'src/user/dto/user.dto';
 import { UserService } from 'src/user/user.service';
-import { FriendsDto, getFriendsDto } from './dto/friend.dto';
+import { FriendsDto, FriendsFilterInput, FriendsQueryResultDto } from './dto/friend.dto';
 import { Friend, FriendDocument } from './schemas/friend.schema';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { PaginationService } from 'src/pagination/pagination.service';
 
 @Injectable()
 export class FriendService {
     constructor(
-        private UserService: UserService,
+        private readonly UserService: UserService,
+        private readonly PaginationService: PaginationService,
         @InjectModel(Friend.name) private FriendModel: Model<Friend>
     ) {}
 
@@ -41,29 +44,36 @@ export class FriendService {
 
     async getFriends(
         targetUserId: string,
-        option: getFriendsDto
-    ): Promise<FriendsDto> {
+        pagination: PaginationInput,
+    ): Promise<FriendsQueryResultDto> {
         try{
 
             const FriendQuery = this.FriendModel
-                                .find({owner: option.targetUserId ? option.targetUserId : targetUserId})
+                                .find({targetUserId})
                                 .sort({createdAt:-1});
 
-            if (option?.skip){
-                FriendQuery.skip(option.skip);
-            }
+            const {countOnlyQuery} 
+                = this.PaginationService.buildPaginationQuery(pagination, FriendQuery);
 
-            FriendQuery.limit(option.limit);
+            const queryCount = await countOnlyQuery.count();
 
-            const FriendDocuments = await FriendQuery.populate('owner').populate('friend');
+            const friendDocuments = await FriendQuery.populate('owner').populate('friend');
 
-            const Friends = FriendDocuments.map( item => ({
+            const Friends = friendDocuments.map( item => ({
                 _id: item._id.toString(),
                 user: this.UserService.userDocumentToUserSafe(item.friend),
                 createdAt: item.createdAt.toISOString()
             }))
+
+
             
-            return {friends: Friends}
+            return {
+                friends: Friends,
+                pageInfo: this.PaginationService.getPageTimeInfo(
+                    friendDocuments.at(-1),
+                    queryCount, friendDocuments.length
+                )
+            }
         } catch (err) {
             
         }

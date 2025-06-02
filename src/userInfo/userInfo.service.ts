@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { FriendService } from "src/friend/friend.service";
 import { UserService } from "src/user/user.service";
 import { AboutMeDto, UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
-import { FriendState } from "./enums/userInfo.enum";
+import { FriendState } from "./enum/userInfo.enum";
 import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 
 @Injectable()
@@ -14,18 +14,15 @@ export class UserInfoService {
     ) {}
 
     async getUserInfos(
-        requestUserId: string,
+        requesterId: string,
         search: string
     ): Promise<UserInfosDto> {
         try {
             const users = await this.UserService.findUsers(search);
-            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
             const userInfoPromises: Promise<UserInfoDto>[] = users.Users.map(async(user) => {
                 
-                const isFriend = await this.getFriendState(requestUserId, user._id);
-                const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
-                    (friendRequest) => (friendRequest.receiveUser._id === user._id)
-                ) === -1 ? false : true;
+                const isFriend = await this.getFriendState(requesterId, user._id);
+                const isFriendRequested = await this.FriendRequestService.hasSentFriendRequest(requesterId, user._id);
                 const friendCount = await this.FriendService.getFriendCount(user._id);
 
                 return {
@@ -82,10 +79,7 @@ export class UserInfoService {
         try {
             const targetUser = await this.UserService.getUserByIdSafe(targetUserId);
             const isFriend = await this.getFriendState(requestUserId, targetUserId);
-            const sentFriendRequests = await this.FriendRequestService.getFriendRequestsByRequestUserId(requestUserId);
-            const isFriendRequested = sentFriendRequests.friendRequests.findIndex(
-                    (friendRequest) => (friendRequest.receiveUser._id === targetUserId)
-                ) === -1 ? false : true;
+            const isFriendRequested = await this.FriendRequestService.hasSentFriendRequest(requestUserId, targetUserId);
             const friendCount = await this.FriendService.getFriendCount(targetUserId);
             
             return {

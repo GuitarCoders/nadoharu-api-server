@@ -5,7 +5,8 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { PostDto } from 'src/post/dto/post.dto';
 import { CommentService } from './comment.service';
-import { CommentDto, commentFilter, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
+import { CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class CommentResolver {
@@ -13,13 +14,13 @@ export class CommentResolver {
         private readonly CommentService: CommentService
     ) {}
 
-    @Query(() => CommentsDto, {name: "getCommentByPostId"})
+    @Query(() => CommentsDto, {name: "comments"})
     @UseGuards(GqlAuthGuard)
-    async getCommentByPostId(
+    async getCommentByPostId (
         @Args('postId') targetPostId: string,
-        @Args('filter') commentFilter: commentFilter
+        @Args('pagination') pagination: PaginationInput
     ): Promise<CommentsDto> {
-        return await this.CommentService.getCommentsByPostId(targetPostId, commentFilter);
+        return await this.CommentService.getCommentsByPostId(targetPostId, pagination);
     }
 
     @Mutation(() => CommentDto, {name: "addCommentToPost"})

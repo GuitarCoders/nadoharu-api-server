@@ -4,8 +4,9 @@ import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { Arg, Int } from 'type-graphql';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, Filter, GetPostsDto, GetPostsResultDto, PostDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostFilterInput, PostsQueryResultDto, PostDto, Test } from './dto/post.dto';
 import { PostService } from './post.service';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class PostResolver {
@@ -13,7 +14,7 @@ export class PostResolver {
         private readonly PostService: PostService
     ) {}
 
-    @Query(() => PostDto, { name: "getPost"})
+    @Query(() => PostDto, { name: "post"})
     @UseGuards(GqlAuthGuard)
     async getPost(
         @CurrentUser() user:UserJwtPayload,
@@ -21,32 +22,43 @@ export class PostResolver {
     ): Promise<PostDto> {
         return await this.PostService.getPostById(targetPostId);
     }
-    
-    @Query(() => GetPostsResultDto, { name: "getPosts"})
+
+    @Query(() => PostsQueryResultDto, { name: "postsByUserId"})
     @UseGuards(GqlAuthGuard)
-    async getPosts(
+    async getPostsByUserId(
         @CurrentUser() user: UserJwtPayload,
-        @Args('targetUserId', {nullable: true}) targetUserId: string,
-        @Args('getPostsData') reqData: GetPostsDto
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, reqData, targetUserId);
+        @Args('targetUserId') targetUserId: string,
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsByUserId(targetUserId, filter, pagination);
     }
 
-    @Query(() => GetPostsResultDto, { name: "getPostsFromMe"})
+    @Query(() => PostsQueryResultDto, { name: "postsForTimeline"})
     @UseGuards(GqlAuthGuard)
-    async getPostsFromMe(
+    async getPostsForTimeline(
         @CurrentUser() user: UserJwtPayload,
-        @Args('count', {type: () => Int}) count: number,
-        @Args('before', {type: () => String, nullable: true}) before?: string
-    ): Promise<GetPostsResultDto> {
-        return await this.PostService.getPosts(user._id, {count: count, filter:{before:before}}, user._id);
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsForTimeline(user._id, pagination);
+    }
+
+    @Query(() => PostsQueryResultDto, { name: "postsByMe"})
+    @UseGuards(GqlAuthGuard)
+    async getPostsByMe(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('filter') filter: PostFilterInput,
+        @Args('pagination') pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostService.getPostsByUserId(user._id, filter, pagination);
     }
         
     @Mutation(() => CreatePostResultDto,{ name: "createPost" })
     @UseGuards(GqlAuthGuard)
     async createPost(
         @CurrentUser() user: UserJwtPayload,
-        @Args('createPostData') reqData: CreatePostDto
+        @Args('input') reqData: CreatePostDto
     ): Promise<CreatePostResultDto> {
         return await this.PostService.createPost(user._id, reqData);
     }
@@ -59,15 +71,4 @@ export class PostResolver {
     ): Promise<DeletePostResultDto> {
         return await this.PostService.deletePost(user._id, reqData);
     }
-
-    //TODO : 해당 쿼리가 필요한지 확인
-    // @Query(() => GetPostsResultDto, { name: "getPostsForTimeline", description: "Deprecated"})
-    // @UseGuards(GqlAuthGuard)
-    // async getPostsForTimeline(
-    //     @CurrentUser() user: UserJwtPayload,
-    //     @Args('getPostsData') reqData: GetPostsDto
-    // ): Promise<GetPostsResultDto> {
-    //     return await this.PostService.getPostsForTimeline(user._id, reqData);
-    // }
-
 }

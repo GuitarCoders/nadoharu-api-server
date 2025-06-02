@@ -39,8 +39,8 @@ type LoginResponse {
 
 type FriendRequest {
   _id: String!
-  requestUser: User!
-  receiveUser: User!
+  requester: User!
+  receiver: User!
   requestMessage: String!
   createdAt: String!
 }
@@ -51,8 +51,8 @@ type FriendRequestArray {
 
 type CreateFriendRequestResult {
   _id: String!
-  requestUser: User!
-  receiveUser: User!
+  requester: User!
+  receiver: User!
   requestMessage: String!
   createdAt: String!
   success: Boolean!
@@ -66,32 +66,25 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
+type Cursor {
+  time: String!
+  id: String!
+}
+
+type PageInfo {
+  hasNext: Boolean!
+  cursor: Cursor
+}
+
 type Friend {
   _id: String!
   user: User!
   createdAt: String!
 }
 
-type Friends {
+type FriendsQueryResult {
   friends: [Friend!]!
-}
-
-type Comment {
-  _id: String!
-  content: String!
-  postId: String!
-  Commenter: User!
-  createdAt: String!
-}
-
-type Comments {
-  comments: [Comment!]!
-  hasNext: Boolean!
-  totalCount: Int!
-}
-
-type deleteCommentResult {
-  success: Boolean!
+  pageInfo: PageInfo!
 }
 
 type Post {
@@ -100,24 +93,16 @@ type Post {
   content: String!
   tags: String
   category: String!
-  commentsCount: Int!
   createdAt: String!
 }
 
-type GetPostsResult {
+type PostsQueryResult {
   posts: [Post!]!
-  lastDateTime: String
-  hasNext: Boolean!
+  pageInfo: PageInfo!
 }
 
 type CreatePostResult {
-  _id: String!
-  author: User!
-  content: String!
-  tags: String
-  category: String!
-  commentsCount: Int!
-  createdAt: String!
+  post: Post!
   success: Boolean!
 }
 
@@ -126,6 +111,23 @@ type DeletePostResult {
 }
 
 type addAllUserInFriendResult {
+  success: Boolean!
+}
+
+type Comment {
+  _id: String!
+  content: String!
+  postId: String!
+  commenter: User!
+  createdAt: String!
+}
+
+type Comments {
+  comments: [Comment!]!
+  pageInfo: PageInfo!
+}
+
+type deleteCommentResult {
   success: Boolean!
 }
 
@@ -160,40 +162,33 @@ type Query {
   userWhoAmI: User!
   users(search: String!): Users!
   login(username: String!, password: String!): LoginResponse!
-  getSentFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. sentFriendRequests 쿼리가 해당 쿼리를 완벽히 대체합니다.")
-  sentFriendRequests: FriendRequestArray!
-  getReceiveFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.")
-  receivedFriendRequests: FriendRequestArray!
-  getFriends(filter: getFriendsData!): Friends!
-  getPost(postId: String!): Post!
-  getPosts(targetUserId: String, getPostsData: GetPosts!): GetPostsResult!
-  getPostsFromMe(count: Int!, before: String): GetPostsResult!
-  getCommentByPostId(postId: String!, filter: commentFilter!): Comments!
+  sentFriendRequests(pagination: PaginationInput!): FriendRequestArray!
+  receivedFriendRequests(pagination: PaginationInput!): FriendRequestArray!
+  friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
+  post(postId: String!): Post!
+  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  comments(postId: String!, pagination: PaginationInput!): Comments!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfos!
   me: AboutMe!
   userInfoByAccountId(accountId: String!): UserInfo!
 }
 
-input getFriendsData {
-  targetUserId: String
-  limit: Int!
-  skip: Int
+input PaginationInput {
+  cursor: CursorInput
+  until: CursorInput
+  limit: Int
 }
 
-input GetPosts {
-  filter: getPostFilter
-  count: Int!
+input CursorInput {
+  time: String!
+  id: String!
 }
 
-input getPostFilter {
+input PostFilter {
   category: String
-  before: String
-}
-
-input commentFilter {
-  skip: Int
-  limit: Int!
 }
 
 type Mutation {
@@ -203,11 +198,11 @@ type Mutation {
   createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
   deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
   acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
-  createPost(createPostData: CreatePost!): CreatePostResult!
+  createPost(input: CreatePostInput!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
+  addAllUserInFriend: addAllUserInFriendResult!
   addCommentToPost(targetPostId: String!, content: String!): Comment!
   deleteCommentById(targetCommentId: String!): deleteCommentResult!
-  addAllUserInFriend: addAllUserInFriendResult!
 }
 
 input UserUpdate {
@@ -228,7 +223,7 @@ input UserDeleteRequest {
 }
 
 input CreateFriendRequest {
-  receiveUserId: String!
+  receiver: String!
   requestMessage: String!
 }
 
@@ -240,7 +235,7 @@ input AcceptFriendRequest {
   friendRequestId: String!
 }
 
-input CreatePost {
+input CreatePostInput {
   content: String!
   tags: String
   category: String

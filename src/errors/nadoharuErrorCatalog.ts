@@ -23,10 +23,6 @@ export const NadoharuErrorCatalog = {
         code: 'FRIEND_REQUEST_NOT_RECEIVED',
         defaultMessage: '받지 않은 친구신청을 승낙할 수 없습니다.'
     }
-
-
-
-
 } as const;
 
 export type NadoharuErrorType = keyof typeof NadoharuErrorCatalog;
