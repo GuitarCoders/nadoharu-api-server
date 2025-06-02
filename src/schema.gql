@@ -114,19 +114,31 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
+"""댓글의 주요 정보를 포함하는 객체입니다."""
 type Comment {
+  """댓글의 고유 id입니다."""
   _id: String!
+
+  """댓글의 내용입니다."""
   content: String!
+
+  """댓글이 속한 게시글의 고유 id입니다."""
   postId: String!
+
+  """댓글의 작성자 User 객체입니다."""
   commenter: User!
+
+  """댓글을 작성한 시간입니다."""
   createdAt: String!
 }
 
+"""여러개의 댓글을 배열로 가지고 있는 객체입니다. 페이지네이션 정보가 포함되어있습니다."""
 type Comments {
   comments: [Comment!]!
   pageInfo: PageInfo!
 }
 
+"""댓글이 삭제되었는지에 대한 결과입니다."""
 type deleteCommentResult {
   success: Boolean!
 }
@@ -169,7 +181,15 @@ type Query {
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  comments(postId: String!, pagination: PaginationInput!): Comments!
+
+  """특정 글의 댓글을 가져오는 쿼리입니다."""
+  comments(
+    """댓글을 가져올 대상 글의 id"""
+    postId: String!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): Comments!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfos!
   me: AboutMe!
@@ -201,8 +221,19 @@ type Mutation {
   createPost(input: CreatePostInput!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
-  addCommentToPost(targetPostId: String!, content: String!): Comment!
-  deleteCommentById(targetCommentId: String!): deleteCommentResult!
+
+  """특정 글에 댓글을 작성하는 뮤테이션입니다."""
+  addCommentToPost(
+    """댓글을 작성할 대상 글의 id"""
+    targetPostId: String!
+
+    """댓글의 내용"""
+    content: String!
+  ): Comment!
+  deleteCommentById(
+    """삭제할 댓글의 id"""
+    targetCommentId: String!
+  ): deleteCommentResult!
 }
 
 input UserUpdate {
