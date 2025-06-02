@@ -11,7 +11,7 @@ export class PaginationService {
 
         query.sort({createdAt: -1});
         if (pagination.cursor) {
-            query.lt('createdAt', pagination.cursor.time);
+            query.lte('createdAt', pagination.cursor.time);
             query.lt('_id', pagination.cursor.id);
         }
 
