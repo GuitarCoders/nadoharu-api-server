@@ -66,16 +66,6 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
-type Friend {
-  _id: String!
-  user: User!
-  createdAt: String!
-}
-
-type Friends {
-  friends: [Friend!]!
-}
-
 type Cursor {
   time: String!
   id: String!
@@ -84,6 +74,17 @@ type Cursor {
 type PageInfo {
   hasNext: Boolean!
   cursor: Cursor
+}
+
+type Friend {
+  _id: String!
+  user: User!
+  createdAt: String!
+}
+
+type FriendsQueryResult {
+  friends: [Friend!]!
+  pageInfo: PageInfo!
 }
 
 type Post {
@@ -165,8 +166,7 @@ type Query {
   sentFriendRequests: FriendRequestArray!
   getReceiveFriendRequests: FriendRequestArray! @deprecated(reason: "쿼리 이름에 오타가 있습니다. receivedFriendRequests가 해당 쿼리를 완벽히 대체합니다.")
   receivedFriendRequests: FriendRequestArray!
-  friends(filter: FriendsFilter!): Friends!
-  getFriends(filter: FriendsFilter!): Friends! @deprecated(reason: "쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. friends 쿼리가 해당 쿼리를 완벽히 대체합니다.")
+  friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
   post(postId: String!): Post!
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
@@ -178,16 +178,6 @@ type Query {
   userInfoByAccountId(accountId: String!): UserInfo!
 }
 
-input FriendsFilter {
-  targetUserId: String
-  limit: Int!
-  skip: Int
-}
-
-input PostFilter {
-  category: String
-}
-
 input PaginationInput {
   cursor: CursorInput
   until: CursorInput
@@ -197,6 +187,10 @@ input PaginationInput {
 input CursorInput {
   time: String!
   id: String!
+}
+
+input PostFilter {
+  category: String
 }
 
 type Mutation {

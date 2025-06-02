@@ -3,8 +3,9 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
-import { FriendsDto, FriendsFilterInput, test } from './dto/friend.dto';
+import { FriendsDto, FriendsQueryResultDto, test } from './dto/friend.dto';
 import { FriendService } from './friend.service';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
 export class FriendResolver {
@@ -12,26 +13,13 @@ export class FriendResolver {
         private readonly FriendService: FriendService
     ) {}
     
-    @Query(() => FriendsDto, {name: 'friends'})
+    @Query(() => FriendsQueryResultDto, {name: 'friends'})
     @UseGuards(GqlAuthGuard)
     async getFriends(
         @CurrentUser() user: UserJwtPayload,
-        @Args('filter') filter: FriendsFilterInput 
-    ):Promise<FriendsDto> {
-        return await this.FriendService.getFriends(user._id, filter);
-    }
-    
-
-    // ========== Deprecated resolvers ==========
-    @Query(() => FriendsDto, {
-        name: 'getFriends',
-        deprecationReason: '쿼리 명명규칙이 변경됨에 따라 더이상 해당 쿼리는 사용하지 않습니다. friends 쿼리가 해당 쿼리를 완벽히 대체합니다.'
-    })
-    @UseGuards(GqlAuthGuard)
-    async getFriendsDeprecated(
-        @CurrentUser() user: UserJwtPayload,
-        @Args('filter') filter: FriendsFilterInput 
-    ):Promise<FriendsDto> {
-        return await this.FriendService.getFriends(user._id, filter);
+        @Args('pagination') pagination: PaginationInput,
+        @Args('targetUserId', {nullable: true}) targetUserId?: string,
+    ):Promise<FriendsQueryResultDto> {
+        return await this.FriendService.getFriends(targetUserId ?? user._id, pagination);
     }
 }
