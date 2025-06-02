@@ -47,9 +47,9 @@ export class FriendService {
         pagination: PaginationInput,
     ): Promise<FriendsQueryResultDto> {
         try{
-
+            console.log(targetUserId);
             const FriendQuery = this.FriendModel
-                                .find({targetUserId})
+                                .find({owner: targetUserId})
                                 .sort({createdAt:-1});
 
             const {countOnlyQuery} 
