@@ -169,7 +169,7 @@ type Query {
   friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
   post(postId: String!): Post!
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  postsForTimeline(targetUserId: String, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+  postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   comments(postId: String!, pagination: PaginationInput!): Comments!
   userInfo(userId: String!): UserInfo!

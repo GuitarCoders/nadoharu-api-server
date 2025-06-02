@@ -38,7 +38,6 @@ export class PostResolver {
     @UseGuards(GqlAuthGuard)
     async getPostsForTimeline(
         @CurrentUser() user: UserJwtPayload,
-        @Args('targetUserId', {nullable: true}) targetUserId: string,
         @Args('filter') filter: PostFilterInput,
         @Args('pagination') pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {

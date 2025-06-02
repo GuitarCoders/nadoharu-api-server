@@ -56,8 +56,7 @@ export class PostService{
 
             const docsCount = await countOnlyQuery.count();
 
-            postsQuery
-                .populate('author');
+            postsQuery.populate('author');
             
             const postDocuments = await postsQuery;
             const posts = postDocuments.map(item => PostMapper.toPostDto(item));
@@ -90,25 +89,25 @@ export class PostService{
                 return item.friend._id.toString();
             });
             console.log(friends);
-            const inQueryModel = this.PostModel.find({});
-
-            inQueryModel.where('author').in([userId, ...friends]);
+            const postsQuery 
+                = this.PostModel
+                    .find({})
+                    .where('author').in([userId, ...friends])
+                    .sort({createdAt: -1});
 
             const {countOnlyQuery} 
-                = this.paginationService.buildPaginationQuery(pagination, inQueryModel);
+                = this.paginationService.buildPaginationQuery(pagination, postsQuery);
 
-            const leftCount = await (new (inQueryModel.toConstructor())).count();
+            const postsCount = await countOnlyQuery.count();
 
-            const resultPostModels = await inQueryModel.sort({createdAt: -1}).limit(pagination.limit).populate('author');
+            const resultPostModels = await postsQuery.populate('author');
             const result = resultPostModels.map(item => PostMapper.toPostDto(item));
-
-            const lastDateTime = resultPostModels.at(-1)?.createdAt.toISOString();
 
             return { 
                 posts:result, 
                 pageInfo: this.paginationService.getPageTimeInfo(
                     resultPostModels.at(-1),
-                    leftCount, result.length
+                    postsCount, result.length
                 )
             };
         } catch (err) {
