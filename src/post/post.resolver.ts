@@ -4,7 +4,7 @@ import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { Arg, Int } from 'type-graphql';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostFilterInput, PostsQueryResultDto, PostDto, Test } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostResultDto, PostFilterInput, PostsQueryResultDto, PostDto } from './dto/post.dto';
 import { PostService } from './post.service';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
@@ -14,61 +14,96 @@ export class PostResolver {
         private readonly PostService: PostService
     ) {}
 
-    @Query(() => PostDto, { name: "post"})
+    @Query(() => PostDto, {
+        name: "post",
+        description: "글 정보를 가져오는 쿼리입니다."    
+    })
     @UseGuards(GqlAuthGuard)
     async getPost(
         @CurrentUser() user:UserJwtPayload,
-        @Args('postId') targetPostId: string
+        @Args('postId', {
+            description: "가져올 글의 id입니다."
+        }) targetPostId: string
     ): Promise<PostDto> {
         return await this.PostService.getPostById(targetPostId);
     }
 
-    @Query(() => PostsQueryResultDto, { name: "postsByUserId"})
+    @Query(() => PostsQueryResultDto, { 
+        name: "postsByUserId",
+        description: "특정 유저의 id를 통해 해당 유저가 작성한 글 목록을 가져오는 쿼리입니다."
+    })
     @UseGuards(GqlAuthGuard)
     async getPostsByUserId(
         @CurrentUser() user: UserJwtPayload,
-        @Args('targetUserId') targetUserId: string,
-        @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationInput
+        @Args('targetUserId', {
+            description: "글 작성자의 id"
+        }) targetUserId: string,
+        @Args('filter', {
+            description: "작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다."
+        }) filter: PostFilterInput,
+        @Args('pagination', {
+            description: "페이지네이션 정보"
+        }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsByUserId(targetUserId, filter, pagination);
     }
 
-    @Query(() => PostsQueryResultDto, { name: "postsForTimeline"})
+    @Query(() => PostsQueryResultDto, { 
+        name: "postsForTimeline",
+        description: "로그인한 유저 기준 타임라인에 표시될 글 목록을 가져오는 쿼리입니다. 로그인한 유저를 포함하여 친구들의 글들을 시간순으로 가져옵니다."
+    })
     @UseGuards(GqlAuthGuard)
     async getPostsForTimeline(
         @CurrentUser() user: UserJwtPayload,
-        @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationInput
+        @Args('pagination', {
+            description: "페이지네이션 정보"
+        }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsForTimeline(user._id, pagination);
     }
 
-    @Query(() => PostsQueryResultDto, { name: "postsByMe"})
+    @Query(() => PostsQueryResultDto, { 
+        name: "postsByMe",
+        description: "로그인한 유저가 작성한 글 목록을 가져오는 쿼리입니다."
+    })
     @UseGuards(GqlAuthGuard)
     async getPostsByMe(
         @CurrentUser() user: UserJwtPayload,
-        @Args('filter') filter: PostFilterInput,
-        @Args('pagination') pagination: PaginationInput
+        @Args('filter', {
+            description: "작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다."
+        }) filter: PostFilterInput,
+        @Args('pagination', {
+            description: "페이지네이션 정보"
+        }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.PostService.getPostsByUserId(user._id, filter, pagination);
     }
         
-    @Mutation(() => CreatePostResultDto,{ name: "createPost" })
+    @Mutation(() => CreatePostResultDto, { 
+        name: "createPost",
+        description: "글을 작성하는 뮤테이션입니다."
+    })
     @UseGuards(GqlAuthGuard)
     async createPost(
         @CurrentUser() user: UserJwtPayload,
-        @Args('input') reqData: CreatePostDto
+        @Args('postData', {
+            description: "글 작성에 필요한 정보를 담는 Input 객체입니다."
+        }) reqData: CreatePostDto
     ): Promise<CreatePostResultDto> {
         return await this.PostService.createPost(user._id, reqData);
     }
 
-    @Mutation(() => DeletePostResultDto, { name: "deletePost"})
+    @Mutation(() => DeletePostResultDto, { 
+        name: "deletePost",
+        description: "특정 id에 해당하는 글을 지우는 뮤테이션입니다."
+    })
     @UseGuards(GqlAuthGuard)
     async deletePost(
         @CurrentUser() user: UserJwtPayload,
-        @Args('deletePostData') reqData: DeletePostDto
+        @Args('postId', {
+            description: "지울 글의 id"
+        }) postId: string
     ): Promise<DeletePostResultDto> {
-        return await this.PostService.deletePost(user._id, reqData);
+        return await this.PostService.deletePost(user._id, postId);
     }
 }

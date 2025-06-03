@@ -126,15 +126,28 @@ type FriendsQueryResult {
   pageInfo: PageInfo!
 }
 
+"""글에 대한 정보를 표현하는 객체입니다."""
 type Post {
+  """글의 고유 id입니다."""
   _id: String!
+
+  """글을 작성한 유저의 User 객체입니다."""
   author: User!
+
+  """글의 내용입니다."""
   content: String!
+
+  """글의 태그입니다. 내용이 없을 수도 있습니다."""
   tags: String
+
+  """글의 카테고리입니다. 관련 기능이 아직 구현되어있지 않습니다."""
   category: String!
+
+  """글을 작성한 시간입니다."""
   createdAt: String!
 }
 
+"""글 목록 쿼리 결과 객체입니다. Post객체를 배열로 가지고 있습니다. 페이지네이션을 위한 정보가 포함되어있습니다."""
 type PostsQueryResult {
   posts: [Post!]!
   pageInfo: PageInfo!
@@ -234,10 +247,45 @@ type Query {
     """친구 목록을 가져올 대상의 user id. 해당 항목을 비우면 로그인한 유저의 id를 기준으로 친구 목록을 불러옵니다."""
     targetUserId: String
   ): FriendsQueryResult!
-  post(postId: String!): Post!
-  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
+
+  """글 정보를 가져오는 쿼리입니다."""
+  post(
+    """가져올 글의 id입니다."""
+    postId: String!
+  ): Post!
+
+  """특정 유저의 id를 통해 해당 유저가 작성한 글 목록을 가져오는 쿼리입니다."""
+  postsByUserId(
+    """글 작성자의 id"""
+    targetUserId: String!
+
+    """
+    작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다.
+    """
+    filter: PostFilter!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
+
+  """
+  로그인한 유저 기준 타임라인에 표시될 글 목록을 가져오는 쿼리입니다. 로그인한 유저를 포함하여 친구들의 글들을 시간순으로 가져옵니다.
+  """
+  postsForTimeline(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
+
+  """로그인한 유저가 작성한 글 목록을 가져오는 쿼리입니다."""
+  postsByMe(
+    """
+    작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다.
+    """
+    filter: PostFilter!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
 
   """특정 글의 댓글을 가져오는 쿼리입니다."""
   comments(
@@ -275,7 +323,11 @@ input CursorInput {
   id: String!
 }
 
+"""
+특정 분류의 글을 가져오기 위한 필터 Input객체입니다. 카테고리 등의 분류 내용을 지정할 수 있습니다. 내용은 생략 가능합니다.
+"""
 input PostFilter {
+  """어떤 카테고리의 글을 가져올지 정합니다. 지금은 아직 관련 기능이 구현되어있지 않습니다."""
   category: String
 }
 
@@ -305,8 +357,18 @@ type Mutation {
     """승낙할 친구신청 id"""
     acceptFriendRequestData: String!
   ): AcceptFriendRequestResult!
-  createPost(input: CreatePostInput!): CreatePostResult!
-  deletePost(deletePostData: DeletePost!): DeletePostResult!
+
+  """글을 작성하는 뮤테이션입니다."""
+  createPost(
+    """글 작성에 필요한 정보를 담는 Input 객체입니다."""
+    postData: CreatePostInput!
+  ): CreatePostResult!
+
+  """특정 id에 해당하는 글을 지우는 뮤테이션입니다."""
+  deletePost(
+    """지울 글의 id"""
+    postId: String!
+  ): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
 
   """특정 글에 댓글을 작성하는 뮤테이션입니다."""
@@ -349,12 +411,14 @@ input CreateFriendRequest {
   requestMessage: String!
 }
 
+"""글 작성에 필요한 정보를 표현하고 있는 Input객체입니다."""
 input CreatePostInput {
+  """글 내용을 지정합니다."""
   content: String!
-  tags: String
-  category: String
-}
 
-input DeletePost {
-  postId: String!
+  """글의 태그를 지정합니다. 내용을 비울 수 있습니다."""
+  tags: String
+
+  """글의 카테고리를 지정합니다. 내용을 비울 수 있습니다."""
+  category: String
 }
