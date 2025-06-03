@@ -37,35 +37,6 @@ type LoginResponse {
   jwt_token: String!
 }
 
-type FriendRequest {
-  _id: String!
-  requester: User!
-  receiver: User!
-  requestMessage: String!
-  createdAt: String!
-}
-
-type FriendRequestArray {
-  friendRequests: [FriendRequest!]!
-}
-
-type CreateFriendRequestResult {
-  _id: String!
-  requester: User!
-  receiver: User!
-  requestMessage: String!
-  createdAt: String!
-  success: Boolean!
-}
-
-type DeleteFriendRequestResult {
-  success: Boolean!
-}
-
-type AcceptFriendRequestResult {
-  success: String!
-}
-
 """
 페이지네이션 쿼리 후 이동한 기준점을 나타내는 객체입니다. 다음 페이지를 탐색하기 위해 해당 정보를 CursorInput으로 사용할 수 있습니다.
 """
@@ -87,12 +58,69 @@ type PageInfo {
   cursor: Cursor
 }
 
-type Friend {
+"""친구신청 관련 객체입니다."""
+type FriendRequest {
+  """친구신청 고유 id입니다."""
   _id: String!
-  user: User!
+
+  """친구신청을 요청한 User객체입니다."""
+  requester: User!
+
+  """친구신청을 받은 User객체입니다."""
+  receiver: User!
+
+  """친구신청 메세지입니다."""
+  requestMessage: String!
+
+  """친구신청이 생성된 시간입니다."""
   createdAt: String!
 }
 
+"""친구신청 목록 쿼리 결과를 나타내는 객체입니다. FriendRequest객체 배열과 페이지네이션 정보가 포함됩니다."""
+type FriendRequestsQueryResult {
+  friendRequests: [FriendRequest!]!
+  pageInfo: PageInfo!
+}
+
+type CreateFriendRequestResult {
+  """친구신청 고유 id입니다."""
+  _id: String!
+
+  """친구신청을 요청한 User객체입니다."""
+  requester: User!
+
+  """친구신청을 받은 User객체입니다."""
+  receiver: User!
+
+  """친구신청 메세지입니다."""
+  requestMessage: String!
+
+  """친구신청이 생성된 시간입니다."""
+  createdAt: String!
+  success: Boolean!
+}
+
+type DeleteFriendRequestResult {
+  success: Boolean!
+}
+
+type AcceptFriendRequestResult {
+  success: String!
+}
+
+"""친구를 나타내는 객체입니다."""
+type Friend {
+  """친구관계 자체를 나타내는 고유 id입니다."""
+  _id: String!
+
+  """친구에 대한 User객체를 나타냅니다."""
+  user: User!
+
+  """친구관계를 언제 형성했는지에 대한 시간을 나타냅니다."""
+  createdAt: String!
+}
+
+"""친구 목록 쿼리 결과를 나타내는 객체입니다. Friend객체 배열과 페이지네이션 정보가 포함됩니다."""
 type FriendsQueryResult {
   friends: [Friend!]!
   pageInfo: PageInfo!
@@ -144,7 +172,7 @@ type Comment {
 }
 
 """여러개의 댓글을 배열로 가지고 있는 객체입니다. 페이지네이션 정보가 포함되어있습니다."""
-type Comments {
+type CommentsQueryResult {
   comments: [Comment!]!
   pageInfo: PageInfo!
 }
@@ -185,9 +213,27 @@ type Query {
   userWhoAmI: User!
   users(search: String!): Users!
   login(username: String!, password: String!): LoginResponse!
-  sentFriendRequests(pagination: PaginationInput!): FriendRequestArray!
-  receivedFriendRequests(pagination: PaginationInput!): FriendRequestArray!
-  friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
+
+  """로그인한 유저가 보낸 친구신청 목록을 가져오는 쿼리"""
+  sentFriendRequests(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): FriendRequestsQueryResult!
+
+  """로그인한 유저가 받은 친구신청 목록을 가져오는 쿼리입니다."""
+  receivedFriendRequests(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): FriendRequestsQueryResult!
+
+  """친구 목록을 가져오는 쿼리입니다."""
+  friends(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+
+    """친구 목록을 가져올 대상의 user id. 해당 항목을 비우면 로그인한 유저의 id를 기준으로 친구 목록을 불러옵니다."""
+    targetUserId: String
+  ): FriendsQueryResult!
   post(postId: String!): Post!
   postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
   postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
@@ -200,7 +246,7 @@ type Query {
 
     """페이지네이션 정보"""
     pagination: PaginationInput!
-  ): Comments!
+  ): CommentsQueryResult!
   userInfo(userId: String!): UserInfo!
   userInfos(search: String!): UserInfos!
   me: AboutMe!
@@ -237,9 +283,28 @@ type Mutation {
   updateUser(updateUserData: UserUpdate!): UserUpdateResult!
   createUser(createUserData: UserCreate!): User!
   deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
-  createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
-  deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
-  acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
+
+  """로그인된 유저로부터 대상에게 친구신청을 생성하는 뮤테이션입니다."""
+  createFriendRequest(
+    """친구신청 대상 유저 id와 친구신청 메시지를 담는 Input객체"""
+    createFriendRequestData: CreateFriendRequest!
+  ): CreateFriendRequestResult!
+
+  """
+  지정된 friendRequestId에 대한 친구신청을 삭제하는 뮤테이션입니다. 로그인한 유저가 해당 친구신청을 보내지 않았다면 삭제할 수 없습니다.
+  """
+  deleteFriendRequest(
+    """삭제할 친구신청 id"""
+    friendRequestId: String!
+  ): DeleteFriendRequestResult!
+
+  """
+  지정된 friendRequestId에 대한 친구신청을 승낙하는 뮤테이션입니다. 해당 뮤테이션이 처리되면 지정된 친구신청은 사라지며, 로그인된 유저와 친구신청을 받은 유저 서로 친구관계로 등록됩니다. 로그인된 유저가 받지 않은 친구신청은 승낙할 수 없습니다.
+  """
+  acceptFriendRequest(
+    """승낙할 친구신청 id"""
+    acceptFriendRequestData: String!
+  ): AcceptFriendRequestResult!
   createPost(input: CreatePostInput!): CreatePostResult!
   deletePost(deletePostData: DeletePost!): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
@@ -275,17 +340,13 @@ input UserDeleteRequest {
   deleteConfirm: Boolean!
 }
 
+"""친구신청을 생성하기 위해 필요한 Input 객체입니다."""
 input CreateFriendRequest {
+  """친구신청을 보낼 유저의 id입니다."""
   receiver: String!
+
+  """친구신청 메세지 내용입니다."""
   requestMessage: String!
-}
-
-input DeleteFriendRequest {
-  friendRequestId: String!
-}
-
-input AcceptFriendRequest {
-  friendRequestId: String!
 }
 
 input CreatePostInput {

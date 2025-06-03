@@ -4,12 +4,9 @@ import { FriendRequest, FriendRequestDocument } from './schemas/friendRequest.sc
 import { Model } from 'mongoose';
 import { 
     CreateFriendRequestDto, 
-    CreateFriendRequestResultDto, 
-    DeleteFriendRequestDto, 
+    CreateFriendRequestResultDto,
     DeleteFriendRequestResultDto, 
-    FriendRequestArrayDto, 
-    FriendRequestDto,
-    AcceptFriendRequestDto,
+    FriendRequestsQueryResultDto, 
     AcceptFriendRequestResultDto
 } from './dto/friendRequest.dto';
 import { GraphQLError } from 'graphql';
@@ -60,15 +57,15 @@ export class FriendRequestService {
     async getFriendRequestsByRequestUserId(
         requesterId: string,
         pagination: PaginationInput
-    ): Promise<FriendRequestArrayDto> {
+    ): Promise<FriendRequestsQueryResultDto> {
         try{
 
             const friendRequestQuery 
                 = this.friendRequestModel
-                    .find({requestUser: requesterId})
+                    .find({requester: requesterId})
                     .sort({createdAt: -1})
-                    .populate('requestUser')
-                    .populate('receiveUser');
+                    .populate('requester')
+                    .populate('receiver');
 
             const { countOnlyQuery } 
                 = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
@@ -80,7 +77,13 @@ export class FriendRequestService {
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
             );
 
-            return {friendRequests};
+            return {
+                friendRequests,
+                pageInfo: this.PaginationService.getPageTimeInfo(
+                    friendRequestDocuments.at(-1),
+                    friendRequestCount, friendRequestDocuments.length
+                )
+            };
         } catch(err) {
             
             console.error(err);
@@ -88,31 +91,40 @@ export class FriendRequestService {
         }
     }
 
-    async getFriendRequestsByReceiveUserId(receiveUserId: string): Promise<FriendRequestArrayDto> {
-        try{
-            const result = await this.friendRequestModel
-                .find({receiveUser: receiveUserId})
-                .populate('requestUser')
-                .populate('receiveUser');
+    async getFriendRequestsByReceiveUserId(
+        receiverId: string,
+        pagination: PaginationInput
+    ): Promise<FriendRequestsQueryResultDto> {
+         try{
 
-            console.log(result);
+            const friendRequestQuery 
+                = this.friendRequestModel
+                    .find({receiver: receiverId})
+                    .sort({createdAt: -1})
+                    .populate('requester')
+                    .populate('receiver');
 
-            const resultToArray: FriendRequestDto[] = new Array();
-            result.forEach( item => {
-                resultToArray.push({
-                    _id: item._id.toString(),
-                    requester: this.UserService.userDocumentToUserSafe(item.requester),
-                    receiver: this.UserService.userDocumentToUserSafe(item.receiver),
-                    requestMessage: item.requestMessage,
-                    createdAt: item.createdAt.toISOString()
-                })
-            })
+            const { countOnlyQuery } 
+                = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
 
-            return {friendRequests: resultToArray};
+            const friendRequestCount = await countOnlyQuery.count();
+            const friendRequestDocuments = await friendRequestQuery;
+                
+            const friendRequests = friendRequestDocuments.map(
+                item => this.FriendRequestMapper.toFriendRequestDto(item)
+            );
+
+            return {
+                friendRequests,
+                pageInfo: this.PaginationService.getPageTimeInfo(
+                    friendRequestDocuments.at(-1),
+                    friendRequestCount, friendRequestDocuments.length
+                )
+            };
         } catch(err) {
-
-            console.error(err);
             
+            console.error(err);
+
         }
     }
 
@@ -133,8 +145,8 @@ export class FriendRequestService {
             }
 
             const alreadyFriendRequests = await this.friendRequestModel.find({
-                requestUser: requestUserId,
-                receiveUser: createFriendRequestDto.receiver
+                requester: requestUserId,
+                receiver: createFriendRequestDto.receiver
             })
             
             if(alreadyFriendRequests.length > 0) {
@@ -143,8 +155,8 @@ export class FriendRequestService {
 
             const createdFriendRequest = new this.friendRequestModel(
                 {
-                    requestUser: requestUserId,
-                    receiveUser: createFriendRequestDto.receiver,
+                    requester: requestUserId,
+                    receiver: createFriendRequestDto.receiver,
                     requestMessage: createFriendRequestDto.requestMessage
                 }
             );
@@ -152,8 +164,8 @@ export class FriendRequestService {
             
             const createdFriendResult = 
                 await this.friendRequestModel.findById(createdFriendRequest._id)
-                    .populate('requestUser')
-                    .populate('receiveUser');
+                    .populate('requester')
+                    .populate('receiver');
 
             // return {...createdFriendResult, success: true}
             return {
@@ -172,11 +184,11 @@ export class FriendRequestService {
         }
     }
 
-    async deleteFriendRequest(requestUserId: string, deleteFriendRequestDto: DeleteFriendRequestDto): Promise<DeleteFriendRequestResultDto>{
+    async deleteFriendRequest(requesterId: string, friendRequestId: string): Promise<DeleteFriendRequestResultDto>{
         try {
             const targetFriendRequest = await this.getFriendRequestById(
-                requestUserId,
-                deleteFriendRequestDto.friendRequestId
+                requesterId,
+                friendRequestId
             );
             
             await targetFriendRequest.deleteOne();
@@ -194,12 +206,12 @@ export class FriendRequestService {
 
     async acceptFriendRequest(
         acceptUserId: string, 
-        acceptFriendRequestDto: AcceptFriendRequestDto
+        friendRequestId: string
     ): Promise<AcceptFriendRequestResultDto> {
         try{
             const targetFriendRequest = await this.getFriendRequestById(
                 acceptUserId,
-                acceptFriendRequestDto.friendRequestId
+                friendRequestId
             );
 
             if(acceptUserId !== targetFriendRequest.receiver._id.toString()) {
