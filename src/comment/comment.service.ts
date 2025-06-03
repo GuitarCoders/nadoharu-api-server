@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
 import { UserService } from 'src/user/user.service';
-import { addCommentDto, CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
+import { addCommentDto, CommentDto, CommentsQueryResultDto, deleteCommentResultDto } from './dto/comment.dto';
 import { Comment } from './schemas/comment.schema';
 import { CommentMapper } from './mapper/comment.mapper';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
@@ -45,7 +45,7 @@ export class CommentService{
         
     }
 
-    async getCommentsByPostId(targetPostId: string, pagination: PaginationInput): Promise<CommentsDto>{
+    async getCommentsByPostId(targetPostId: string, pagination: PaginationInput): Promise<CommentsQueryResultDto>{
         try {
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
             

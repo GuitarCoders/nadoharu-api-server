@@ -5,7 +5,7 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { PostDto } from 'src/post/dto/post.dto';
 import { CommentService } from './comment.service';
-import { CommentDto, CommentsDto, deleteCommentResultDto } from './dto/comment.dto';
+import { CommentDto, CommentsQueryResultDto, deleteCommentResultDto } from './dto/comment.dto';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Resolver()
@@ -15,7 +15,7 @@ export class CommentResolver {
     ) {}
 
     @Query(
-        () => CommentsDto, 
+        () => CommentsQueryResultDto, 
         {
             name: "comments",
             description: "특정 글의 댓글을 가져오는 쿼리입니다."
@@ -24,7 +24,7 @@ export class CommentResolver {
     async getCommentByPostId (
         @Args('postId', {description: "댓글을 가져올 대상 글의 id"}) targetPostId: string,
         @Args('pagination', {description: "페이지네이션 정보"}) pagination: PaginationInput
-    ): Promise<CommentsDto> {
+    ): Promise<CommentsQueryResultDto> {
         return await this.CommentService.getCommentsByPostId(targetPostId, pagination);
     }
 

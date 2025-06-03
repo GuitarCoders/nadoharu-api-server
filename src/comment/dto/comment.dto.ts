@@ -39,10 +39,10 @@ export class CommentDto{
     createdAt: string;
 }
 
-@ObjectType('Comments',
+@ObjectType('CommentsQueryResult',
     {description: "여러개의 댓글을 배열로 가지고 있는 객체입니다. 페이지네이션 정보가 포함되어있습니다."}
 )
-export class CommentsDto{
+export class CommentsQueryResultDto{
     @Field(() => [CommentDto])
     comments: CommentDto[];
 
