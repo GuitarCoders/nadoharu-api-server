@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UsersSafeDto } from 'src/user/dto/user.dto';
 import { UserService } from 'src/user/user.service';
-import { FriendsDto, FriendsFilterInput, FriendsQueryResultDto } from './dto/friend.dto';
+import { FriendsQueryResultDto } from './dto/friend.dto';
 import { Friend, FriendDocument } from './schemas/friend.schema';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { PaginationService } from 'src/pagination/pagination.service';

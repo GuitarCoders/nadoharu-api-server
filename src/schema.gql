@@ -2,23 +2,43 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""유저의 기초적인 정보를 표현하는 객체입니다."""
 type User {
+  """유저의 고유 id입니다."""
   _id: String!
+
+  """유저의 표시용 이름입니다."""
   name: String!
+
+  """유저의 가입시 사용한 이메일입니다."""
   email: String!
+
+  """유저의 로그인 전용 계정이름입니다."""
   account_id: String!
+
+  """유저의 자기소개 내용입니다."""
   about_me: String!
 }
 
+"""유저의 목록을 User객체의 배열로 가지고있는 객체입니다."""
 type Users {
   Users: [User!]!
 }
 
 type UserUpdateResult {
+  """유저의 고유 id입니다."""
   _id: String!
+
+  """유저의 표시용 이름입니다."""
   name: String!
+
+  """유저의 가입시 사용한 이메일입니다."""
   email: String!
+
+  """유저의 로그인 전용 계정이름입니다."""
   account_id: String!
+
+  """유저의 자기소개 내용입니다."""
   about_me: String!
   status: String!
 }
@@ -28,32 +48,83 @@ type UserDeleteResult {
 }
 
 type LoginResponse {
+  """유저의 고유 id입니다."""
   _id: String!
+
+  """유저의 표시용 이름입니다."""
   name: String!
+
+  """유저의 가입시 사용한 이메일입니다."""
   email: String!
+
+  """유저의 로그인 전용 계정이름입니다."""
   account_id: String!
+
+  """유저의 자기소개 내용입니다."""
   about_me: String!
   status: String!
   jwt_token: String!
 }
 
+"""
+페이지네이션 쿼리 후 이동한 기준점을 나타내는 객체입니다. 다음 페이지를 탐색하기 위해 해당 정보를 CursorInput으로 사용할 수 있습니다.
+"""
+type Cursor {
+  time: String!
+  id: String!
+}
+
+"""페이지네이션 결과를 표현하는 객체입니다. 주로 다음 페이지를 가져오기 위한 정보를 표현합니다."""
+type PageInfo {
+  """
+  다음 페이지에 대한 항목이 추가로 존재하는지의 여부를 나타냅니다. 해당 값이 true라면, 쿼리 결과 항목을 한 페이지에 전부 담지 못했음을 의미합니다.
+  """
+  hasNext: Boolean!
+
+  """
+  쿼리한 페이지의 끝점을 나타냅니다. 정보 누락 없이 다음 페이지를 요청하려면, 해당 Cursor를 시작점으로 다음 페이지를 요청해야 합니다. 해당 값이 null이라면 페이지에 아무 정보도 없다는 뜻입니다.
+  """
+  cursor: Cursor
+}
+
+"""친구신청 관련 객체입니다."""
 type FriendRequest {
+  """친구신청 고유 id입니다."""
   _id: String!
+
+  """친구신청을 요청한 User객체입니다."""
   requester: User!
+
+  """친구신청을 받은 User객체입니다."""
   receiver: User!
+
+  """친구신청 메세지입니다."""
   requestMessage: String!
+
+  """친구신청이 생성된 시간입니다."""
   createdAt: String!
 }
 
-type FriendRequestArray {
+"""친구신청 목록 쿼리 결과를 나타내는 객체입니다. FriendRequest객체 배열과 페이지네이션 정보가 포함됩니다."""
+type FriendRequestsQueryResult {
   friendRequests: [FriendRequest!]!
+  pageInfo: PageInfo!
 }
 
 type CreateFriendRequestResult {
+  """친구신청 고유 id입니다."""
   _id: String!
+
+  """친구신청을 요청한 User객체입니다."""
   requester: User!
+
+  """친구신청을 받은 User객체입니다."""
   receiver: User!
+
+  """친구신청 메세지입니다."""
   requestMessage: String!
+
+  """친구신청이 생성된 시간입니다."""
   createdAt: String!
   success: Boolean!
 }
@@ -66,36 +137,46 @@ type AcceptFriendRequestResult {
   success: String!
 }
 
-type Cursor {
-  time: String!
-  id: String!
-}
-
-type PageInfo {
-  hasNext: Boolean!
-  cursor: Cursor
-}
-
+"""친구를 나타내는 객체입니다."""
 type Friend {
+  """친구관계 자체를 나타내는 고유 id입니다."""
   _id: String!
+
+  """친구에 대한 User객체를 나타냅니다."""
   user: User!
+
+  """친구관계를 언제 형성했는지에 대한 시간을 나타냅니다."""
   createdAt: String!
 }
 
+"""친구 목록 쿼리 결과를 나타내는 객체입니다. Friend객체 배열과 페이지네이션 정보가 포함됩니다."""
 type FriendsQueryResult {
   friends: [Friend!]!
   pageInfo: PageInfo!
 }
 
+"""글에 대한 정보를 표현하는 객체입니다."""
 type Post {
+  """글의 고유 id입니다."""
   _id: String!
+
+  """글을 작성한 유저의 User 객체입니다."""
   author: User!
+
+  """글의 내용입니다."""
   content: String!
+
+  """글의 태그입니다. 내용이 없을 수도 있습니다."""
   tags: String
+
+  """글의 카테고리입니다. 관련 기능이 아직 구현되어있지 않습니다."""
   category: String!
+
+  """글을 작성한 시간입니다."""
   createdAt: String!
 }
 
+"""글 목록 쿼리 결과 객체입니다. Post객체를 배열로 가지고 있습니다. 페이지네이션을 위한 정보가 포함되어있습니다."""
 type PostsQueryResult {
   posts: [Post!]!
   pageInfo: PageInfo!
@@ -114,31 +195,54 @@ type addAllUserInFriendResult {
   success: Boolean!
 }
 
+"""댓글의 주요 정보를 포함하는 객체입니다."""
 type Comment {
+  """댓글의 고유 id입니다."""
   _id: String!
+
+  """댓글의 내용입니다."""
   content: String!
+
+  """댓글이 속한 게시글의 고유 id입니다."""
   postId: String!
+
+  """댓글의 작성자 User 객체입니다."""
   commenter: User!
+
+  """댓글을 작성한 시간입니다."""
   createdAt: String!
 }
 
-type Comments {
+"""여러개의 댓글을 배열로 가지고 있는 객체입니다. 페이지네이션 정보가 포함되어있습니다."""
+type CommentsQueryResult {
   comments: [Comment!]!
   pageInfo: PageInfo!
 }
 
+"""댓글이 삭제되었는지에 대한 결과입니다."""
 type deleteCommentResult {
   success: Boolean!
 }
 
+"""유저 상세정보 목록을 userInfo객체 배열로 가진 객체입니다."""
 type UserInfos {
   users: [UserInfo!]!
 }
 
+"""
+유저의 상세정보입니다. user객체 외 추가적으로 특정 대상과 친구인지, 친구신청을 보냈는지, 해당 유저의 친구 수 등의 추가정보를 담고 있습니다.
+"""
 type UserInfo {
+  """유저의 기본 정보입니다."""
   user: User!
+
+  """해당 유저와 친구인지를 나타냅니다. 가져온 정보가 자기 자신일 경우 'ME'로 표현합니다."""
   isFriend: FriendState!
+
+  """해당 유저에게 친구신청을 보냈는지 여부입니다."""
   isFriendRequested: Boolean!
+
+  """해당 유저의 친구 수 입니다. 인싸력을 테스트 해볼 수 있습니다."""
   friendCount: Int!
 }
 
@@ -148,73 +252,274 @@ enum FriendState {
   STRANGER
 }
 
+"""자기 자신에 대한 상세정보입니다. user객체 외 주로 프로필 화면에 필요한 정보들을 담고 있습니다."""
 type AboutMe {
+  """유저의 기본 정보입니다."""
   user: User!
+
+  """해당 유저와 친구인지를 나타냅니다. 가져온 정보가 자기 자신일 경우 'ME'로 표현합니다."""
   isFriend: FriendState!
+
+  """해당 유저에게 친구신청을 보냈는지 여부입니다."""
   isFriendRequested: Boolean!
+
+  """해당 유저의 친구 수 입니다. 인싸력을 테스트 해볼 수 있습니다."""
   friendCount: Int!
+
+  """자신이 받은 친구신청 수 입니다."""
   receivedFriendRequestCount: Int!
 }
 
 type Query {
-  userByAccountId(account_id: String!): User!
-  userById(id: String!): User!
+  """
+  accoundId에 해당하는 유저의 정보를 가져오는 쿼리입니다. 상세한 정보 (친구 수, 친구여부 등)을 가져오려면 userInfoByAccoundId를 사용하십시오.
+  """
+  userByAccountId(
+    """가져올 유저의 accountId"""
+    account_id: String!
+  ): User!
+
+  """
+  user id에 해당하는 유저의 정보를 가져오는 쿼리입니다. 상세한 정보 (친구 수, 친구여부 등)을 가져오려면 userInfo 쿼리를 사용하십시오.
+  """
+  userById(
+    """가져올 유저의 고유 id"""
+    id: String!
+  ): User!
+
+  """
+  로그인한 유저의 정보를 가져오는 쿼리입니다. 상세한 정보 (친구 수, 친구여부 등)을 가져오려면 userInfo 쿼리를 사용하십시오.
+  """
   userWhoAmI: User!
-  users(search: String!): Users!
+
+  """
+  검색어를 통해 검색된 유저 목록을 가져오는 쿼리입니다. 검색어는 유저의 name(유저가 지정한 닉네임), accound_id(유저의 계정 아이디)를 검색합니다. 한국어 검색은 자모 분리를 고려하지 않습니다.
+  """
+  users(
+    """검색 문자열."""
+    search: String!
+  ): Users!
   login(username: String!, password: String!): LoginResponse!
-  sentFriendRequests(pagination: PaginationInput!): FriendRequestArray!
-  receivedFriendRequests(pagination: PaginationInput!): FriendRequestArray!
-  friends(pagination: PaginationInput!, targetUserId: String): FriendsQueryResult!
-  post(postId: String!): Post!
-  postsByUserId(targetUserId: String!, filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  postsForTimeline(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  postsByMe(filter: PostFilter!, pagination: PaginationInput!): PostsQueryResult!
-  comments(postId: String!, pagination: PaginationInput!): Comments!
-  userInfo(userId: String!): UserInfo!
-  userInfos(search: String!): UserInfos!
+
+  """로그인한 유저가 보낸 친구신청 목록을 가져오는 쿼리"""
+  sentFriendRequests(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): FriendRequestsQueryResult!
+
+  """로그인한 유저가 받은 친구신청 목록을 가져오는 쿼리입니다."""
+  receivedFriendRequests(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): FriendRequestsQueryResult!
+
+  """친구 목록을 가져오는 쿼리입니다."""
+  friends(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+
+    """친구 목록을 가져올 대상의 user id. 해당 항목을 비우면 로그인한 유저의 id를 기준으로 친구 목록을 불러옵니다."""
+    targetUserId: String
+  ): FriendsQueryResult!
+
+  """글 정보를 가져오는 쿼리입니다."""
+  post(
+    """가져올 글의 id입니다."""
+    postId: String!
+  ): Post!
+
+  """특정 유저의 id를 통해 해당 유저가 작성한 글 목록을 가져오는 쿼리입니다."""
+  postsByUserId(
+    """글 작성자의 id"""
+    targetUserId: String!
+
+    """
+    작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다.
+    """
+    filter: PostFilter!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
+
+  """
+  로그인한 유저 기준 타임라인에 표시될 글 목록을 가져오는 쿼리입니다. 로그인한 유저를 포함하여 친구들의 글들을 시간순으로 가져옵니다.
+  """
+  postsForTimeline(
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
+
+  """로그인한 유저가 작성한 글 목록을 가져오는 쿼리입니다."""
+  postsByMe(
+    """
+    작성한 글의 카테고리 등의 분류를 위한 필터. 아직 카테고리등의 기능을 구현하지 않았으므로 필터 안의 내용을 비워서 쿼리를 보내주시기 바랍니다.
+    """
+    filter: PostFilter!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): PostsQueryResult!
+
+  """특정 글의 댓글을 가져오는 쿼리입니다."""
+  comments(
+    """댓글을 가져올 대상 글의 id"""
+    postId: String!
+
+    """페이지네이션 정보"""
+    pagination: PaginationInput!
+  ): CommentsQueryResult!
+
+  """특정 id를 가진 유저의 상세한 정보를 가져오는 쿼리입니다."""
+  userInfo(
+    """가져올 유저의 고유 id"""
+    userId: String!
+  ): UserInfo!
+
+  """
+  특정 검색어 만족하는 유저 상세정보 목록을 가져오는 쿼리입니다. 검색어는 유저의 name(유저가 지정한 닉네임), accound_id(유저의 계정 아이디)를 검색합니다. 한국어 검색은 자모 분리를 고려하지 않습니다.
+  """
+  userInfos(
+    """검색 문자열"""
+    search: String!
+  ): UserInfos!
+
+  """로그인한 유저의 상세정보를 가져오는 쿼리입니다."""
   me: AboutMe!
-  userInfoByAccountId(accountId: String!): UserInfo!
+
+  """account_id에 해당하는 유저의 상세정보를 가져오는 쿼리입니다."""
+  userInfoByAccountId(
+    """상세정보를 가져올 유저의 account_id"""
+    accountId: String!
+  ): UserInfo!
 }
 
+"""한 페이지를 가져오기 위해 필요한 입력 데이터입니다. 시작점, 끝점, 페이지 당 항목 갯수를 입력합니다."""
 input PaginationInput {
+  """
+  페이지네이션 시작점을 나타냅니다. 해당 항목을 생략하면 쿼리를 요청한 시간을 시작점으로 정합니다. 입력한 id에 대한 결과는 포함하지 않습니다.
+  """
   cursor: CursorInput
+
+  """
+  페이지네이션 끝점을 나타냅니다. 해당 항목을 생략하면 시작점으로 부터 제한 없이 결과를 가져옵니다. 입력한 id에 대한 결과는 포함하지 않습니다.
+  """
   until: CursorInput
+
+  """한 페이지에 포함할 객체의 갯수를 나타냅니다. 해당 항목을 생략하면 각각의 쿼리에 대한 기본값으로 limit를 정합니다."""
   limit: Int
 }
 
+"""페이지네이션 기준점을 나타내는 Input입니다. 시간과 ID 둘다 필요합니다."""
 input CursorInput {
   time: String!
   id: String!
 }
 
+"""
+특정 분류의 글을 가져오기 위한 필터 Input객체입니다. 카테고리 등의 분류 내용을 지정할 수 있습니다. 내용은 생략 가능합니다.
+"""
 input PostFilter {
+  """어떤 카테고리의 글을 가져올지 정합니다. 지금은 아직 관련 기능이 구현되어있지 않습니다."""
   category: String
 }
 
 type Mutation {
-  updateUser(updateUserData: UserUpdate!): UserUpdateResult!
-  createUser(createUserData: UserCreate!): User!
-  deleteUser(deleteUserData: UserDeleteRequest!): UserDeleteResult!
-  createFriendRequest(createFriendRequestData: CreateFriendRequest!): CreateFriendRequestResult!
-  deleteFriendRequest(deleteFriendRequestData: DeleteFriendRequest!): DeleteFriendRequestResult!
-  acceptFriendRequest(acceptFriendRequestData: AcceptFriendRequest!): AcceptFriendRequestResult!
-  createPost(input: CreatePostInput!): CreatePostResult!
-  deletePost(deletePostData: DeletePost!): DeletePostResult!
+  """로그인한 유저의 정보를 변경하는 뮤테이션입니다."""
+  updateUser(
+    """바꿀 정보 Input객체"""
+    updateUserData: UserUpdate!
+  ): UserUpdateResult!
+
+  """새 유저를 생성하는 뮤테이션입니다."""
+  createUser(
+    """새로운 유저에 대한 정보 Input객체"""
+    createUserData: UserCreate!
+  ): User!
+
+  """
+  로그인한 유저의 데이터를 삭제하는 뮤테이션입니다. 삭제한 유저는 데이터베이스 상에서 영구삭제되며 다시 접근할 수 없습니다. 하지만 해당 유저가 남긴 글, 댓글 등은 남아있습니다.
+  """
+  deleteUser(
+    """정말로 삭제할 것인지의 여부를 묻는 input객체"""
+    deleteUserData: UserDeleteRequest!
+  ): UserDeleteResult!
+
+  """로그인된 유저로부터 대상에게 친구신청을 생성하는 뮤테이션입니다."""
+  createFriendRequest(
+    """친구신청 대상 유저 id와 친구신청 메시지를 담는 Input객체"""
+    createFriendRequestData: CreateFriendRequest!
+  ): CreateFriendRequestResult!
+
+  """
+  지정된 friendRequestId에 대한 친구신청을 삭제하는 뮤테이션입니다. 로그인한 유저가 해당 친구신청을 보내지 않았다면 삭제할 수 없습니다.
+  """
+  deleteFriendRequest(
+    """삭제할 친구신청 id"""
+    friendRequestId: String!
+  ): DeleteFriendRequestResult!
+
+  """
+  지정된 friendRequestId에 대한 친구신청을 승낙하는 뮤테이션입니다. 해당 뮤테이션이 처리되면 지정된 친구신청은 사라지며, 로그인된 유저와 친구신청을 받은 유저 서로 친구관계로 등록됩니다. 로그인된 유저가 받지 않은 친구신청은 승낙할 수 없습니다.
+  """
+  acceptFriendRequest(
+    """승낙할 친구신청 id"""
+    acceptFriendRequestData: String!
+  ): AcceptFriendRequestResult!
+
+  """글을 작성하는 뮤테이션입니다."""
+  createPost(
+    """글 작성에 필요한 정보를 담는 Input 객체입니다."""
+    postData: CreatePostInput!
+  ): CreatePostResult!
+
+  """특정 id에 해당하는 글을 지우는 뮤테이션입니다."""
+  deletePost(
+    """지울 글의 id"""
+    postId: String!
+  ): DeletePostResult!
   addAllUserInFriend: addAllUserInFriendResult!
-  addCommentToPost(targetPostId: String!, content: String!): Comment!
-  deleteCommentById(targetCommentId: String!): deleteCommentResult!
+
+  """특정 글에 댓글을 작성하는 뮤테이션입니다."""
+  addCommentToPost(
+    """댓글을 작성할 대상 글의 id"""
+    targetPostId: String!
+
+    """댓글의 내용"""
+    content: String!
+  ): Comment!
+  deleteCommentById(
+    """삭제할 댓글의 id"""
+    targetCommentId: String!
+  ): deleteCommentResult!
 }
 
+"""유저의 정보를 수정/갱신하기 위한 정보를 담는 Input객체입니다."""
 input UserUpdate {
+  """유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다."""
   name: String!
+
+  """유저의 자기소개 내용입니다."""
   about_me: String!
+
+  """유저의 로그인용 비밀번호입니다. 해당 정보는 암호화되어 서버에 저장됩니다. 저장된 암호는 다시 복호화할 수 없습니다."""
   password: String!
 }
 
+"""유저를 생성할때 필요한 정보를 담는 Input객체입니다."""
 input UserCreate {
+  """유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다."""
   name: String!
+
+  """유저의 로그인용 이름입니다. 중복을 허용하지 않습니다."""
   account_id: String!
+
+  """
+  유저의 식별용 이메일입니다. 해당 정보는 로그인할때 사용되지 않습니다. 중복을 허용하지만, 같은 이메일을 가진 유저는 서비스 내에서 같은 사람이 여러개의 계정을 가진 것으로 취급합니다.
+  """
   email: String!
+
+  """유저의 로그인용 비밀번호입니다. 해당 정보는 암호화되어 서버에 저장됩니다. 저장된 암호는 다시 복호화할 수 없습니다."""
   password: String!
 }
 
@@ -222,25 +527,23 @@ input UserDeleteRequest {
   deleteConfirm: Boolean!
 }
 
+"""친구신청을 생성하기 위해 필요한 Input 객체입니다."""
 input CreateFriendRequest {
+  """친구신청을 보낼 유저의 id입니다."""
   receiver: String!
+
+  """친구신청 메세지 내용입니다."""
   requestMessage: String!
 }
 
-input DeleteFriendRequest {
-  friendRequestId: String!
-}
-
-input AcceptFriendRequest {
-  friendRequestId: String!
-}
-
+"""글 작성에 필요한 정보를 표현하고 있는 Input객체입니다."""
 input CreatePostInput {
+  """글 내용을 지정합니다."""
   content: String!
-  tags: String
-  category: String
-}
 
-input DeletePost {
-  postId: String!
+  """글의 태그를 지정합니다. 내용을 비울 수 있습니다."""
+  tags: String
+
+  """글의 카테고리를 지정합니다. 내용을 비울 수 있습니다."""
+  category: String
 }

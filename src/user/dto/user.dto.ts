@@ -6,57 +6,79 @@ import { ObjectId } from "mongoose";
 import { Int } from "type-graphql";
 import { UserDocument } from "../schemas/user.schema";
 
-@ObjectType('User')
+@ObjectType('User',
+    {description: "유저의 기초적인 정보를 표현하는 객체입니다."}
+)
 export class UserSafeDto{
     
-    @Field(() => String)
+    @Field(() => String, {description: "유저의 고유 id입니다."})
     _id: string;
     
-    @Field(() => String)
+    @Field(() => String, {description: "유저의 표시용 이름입니다."})
     name: string;
     
-    @Field(() => String)
+    @Field(() => String, {description: "유저의 가입시 사용한 이메일입니다."})
     email: string;
     
-    @Field(() => String)
+    @Field(() => String, {description: "유저의 로그인 전용 계정이름입니다."})
     account_id: string;
     
-    @Field(() => String)
+    @Field(() => String, {description: "유저의 자기소개 내용입니다."})
     about_me: string;
 }
 
-@ObjectType('Users')
+@ObjectType('Users',
+    {description: "유저의 목록을 User객체의 배열로 가지고있는 객체입니다."}
+)
 export class UsersSafeDto{
     @Field(() => [UserSafeDto])
     Users: UserSafeDto[];
 }
 
-@InputType('UserCreate')
+@InputType('UserCreate',
+    {description: "유저를 생성할때 필요한 정보를 담는 Input객체입니다."}
+)
 export class UserCreateRequestDto{
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다."
+    })
     name: string;
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 로그인용 이름입니다. 중복을 허용하지 않습니다."
+    })
     account_id: string;
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 식별용 이메일입니다. 해당 정보는 로그인할때 사용되지 않습니다. 중복을 허용하지만, 같은 이메일을 가진 유저는 서비스 내에서 같은 사람이 여러개의 계정을 가진 것으로 취급합니다."
+    })
     email: string;
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 로그인용 비밀번호입니다. 해당 정보는 암호화되어 서버에 저장됩니다. 저장된 암호는 다시 복호화할 수 없습니다."
+    })
     password: string;
 }
 
-@InputType('UserUpdate')
+@InputType('UserUpdate', {
+    description: "유저의 정보를 수정/갱신하기 위한 정보를 담는 Input객체입니다."
+})
 export class UserUpdateRequestDto{
     
-    @Field(() => String)
+    @Field(() => String, {
+        description:"유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다."
+    })
     name: string;
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 자기소개 내용입니다."
+    })
     about_me: string;
 
-    @Field(() => String)
+    @Field(() => String, {
+        description: "유저의 로그인용 비밀번호입니다. 해당 정보는 암호화되어 서버에 저장됩니다. 저장된 암호는 다시 복호화할 수 없습니다."
+    })
     password: string;
 }
 

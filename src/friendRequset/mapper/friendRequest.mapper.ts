@@ -21,8 +21,8 @@ export class FriendRequestMapper {
             _id: friendRequest._id.toString(),
             requester: requesterSafe,
             receiver: receiverSafe,
-            requestMessage: "",
-            createdAt: ""
+            requestMessage: friendRequest.requestMessage,
+            createdAt: friendRequest.createdAt.toISOString()
         }
     }
 }

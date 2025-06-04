@@ -5,7 +5,7 @@ import { Model, Query, Types } from 'mongoose';
 import { CommentService } from 'src/comment/comment.service';
 import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
-import { CreatePostDto, CreatePostResultDto, DeletePostDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
+import { CreatePostDto, CreatePostResultDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { GraphQLError } from 'graphql';
@@ -139,10 +139,10 @@ export class PostService{
 
     async deletePost(
         userId: string,
-        data: DeletePostDto
+        postId: string
     ): Promise<DeletePostResultDto> {
         try{
-            const targetPostModel = await this.PostModel.findById(data.postId).populate('author');
+            const targetPostModel = await this.PostModel.findById(postId).populate('author');
             if(targetPostModel.author._id.toString() != userId){
                 throw new Error("본인의 글만 삭제할 수 있습니다.");
             }
