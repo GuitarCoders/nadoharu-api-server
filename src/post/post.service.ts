@@ -31,7 +31,8 @@ export class PostService{
 
     async getPostById(postId: string): Promise<PostDto>{
         try{
-            const result = await this.getPostDocumentById(postId)
+            const postDocument = await this.getPostDocumentById(postId)
+            const result = await postDocument.populate('author');
             return PostMapper.toPostDto(result);
         } catch (err) {
             console.error(err);
