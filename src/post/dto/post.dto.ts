@@ -29,9 +29,10 @@ export class PostDto{
     tags?: string;
 
     @Field(() => String, {
+        nullable: true,
         description: "글의 카테고리입니다. 관련 기능이 아직 구현되어있지 않습니다."
     })
-    category: string;
+    category?: string;
 
     @Field(() => String, {
         description: "글을 작성한 시간입니다."
