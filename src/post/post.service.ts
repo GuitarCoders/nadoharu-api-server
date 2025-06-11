@@ -52,10 +52,8 @@ export class PostService{
                 postsQuery.where('category', filter.category);
             }
 
-            const {countOnlyQuery} 
-                = this.paginationService.buildPaginationQuery(pagination, postsQuery)
-
-            const docsCount = await countOnlyQuery.count();
+            const paginatedQuery
+                = this.paginationService.buildPaginationQuery(pagination, postsQuery);
 
             postsQuery.populate('author');
             
@@ -66,9 +64,10 @@ export class PostService{
 
             return {
                 posts: posts,
-                pageInfo: this.paginationService.getPageTimeInfo(
+                pageInfo: await this.paginationService.getPageTimeInfo(
+                    postDocuments.at(0),
                     postDocuments.at(-1),
-                    docsCount, posts.length
+                    paginatedQuery
                 )
             };
         } catch (err) {
@@ -94,19 +93,18 @@ export class PostService{
                     .where('author').in([userId, ...friends])
                     .sort({createdAt: -1});
 
-            const {countOnlyQuery} 
+            const paginatedQuery
                 = this.paginationService.buildPaginationQuery(pagination, postsQuery);
-
-            const postsCount = await countOnlyQuery.count();
 
             const resultPostModels = await postsQuery.populate('author');
             const result = resultPostModels.map(item => PostMapper.toPostDto(item));
 
             return { 
                 posts:result, 
-                pageInfo: this.paginationService.getPageTimeInfo(
+                pageInfo: await this.paginationService.getPageTimeInfo(
+                    resultPostModels.at(0),
                     resultPostModels.at(-1),
-                    postsCount, result.length
+                    paginatedQuery
                 )
             };
         } catch (err) {

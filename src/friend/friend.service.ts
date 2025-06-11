@@ -51,10 +51,8 @@ export class FriendService {
                                 .find({owner: targetUserId})
                                 .sort({createdAt:-1});
 
-            const {countOnlyQuery} 
+            const paginatedQuery
                 = this.PaginationService.buildPaginationQuery(pagination, FriendQuery);
-
-            const queryCount = await countOnlyQuery.count();
 
             const friendDocuments = await FriendQuery.populate('owner').populate('friend');
 
@@ -68,9 +66,10 @@ export class FriendService {
             
             return {
                 friends: Friends,
-                pageInfo: this.PaginationService.getPageTimeInfo(
+                pageInfo: await this.PaginationService.getPageTimeInfo(
+                    friendDocuments.at(0),
                     friendDocuments.at(-1),
-                    queryCount, friendDocuments.length
+                    paginatedQuery
                 )
             }
         } catch (err) {

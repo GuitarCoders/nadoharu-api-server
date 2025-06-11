@@ -67,10 +67,9 @@ export class FriendRequestService {
                     .populate('requester')
                     .populate('receiver');
 
-            const { countOnlyQuery } 
+            const paginatedQuery
                 = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
 
-            const friendRequestCount = await countOnlyQuery.count();
             const friendRequestDocuments = await friendRequestQuery;
                 
             const friendRequests = friendRequestDocuments.map(
@@ -79,9 +78,10 @@ export class FriendRequestService {
 
             return {
                 friendRequests,
-                pageInfo: this.PaginationService.getPageTimeInfo(
+                pageInfo: await this.PaginationService.getPageTimeInfo(
+                    friendRequestDocuments.at(0),
                     friendRequestDocuments.at(-1),
-                    friendRequestCount, friendRequestDocuments.length
+                    paginatedQuery
                 )
             };
         } catch(err) {
@@ -104,10 +104,9 @@ export class FriendRequestService {
                     .populate('requester')
                     .populate('receiver');
 
-            const { countOnlyQuery } 
+            const paginatedQuery
                 = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
 
-            const friendRequestCount = await countOnlyQuery.count();
             const friendRequestDocuments = await friendRequestQuery;
                 
             const friendRequests = friendRequestDocuments.map(
@@ -116,9 +115,10 @@ export class FriendRequestService {
 
             return {
                 friendRequests,
-                pageInfo: this.PaginationService.getPageTimeInfo(
+                pageInfo: await this.PaginationService.getPageTimeInfo(
+                    friendRequestDocuments.at(0),
                     friendRequestDocuments.at(-1),
-                    friendRequestCount, friendRequestDocuments.length
+                    paginatedQuery
                 )
             };
         } catch(err) {

@@ -49,9 +49,8 @@ export class CommentService{
         try {
             const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
             
-            const {countOnlyQuery} = this.PaginationService.buildPaginationQuery(pagination, commentQuery);
+            const paginatedQuery = this.PaginationService.buildPaginationQuery(pagination, commentQuery);
 
-            const count = await countOnlyQuery.count();
             const commentDocuments = await commentQuery.populate('commenter');
     
             const commentArray = commentDocuments.map(item => (
@@ -63,9 +62,10 @@ export class CommentService{
 
             return {
                 comments: commentArray,
-                pageInfo: this.PaginationService.getPageTimeInfo(
+                pageInfo: await this.PaginationService.getPageTimeInfo(
+                    commentDocuments.at(0),
                     commentDocuments.at(-1),
-                    count, commentDocuments.length
+                    paginatedQuery
                 )
             };
         } catch (err) {
