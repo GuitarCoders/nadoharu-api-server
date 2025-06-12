@@ -49,26 +49,19 @@ export class PostService{
             const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
 
             if (filter.category) {
-                postsQuery.where('category', filter.category);
+                postsQuery.where('category', filter.category).populate('author');
             }
-
-            const paginatedQuery
-                = this.paginationService.buildPaginationQuery(pagination, postsQuery);
-
-            postsQuery.populate('author');
             
-            const postDocuments = await postsQuery;
+            const {
+                paginatedDoc: postDocuments,
+                pageInfo
+            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
+            
             const posts = postDocuments.map(item => PostMapper.toPostDto(item));
-
-            const lastDateTime = postDocuments.at(-1)?.createdAt.toISOString();
 
             return {
                 posts: posts,
-                pageInfo: await this.paginationService.getPageTimeInfo(
-                    postDocuments.at(0),
-                    postDocuments.at(-1),
-                    paginatedQuery
-                )
+                pageInfo
             };
         } catch (err) {
             if (err instanceof GraphQLError) {
@@ -91,21 +84,18 @@ export class PostService{
                 = this.PostModel
                     .find({})
                     .where('author').in([userId, ...friends])
-                    .sort({createdAt: -1});
+                    .sort({createdAt: -1})
+                    .populate('author');
 
-            const paginatedQuery
-                = this.paginationService.buildPaginationQuery(pagination, postsQuery);
-
-            const resultPostModels = await postsQuery.populate('author');
+            const {
+                paginatedDoc: resultPostModels,
+                pageInfo
+            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
             const result = resultPostModels.map(item => PostMapper.toPostDto(item));
 
             return { 
                 posts:result, 
-                pageInfo: await this.paginationService.getPageTimeInfo(
-                    resultPostModels.at(0),
-                    resultPostModels.at(-1),
-                    paginatedQuery
-                )
+                pageInfo
             };
         } catch (err) {
             console.error(err);

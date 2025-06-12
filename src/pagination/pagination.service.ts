@@ -8,7 +8,7 @@ export class PaginationService {
     buildPaginationQuery<ResultT, DocT>(
         pagination: PaginationInput, 
         query: Query<ResultT, DocT>,
-    ): Query<ResultT, DocT> {
+    ): {paginatedQuery: Query<ResultT, DocT>, noLimitQuery: Query<ResultT, DocT>} {
 
         const cursor:{time: string, id:string} = pagination.cursor ? JSON.parse(
             Buffer.from(pagination.cursor, 'base64').toString('utf-8')
@@ -34,9 +34,14 @@ export class PaginationService {
             query.gt('_id', gtCursor.id);
         }
 
+        const noLimitQuery = query.clone();
+
         query.limit(pagination.limit || 30);
 
-        return query;
+        return {
+            paginatedQuery: query, 
+            noLimitQuery
+        }
     }
 
     async getPaginatedDocuments<ResultT extends Document[], DocT>(
@@ -44,7 +49,8 @@ export class PaginationService {
         query: Query<ResultT, DocT>
     ): Promise<{paginatedDoc: ResultT, pageInfo: PageInfo}> {
         const beforePaginationQuery = query.clone();
-        const paginatedQuery = this.buildPaginationQuery(pagination, query);
+
+        const {paginatedQuery, noLimitQuery} = this.buildPaginationQuery(pagination, query);
         const paginatedDoc = await paginatedQuery;
 
         if (pagination.from === PaginationFrom.START) {
@@ -56,20 +62,20 @@ export class PaginationService {
             pageInfo: await this.getPageTimeInfo(
                 paginatedDoc.at(0),
                 paginatedDoc.at(-1),
-                beforePaginationQuery
+                beforePaginationQuery,
+                noLimitQuery,
+                paginatedDoc.length
             )
         };
     }
 
-
     async getPageTimeInfo<ResultT, DocT>(
         startDoc: Document,
         endDoc: Document,
-        query: Query<ResultT, DocT>
+        query: Query<ResultT, DocT>,
+        noLimitQuery: Query<ResultT, DocT>,
+        paginatedDocCount: number
     ): Promise<PageInfo> {
-
-        console.log(`start: ${startDoc?._id}`);
-        console.log(`end: ${endDoc?._id}`);
 
         const startCursorJsonString = JSON.stringify(startDoc ? {
             id: startDoc.get('id'),
@@ -86,25 +92,28 @@ export class PaginationService {
 
         const documentModel = query.model;
 
-        const hasPrevious = await documentModel.exists({
+        const hasOverStart = await documentModel.exists({
             ...query.getFilter(),
             createdAt: {
                 $gt: startDoc?.get('createdAt')
             }
         })
 
-        const hasNext = await documentModel.exists({
+        const hasOverEnd = await documentModel.exists({
             ...query.getFilter(),
             createdAt: {
                 $lt: endDoc?.get('createdAt')
             }
         });
+        
+        const totalDocCount = await noLimitQuery.count();
 
         return {
             startCursor,
             endCursor,
-            hasPrevious: hasPrevious ? true : false,
-            hasNext: hasNext ? true : false
+            hasOverStart: hasOverStart ? true : false,
+            hasOverEnd: hasOverEnd ? true : false,
+            hasNext: totalDocCount > paginatedDocCount
         }
     }
 

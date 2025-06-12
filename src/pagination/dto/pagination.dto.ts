@@ -43,21 +43,28 @@ export class PaginationInput {
 export class PageInfo {
     @Field(
         () => Boolean, {
-            description: "이전 페이지에 대한 항목이 추가로 존재하는지의 여부를 나타냅니다."
+            description: "startCursor 기준을 넘어선 데이터가 존재하는지의 여부를 나타냅니다."
         }
     )
-    hasPrevious: boolean
+    hasOverStart: boolean
 
     @Field(
         () => Boolean, {
-            description: "다음 페이지에 대한 항목이 추가로 존재하는지의 여부를 나타냅니다."
+            description: "endCursor 기준을 넘어선 데이터가 존재하는지의 여부를 나타냅니다."
         })
+    hasOverEnd: boolean
+
+    @Field(
+        () => Boolean, {
+            description: "다음 페이지에 대한 항목이 추가로 존재하는지의 여부를 나타냅니다. 만약 pagination 옵션에 until이 있다면, until 커서까지의 여부만 판단합니다. 즉, until 직전까지 데이터를 받았다면 false를 받게 됩니다."
+        }
+    )
     hasNext: boolean
 
     @Field(
         () => String, {
             nullable: true,
-            description: "쿼리한 페이지의 시작점을 나타냅니다. 정보 누락 없이 이전 페이지를 요청하려면, 해당 Cursor를 끝점으로 이전 페이지를 요청해야 합니다. 페이지에 아무런 정보도 없다면 null을 반환합니다."
+            description: "쿼리한 페이지의 시작점을 나타냅니다. 정보 누락 없이 이전 페이지를 요청하려면, 해당 Cursor를 기준으로START 방향 페이지를 요청해야 합니다. 페이지에 아무런 정보도 없다면 null을 반환합니다."
         }
     )
     startCursor?: string
@@ -65,7 +72,7 @@ export class PageInfo {
     @Field(
         () => String, {
             nullable: true,
-            description: "쿼리한 페이지의 끝점을 나타냅니다. 정보 누락 없이 다음 페이지를 요청하려면, 해당 Cursor를 시작점으로 다음 페이지를 요청해야 합니다. 페이지에 아무런 정보도 없다면 null을 반환합니다."
+            description: "쿼리한 페이지의 끝점을 나타냅니다. 정보 누락 없이 다음 페이지를 요청하려면, 해당 Cursor를 기준으로 END방향 페이지를 요청해야 합니다. 페이지에 아무런 정보도 없다면 null을 반환합니다."
         }
     )
     endCursor?: string
