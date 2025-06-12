@@ -47,12 +47,14 @@ export class CommentService{
 
     async getCommentsByPostId(targetPostId: string, pagination: PaginationInput): Promise<CommentsQueryResultDto>{
         try {
-            const commentQuery = this.CommentModel.find({post: targetPostId}).sort({createdAt: 1});
-            
-            const {countOnlyQuery} = this.PaginationService.buildPaginationQuery(pagination, commentQuery);
+            const commentQuery 
+                = this.CommentModel
+                    .find({post: targetPostId})
+                    .sort({createdAt: 1})
+                    .populate('commenter'); 
 
-            const count = await countOnlyQuery.count();
-            const commentDocuments = await commentQuery.populate('commenter');
+            const {paginatedDoc:commentDocuments, pageInfo} 
+                = await this.PaginationService.getPaginatedDocuments(pagination, commentQuery);
     
             const commentArray = commentDocuments.map(item => (
                 CommentMapper.toCommentDto(
@@ -63,10 +65,7 @@ export class CommentService{
 
             return {
                 comments: commentArray,
-                pageInfo: this.PaginationService.getPageTimeInfo(
-                    commentDocuments.at(-1),
-                    count, commentDocuments.length
-                )
+                pageInfo
             };
         } catch (err) {
             console.error(err);

@@ -67,11 +67,8 @@ export class FriendRequestService {
                     .populate('requester')
                     .populate('receiver');
 
-            const { countOnlyQuery } 
-                = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
 
-            const friendRequestCount = await countOnlyQuery.count();
-            const friendRequestDocuments = await friendRequestQuery;
+            const {paginatedDoc: friendRequestDocuments, pageInfo} = await this.PaginationService.getPaginatedDocuments(pagination, friendRequestQuery);
                 
             const friendRequests = friendRequestDocuments.map(
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
@@ -79,10 +76,7 @@ export class FriendRequestService {
 
             return {
                 friendRequests,
-                pageInfo: this.PaginationService.getPageTimeInfo(
-                    friendRequestDocuments.at(-1),
-                    friendRequestCount, friendRequestDocuments.length
-                )
+                pageInfo
             };
         } catch(err) {
             
@@ -100,15 +94,13 @@ export class FriendRequestService {
             const friendRequestQuery 
                 = this.friendRequestModel
                     .find({receiver: receiverId})
-                    .sort({createdAt: -1})
                     .populate('requester')
                     .populate('receiver');
 
-            const { countOnlyQuery } 
-                = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
-
-            const friendRequestCount = await countOnlyQuery.count();
-            const friendRequestDocuments = await friendRequestQuery;
+            const {paginatedDoc: friendRequestDocuments, pageInfo} = await this.PaginationService.getPaginatedDocuments(
+                pagination,
+                friendRequestQuery
+            );
                 
             const friendRequests = friendRequestDocuments.map(
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
@@ -116,10 +108,7 @@ export class FriendRequestService {
 
             return {
                 friendRequests,
-                pageInfo: this.PaginationService.getPageTimeInfo(
-                    friendRequestDocuments.at(-1),
-                    friendRequestCount, friendRequestDocuments.length
-                )
+                pageInfo
             };
         } catch(err) {
             

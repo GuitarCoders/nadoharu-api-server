@@ -47,16 +47,15 @@ export class FriendService {
     ): Promise<FriendsQueryResultDto> {
         try{
             console.log(targetUserId);
-            const FriendQuery = this.FriendModel
+            const friendQuery = this.FriendModel
                                 .find({owner: targetUserId})
-                                .sort({createdAt:-1});
+                                .populate('owner')
+                                .populate('friend');
 
-            const {countOnlyQuery} 
-                = this.PaginationService.buildPaginationQuery(pagination, FriendQuery);
-
-            const queryCount = await countOnlyQuery.count();
-
-            const friendDocuments = await FriendQuery.populate('owner').populate('friend');
+            const {
+                paginatedDoc: friendDocuments,
+                pageInfo
+            } = await this.PaginationService.getPaginatedDocuments(pagination, friendQuery);
 
             const Friends = friendDocuments.map( item => ({
                 _id: item._id.toString(),
@@ -68,10 +67,7 @@ export class FriendService {
             
             return {
                 friends: Friends,
-                pageInfo: this.PaginationService.getPageTimeInfo(
-                    friendDocuments.at(-1),
-                    queryCount, friendDocuments.length
-                )
+                pageInfo
             }
         } catch (err) {
             
