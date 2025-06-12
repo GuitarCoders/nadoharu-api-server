@@ -100,14 +100,18 @@ export class FriendRequestService {
             const friendRequestQuery 
                 = this.friendRequestModel
                     .find({receiver: receiverId})
-                    .sort({createdAt: -1})
                     .populate('requester')
                     .populate('receiver');
 
-            const paginatedQuery
-                = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
+            // const paginatedQuery
+            //     = this.PaginationService.buildPaginationQuery(pagination, friendRequestQuery)
 
-            const friendRequestDocuments = await friendRequestQuery;
+            // const friendRequestDocuments = await friendRequestQuery;
+
+            const {paginatedDoc: friendRequestDocuments, pageInfo} = await this.PaginationService.getPaginatedDocuments(
+                pagination,
+                friendRequestQuery
+            );
                 
             const friendRequests = friendRequestDocuments.map(
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
@@ -115,11 +119,7 @@ export class FriendRequestService {
 
             return {
                 friendRequests,
-                pageInfo: await this.PaginationService.getPageTimeInfo(
-                    friendRequestDocuments.at(0),
-                    friendRequestDocuments.at(-1),
-                    paginatedQuery
-                )
+                pageInfo
             };
         } catch(err) {
             

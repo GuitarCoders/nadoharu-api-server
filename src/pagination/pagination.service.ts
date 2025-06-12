@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { Document, Model, Query } from "mongoose";
+import { Document, Model, Query, SortOrder } from "mongoose";
 import { PageInfo, PaginationInput } from "./dto/pagination.dto";
 import { PaginationFrom } from "./enum/pagination.enum";
-
-
 
 @Injectable()
 export class PaginationService {
@@ -20,13 +18,12 @@ export class PaginationService {
             Buffer.from(pagination?.until, 'base64').toString('utf-8')
         ) : null;
 
-        const [ltCursor, gtCursor]
+        const [ltCursor, gtCursor, sort]
             = pagination.from === PaginationFrom.END
-                ? [cursor, until]
-                : [until, cursor]
-    
+                ? [cursor, until, -1 as SortOrder]
+                : [until, cursor, 1 as SortOrder]
 
-        query.sort({createdAt: -1, _id: -1});
+        query.sort({createdAt: sort, _id: sort});
         if (ltCursor) {
             query.lte('createdAt', ltCursor.time);
             query.lt('_id', ltCursor.id);
@@ -37,22 +34,42 @@ export class PaginationService {
             query.gt('_id', gtCursor.id);
         }
 
-        const countOnlyQuery = query.clone();
-
         query.limit(pagination.limit || 30);
 
         return query;
+    }
+
+    async getPaginatedDocuments<ResultT extends Document[], DocT>(
+        pagination: PaginationInput,
+        query: Query<ResultT, DocT>
+    ): Promise<{paginatedDoc: ResultT, pageInfo: PageInfo}> {
+        const beforePaginationQuery = query.clone();
+        const paginatedQuery = this.buildPaginationQuery(pagination, query);
+        const paginatedDoc = await paginatedQuery;
+
+        if (pagination.from === PaginationFrom.START) {
+            paginatedDoc.reverse()
+        }
+
+        return {
+            paginatedDoc: paginatedDoc as unknown as ResultT,
+            pageInfo: await this.getPageTimeInfo(
+                paginatedDoc.at(0),
+                paginatedDoc.at(-1),
+                beforePaginationQuery
+            )
+        };
     }
 
 
     async getPageTimeInfo<ResultT, DocT>(
         startDoc: Document,
         endDoc: Document,
-        afterPaginationQuery: Query<ResultT, DocT>
+        query: Query<ResultT, DocT>
     ): Promise<PageInfo> {
 
-        console.log(startDoc._id);
-        console.log(endDoc._id);
+        console.log(`start: ${startDoc?._id}`);
+        console.log(`end: ${endDoc?._id}`);
 
         const startCursorJsonString = JSON.stringify(startDoc ? {
             id: startDoc.get('id'),
@@ -67,17 +84,17 @@ export class PaginationService {
         const startCursor = Buffer.from(startCursorJsonString, 'utf-8').toString('base64');
         const endCursor = Buffer.from(endCursorJsonString, 'utf-8').toString('base64');
 
-        const documentModel = afterPaginationQuery.model;
+        const documentModel = query.model;
 
         const hasPrevious = await documentModel.exists({
-            ...afterPaginationQuery.getFilter(),
+            ...query.getFilter(),
             createdAt: {
                 $gt: startDoc?.get('createdAt')
             }
         })
 
         const hasNext = await documentModel.exists({
-            ...afterPaginationQuery.getFilter(),
+            ...query.getFilter(),
             createdAt: {
                 $lt: endDoc?.get('createdAt')
             }
