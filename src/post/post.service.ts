@@ -49,8 +49,9 @@ export class PostService{
             const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
 
             if (filter.category) {
-                postsQuery.where('category', filter.category).populate('author');
+                postsQuery.where('category', filter.category);
             }
+            postsQuery.populate('author');
             
             const {
                 paginatedDoc: postDocuments,
