@@ -157,18 +157,16 @@ export class UserService {
         }
     }
 
-    //jwtOwnerId -> ownerId 이쪽이 좀더 의도에 맞는 듯.
-    //함수가 이게 jwt를 타고 오는건지 알 필요가 없다.
-    async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequestDto): Promise<UserDeleteResultDto> {
+    async deleteUser(ownerId: string, deleteReq: UserDeleteRequestDto): Promise<UserDeleteResultDto> {
         const result = new UserDeleteResultDto;
         try{
 
-            const targetUser = await this.getUserById(jwtOwnerId);
+            const targetUser = await this.getUserById(ownerId);
             const deleteResult = await targetUser.deleteOne();
 
             console.log(deleteResult);
 
-            console.log(this.getUserById(jwtOwnerId));
+            console.log(this.getUserById(ownerId));
             result.deleteStatus = true;
             
             return result;
@@ -177,34 +175,5 @@ export class UserService {
             result.deleteStatus = false;
             return result;
         }
-    }
-
-    //TODO : Promise type 결정하기
-    //TODO : 사용하지 않음
-    /** @deprecated 해당 기능은 Friend부분이 처리합니다. */
-    async addFriend(
-        acceptUserId: string, 
-        reqUserId: string)
-    : Promise<any> {
-
-        try {
-            const acceptUser = await this.getUserById(acceptUserId);
-            const requestUser = await this.getUserById(reqUserId);
-
-            // acceptUser.friends.push(requestUser._id);
-            await acceptUser.updateOne({$addToSet: {friends: requestUser._id}});
-            // requestUser.friends.push(acceptUser._id);
-            await requestUser.updateOne({$addToSet: {friends: acceptUser._id}});
-
-            // await acceptUser.save();
-            // await requestUser.save();
-    
-            return {success: true};
-
-        } catch {
-            return {success: false};
-        }
-
-
     }
 }
