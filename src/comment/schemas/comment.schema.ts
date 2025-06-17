@@ -36,5 +36,8 @@ export class Comment{
     createdAt: Date;
 }
 
-// export const CommentSchema = SchemaFactory.createForClass(Post);
-export const CommentSchema = SchemaFactory.createForClass(Comment);
+const CommentSchema = SchemaFactory.createForClass(Comment);
+
+CommentSchema.index({ createdAt: 1, _id: 1 });
+
+export { CommentSchema };

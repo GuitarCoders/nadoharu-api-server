@@ -50,4 +50,8 @@ export class Post {
     createdAt: Date;
 }
 
-export const PostSchema = SchemaFactory.createForClass(Post);
+const PostSchema = SchemaFactory.createForClass(Post);
+
+PostSchema.index({ createdAt: 1, _id: 1 });
+
+export { PostSchema };

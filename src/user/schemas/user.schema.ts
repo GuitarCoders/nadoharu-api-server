@@ -3,7 +3,9 @@ import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({timestamps: true})
+@Schema({
+    timestamps: true,
+})
 export class User{
     @Prop({ 
         required: true,
@@ -39,5 +41,7 @@ export class User{
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ createdAt: 1, _id: 1 });
 
 export { UserSchema }
