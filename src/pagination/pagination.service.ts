@@ -77,18 +77,29 @@ export class PaginationService {
         paginatedDocCount: number
     ): Promise<PageInfo> {
 
-        const startCursorJsonString = JSON.stringify(startDoc ? {
-            id: startDoc.get('id'),
-            time: (startDoc.get('createdAt') as Date).toISOString()
-        } : null)
+        const startCursorJsonString = startDoc 
+            ? 
+                JSON.stringify({
+                    id: startDoc.get('id'),
+                    time: (startDoc.get('createdAt') as Date).toISOString()
+                })
+            : null;
 
-        const endCursorJsonString = JSON.stringify(endDoc ? {
-            id: endDoc.get('id'),
-            time: (endDoc.get('createdAt') as Date).toISOString()
-        } : null)
+        const endCursorJsonString = endDoc
+            ? 
+                JSON.stringify({
+                    id: endDoc.get('id'),
+                    time: (endDoc.get('createdAt') as Date).toISOString()
+                })
+            : null;
 
-        const startCursor = Buffer.from(startCursorJsonString, 'utf-8').toString('base64');
-        const endCursor = Buffer.from(endCursorJsonString, 'utf-8').toString('base64');
+        const startCursor = startCursorJsonString
+            ? Buffer.from(startCursorJsonString, 'utf-8').toString('base64')
+            : null;
+
+        const endCursor = endCursorJsonString
+            ? Buffer.from(endCursorJsonString, 'utf-8').toString('base64')
+            : null;
 
         const documentModel = query.model;
 
