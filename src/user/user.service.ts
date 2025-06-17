@@ -1,4 +1,4 @@
-import mongoose, { Model, Document, ObjectId, LeanDocument } from 'mongoose';
+import mongoose, { Model, Document, ObjectId, LeanDocument, UpdateWriteOpResult } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
@@ -102,21 +102,21 @@ export class UserService {
     ): Promise<UserUpdateResultDto> {
         try {
             const targetUser = await this.getUserById(jwtOwnerId);
-            const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
-            const updateResult = await targetUser.updateOne({
+            // const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
+            await targetUser.updateOne({
                 name: updateReq.name,
-                pwd_hash: pwd_hash,
+                // pwd_hash: pwd_hash,
                 about_me: updateReq.about_me
             })
 
-            console.log(updateResult.modifiedCount);
-
+            const updatedUserDoc = await this.getUserById(jwtOwnerId);
+            
             const updatedUser: UserUpdateResultDto = {
-                _id: targetUser._id.toString(),
-                name: targetUser.name,
-                email: targetUser.email,
-                account_id: targetUser.account_id,
-                about_me: targetUser.about_me,
+                _id: updatedUserDoc._id.toString(),
+                name: updatedUserDoc.name,
+                email: updatedUserDoc.email,
+                account_id: updatedUserDoc.account_id,
+                about_me: updatedUserDoc.about_me,
                 status: "success"
             } 
             

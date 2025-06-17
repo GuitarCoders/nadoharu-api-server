@@ -75,11 +75,6 @@ export class UserUpdateRequestDto{
         description: "유저의 자기소개 내용입니다."
     })
     about_me: string;
-
-    @Field(() => String, {
-        description: "유저의 로그인용 비밀번호입니다. 해당 정보는 암호화되어 서버에 저장됩니다. 저장된 암호는 다시 복호화할 수 없습니다."
-    })
-    password: string;
 }
 
 @ObjectType('UserUpdateResult')
