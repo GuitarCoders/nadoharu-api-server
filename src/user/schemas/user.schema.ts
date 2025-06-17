@@ -33,9 +33,8 @@ export class User{
     pwd_hash: string;
 
     @Prop({
-        required: true,
         maxlength: 250,
-        type: mongoose.Schema.Types.String
+        type: mongoose.Schema.Types.String,
     })
     about_me: string;
 }
