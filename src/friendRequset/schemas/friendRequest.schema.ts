@@ -34,4 +34,8 @@ export class FriendRequest{
 
 }
 
-export const FriendRequestSchema = SchemaFactory.createForClass(FriendRequest);
+const FriendRequestSchema = SchemaFactory.createForClass(FriendRequest);
+
+FriendRequestSchema.index({ createdAt: 1, _id: 1 });
+
+export { FriendRequestSchema };

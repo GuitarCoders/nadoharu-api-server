@@ -27,4 +27,8 @@ export class Friend {
     createdAt: Date;
 }
 
-export const FriendSchema = SchemaFactory.createForClass(Friend);
+const FriendSchema = SchemaFactory.createForClass(Friend);
+
+FriendSchema.index({ createdAt: 1, _id: 1 });
+
+export { FriendSchema };
