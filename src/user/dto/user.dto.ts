@@ -77,6 +77,22 @@ export class UserUpdateRequestDto{
     about_me: string;
 }
 
+@InputType('UserUpdatePasswordInput', {
+    description: "유저의 비밀번호를 변경하기 위한 정보를 담는 Input 객체입니다."
+})
+export class UserUpdatePasswordRequestDto {
+    
+    @Field(() => String, {
+        description: "로그인한 유저의 기존 비밀번호입니다. 비밀번호를 변경하기 위해 기존 비밀번호가 필요합니다."
+    })
+    oldPassword: string;
+
+    @Field(() => String, {
+        description: "로그인한 유저가 변경할 비밀번호입니다."
+    })
+    newPassword: string;
+}
+
 @ObjectType('UserUpdateResult')
 export class UserUpdateResultDto extends UserSafeDto{
 

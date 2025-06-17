@@ -4,7 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
 
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
-import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UsersSafeDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UsersSafeDto, UserUpdatePasswordRequestDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
+import { error } from 'console';
 
 @Injectable()
 export class UserService {
@@ -123,6 +124,30 @@ export class UserService {
             return updatedUser;
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    async updatePassword(ownerId: string, userUpdatePasswordRequest: UserUpdatePasswordRequestDto): Promise<UserUpdateResultDto> {
+        try {
+            const targetuser = await this.getUserById(ownerId);
+
+            //TODO : 비밀번호등의 인증 관련 내용은 auth모듈의 것을 사용하자
+            const validateUser = await Bcrypt.compare(userUpdatePasswordRequest.oldPassword, targetuser.pwd_hash);
+            console.log(validateUser);
+            if (!validateUser) {
+                // TODO : 해당 오류에 대한 graphQL 오류를 응답하자
+                throw new error("비밀번호 오류");
+            }
+            const pwd_hash = await Bcrypt.hash(userUpdatePasswordRequest.newPassword, 10);
+            await targetuser.updateOne({
+                pwd_hash
+            });
+
+            const updatedUserDoc = await this.getUserById(ownerId);
+
+            return {...this.userDocumentToUserSafe(updatedUserDoc), status: "success"}
+        } catch (err) {
+            console.error(err);
         }
     }
 

@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import mongoose, { LeanDocument } from 'mongoose';
 
 import { User, UserDocument } from './schemas/user.schema';
-import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UserUpdateRequestDto, UserUpdateResultDto, UsersSafeDto } from './dto/user.dto';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UserUpdatePasswordRequestDto, UserUpdateRequestDto, UserUpdateResultDto, UsersSafeDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
@@ -76,6 +76,18 @@ export class UserResolver {
         }) reqUser: UserUpdateRequestDto
     ): Promise<UserUpdateResultDto> {
         return await this.UserService.updateUserById(user._id, reqUser);
+    }
+
+    @Mutation(() => UserUpdateResultDto, {
+        name: 'updateUserPassword',
+        description: "로그인한 유저의 비밀번호를 변경하는 뮤테이션입니다."
+    })
+    @UseGuards(GqlAuthGuard)
+    async updateUserPassword(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('updateUserPassword') userUpdateReq: UserUpdatePasswordRequestDto
+    ) {
+        return await this.UserService.updatePassword(user._id, userUpdateReq);
     }
 
     @Mutation(() => UserSafeDto, {
