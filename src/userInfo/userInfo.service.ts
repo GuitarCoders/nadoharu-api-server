@@ -7,6 +7,8 @@ import { FriendRequestService } from "src/friendRequset/friendRequest.service";
 import { AuthService } from "src/auth/auth.service";
 import { UserUpdateResultDto } from "src/user/dto/user.dto";
 import * as bcrypt from 'bcrypt';
+import { NadoharuGraphQLError } from "src/errors/nadoharuGraphQLError";
+import { GraphQLError } from "graphql";
 
 @Injectable()
 export class UserInfoService {
@@ -122,15 +124,6 @@ export class UserInfoService {
         newPassword: string
     ): Promise<UserUpdateResultDto> {
         try {
-            // const pwd_hash = await Bcrypt.hash(userUpdatePasswordRequest.newPassword, 10);
-            // await targetuser.updateOne({
-            //     pwd_hash
-            // });
-
-            // const updatedUserDoc = await this.getUserById(ownerId);
-
-            // return {...this.userDocumentToUserSafe(updatedUserDoc), status: "success"}
-
             const targetUserDocument = await this.UserService.getUserById(userId);
     
             const validateResult = await this.AuthService.validateUser({
@@ -139,7 +132,7 @@ export class UserInfoService {
             })
 
             if (!validateResult) {
-                throw new Error("유저 로그인 정보가 일치하지 않습니다.")
+                throw new NadoharuGraphQLError('INVALID_USER_CREDENTIALS');
             }
 
             const pwd_hash = await bcrypt.hash(newPassword, 10);
@@ -159,6 +152,9 @@ export class UserInfoService {
                 status: "success",
             }
         } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
             console.error(err);
         }
     }

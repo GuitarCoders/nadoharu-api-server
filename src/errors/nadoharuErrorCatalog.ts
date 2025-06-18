@@ -22,7 +22,12 @@ export const NadoharuErrorCatalog = {
     FRIEND_REQUEST_NOT_RECEIVED: {
         code: 'FRIEND_REQUEST_NOT_RECEIVED',
         defaultMessage: '받지 않은 친구신청을 승낙할 수 없습니다.'
+    },
+    INVALID_USER_CREDENTIALS: {
+        code: 'INVALID_LOGIN_CREDENTIALS',
+        defaultMessage: '사용자 인증 정보가 일치하지 않습니다.'
     }
+    
 } as const;
 
 export type NadoharuErrorType = keyof typeof NadoharuErrorCatalog;
