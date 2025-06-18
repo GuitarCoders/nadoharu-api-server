@@ -1,10 +1,11 @@
-import { Args, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { AboutMeDto, UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "src/auth/gql-auth.guard";
 import { UserJwtPayload } from "src/auth/models/auth.model";
 import { UserInfoService } from "./userInfo.service";
 import { CurrentUser } from "src/auth/auth-user.decorator";
+import { UserUpdatePasswordRequestDto, UserUpdateResultDto } from "src/user/dto/user.dto";
 
 
 @Resolver()
@@ -64,5 +65,21 @@ export class UserInfoResolver {
         ) accountId: string 
     ): Promise<UserInfoDto> {
         return this.UserInfoService.getUserInfoByAccountId(user._id, accountId);
+    }
+
+    @Mutation(() => UserUpdateResultDto, {
+        name: 'updateUserPassword',
+        description: ""
+    })
+    @UseGuards(GqlAuthGuard)
+    async updateUserPassword(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('updatePasswordData', {
+            description: ""
+        }) updatePasswordData: UserUpdatePasswordRequestDto
+    ): Promise<UserUpdateResultDto> {
+        return this.UserInfoService.updateUserPassword(
+            user._id, updatePasswordData.oldPassword, updatePasswordData.newPassword
+        );
     }
 }

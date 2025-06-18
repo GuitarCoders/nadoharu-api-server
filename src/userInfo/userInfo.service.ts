@@ -4,13 +4,17 @@ import { UserService } from "src/user/user.service";
 import { AboutMeDto, UserInfoDto, UserInfosDto } from "./dto/userInfo.dto";
 import { FriendState } from "./enum/userInfo.enum";
 import { FriendRequestService } from "src/friendRequset/friendRequest.service";
+import { AuthService } from "src/auth/auth.service";
+import { UserUpdateResultDto } from "src/user/dto/user.dto";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserInfoService {
     constructor (
         private UserService: UserService,
         private FriendService: FriendService,
-        private FriendRequestService: FriendRequestService
+        private FriendRequestService: FriendRequestService,
+        private AuthService: AuthService
     ) {}
 
     async getUserInfos(
@@ -109,6 +113,53 @@ export class UserInfoService {
 
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    async updateUserPassword(
+        userId: string, 
+        oldPassword: string, 
+        newPassword: string
+    ): Promise<UserUpdateResultDto> {
+        try {
+            // const pwd_hash = await Bcrypt.hash(userUpdatePasswordRequest.newPassword, 10);
+            // await targetuser.updateOne({
+            //     pwd_hash
+            // });
+
+            // const updatedUserDoc = await this.getUserById(ownerId);
+
+            // return {...this.userDocumentToUserSafe(updatedUserDoc), status: "success"}
+
+            const targetUserDocument = await this.UserService.getUserById(userId);
+    
+            const validateResult = await this.AuthService.validateUser({
+                account_id: targetUserDocument.account_id,
+                password: oldPassword
+            })
+
+            if (!validateResult) {
+                throw new Error("유저 로그인 정보가 일치하지 않습니다.")
+            }
+
+            const pwd_hash = await bcrypt.hash(newPassword, 10);
+            
+            await targetUserDocument.updateOne({pwd_hash})
+
+            const updatedUserDocument = await this.UserService.getUserById(userId);
+            const updatedUserDocumentSafe 
+                = this.UserService.userDocumentToUserSafe(updatedUserDocument);
+
+            return {
+                _id: updatedUserDocumentSafe._id,
+                name: updatedUserDocumentSafe.name,
+                email: updatedUserDocumentSafe.email,
+                account_id: updatedUserDocumentSafe.account_id,
+                about_me: updatedUserDocumentSafe.about_me,
+                status: "success",
+            }
+        } catch (err) {
+            console.error(err);
         }
     }
 }

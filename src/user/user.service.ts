@@ -127,31 +127,6 @@ export class UserService {
         }
     }
 
-    async updatePassword(ownerId: string, userUpdatePasswordRequest: UserUpdatePasswordRequestDto): Promise<UserUpdateResultDto> {
-        try {
-            const targetuser = await this.getUserById(ownerId);
-
-            //TODO : 비밀번호등의 인증 관련 내용은 auth모듈의 것을 사용하자
-            const validateUser = await Bcrypt.compare(userUpdatePasswordRequest.oldPassword, targetuser.pwd_hash);
-            console.log(validateUser);
-            if (!validateUser) {
-                // TODO : 해당 오류에 대한 graphQL 오류를 응답하자
-                throw new error("비밀번호 오류");
-            }
-            const pwd_hash = await Bcrypt.hash(userUpdatePasswordRequest.newPassword, 10);
-            await targetuser.updateOne({
-                pwd_hash
-            });
-
-            const updatedUserDoc = await this.getUserById(ownerId);
-
-            return {...this.userDocumentToUserSafe(updatedUserDoc), status: "success"}
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-
     async createUser(reqUser: UserCreateRequestDto): Promise<UserSafeDto> {
         try {
 
