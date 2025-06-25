@@ -27,7 +27,7 @@ export class FriendRequestService {
         @InjectModel(FriendRequest.name) private friendRequestModel: Model<FriendRequest>
     ) {}
 
-    async getFriendRequestById(requestUserId: string, id: string): Promise<FriendRequestDocument> {
+    async getFriendRequestById(requesterId: string, id: string): Promise<FriendRequestDocument> {
         try{
             const result = await this.friendRequestModel.findById(id)
                 .populate('requester')
@@ -38,9 +38,9 @@ export class FriendRequestService {
             }
             
             if (
-                result.requester._id.toString() !== requestUserId
+                result.requester._id.toString() !== requesterId
                 &&
-                result.receiver._id.toString() !== requestUserId
+                result.receiver._id.toString() !== requesterId
             ) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_OWNED');
             }
@@ -54,7 +54,7 @@ export class FriendRequestService {
         }
     }
 
-    async getFriendRequestsByRequestUserId(
+    async getFriendRequestsByRequesterId(
         requesterId: string,
         pagination: PaginationInput
     ): Promise<FriendRequestsQueryResultDto> {
@@ -68,7 +68,8 @@ export class FriendRequestService {
                     .populate('receiver');
 
 
-            const {paginatedDoc: friendRequestDocuments, pageInfo} = await this.PaginationService.getPaginatedDocuments(pagination, friendRequestQuery);
+            const {paginatedDoc: friendRequestDocuments, pageInfo} 
+                = await this.PaginationService.getPaginatedDocuments(pagination, friendRequestQuery);
                 
             const friendRequests = friendRequestDocuments.map(
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
@@ -85,7 +86,7 @@ export class FriendRequestService {
         }
     }
 
-    async getFriendRequestsByReceiveUserId(
+    async getFriendRequestsByReceiverId(
         receiverId: string,
         pagination: PaginationInput
     ): Promise<FriendRequestsQueryResultDto> {
@@ -97,10 +98,11 @@ export class FriendRequestService {
                     .populate('requester')
                     .populate('receiver');
 
-            const {paginatedDoc: friendRequestDocuments, pageInfo} = await this.PaginationService.getPaginatedDocuments(
-                pagination,
-                friendRequestQuery
-            );
+            const {paginatedDoc: friendRequestDocuments, pageInfo}
+                = await this.PaginationService.getPaginatedDocuments(
+                    pagination,
+                    friendRequestQuery
+                );
                 
             const friendRequests = friendRequestDocuments.map(
                 item => this.FriendRequestMapper.toFriendRequestDto(item)
@@ -124,17 +126,17 @@ export class FriendRequestService {
     }
 
     async createFriendRequest(
-        requestUserId: string,
+        requesterId: string,
         createFriendRequestDto: CreateFriendRequestDto
     ): Promise<CreateFriendRequestResultDto> {
         try{
 
-            if(requestUserId === createFriendRequestDto.receiver) {
+            if(requesterId === createFriendRequestDto.receiver) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_TO_ME');
             }
 
             const alreadyFriendRequests = await this.friendRequestModel.find({
-                requester: requestUserId,
+                requester: requesterId,
                 receiver: createFriendRequestDto.receiver
             })
             
@@ -144,7 +146,7 @@ export class FriendRequestService {
 
             const createdFriendRequest = new this.friendRequestModel(
                 {
-                    requester: requestUserId,
+                    requester: requesterId,
                     receiver: createFriendRequestDto.receiver,
                     requestMessage: createFriendRequestDto.requestMessage
                 }
