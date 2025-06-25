@@ -103,12 +103,16 @@ export class UserService {
     ): Promise<UserUpdateResultDto> {
         try {
             const targetUser = await this.getUserById(jwtOwnerId);
-            // const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
-            await targetUser.updateOne({
-                name: updateReq.name,
-                // pwd_hash: pwd_hash,
-                about_me: updateReq.about_me
-            })
+            Object.keys(updateReq).forEach(
+                (key) => {
+                    if ((updateReq[key] == null) || (updateReq[key] === "")) {
+                        delete updateReq[key]
+                    }
+                } 
+            )
+            await targetUser.updateOne(
+                updateReq
+            );
 
             const updatedUserDoc = await this.getUserById(jwtOwnerId);
             

@@ -67,14 +67,16 @@ export class UserCreateRequestDto{
 export class UserUpdateRequestDto{
     
     @Field(() => String, {
-        description:"유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다."
+        description: "유저의 표시용 이름입니다. 해당 정보는 로그인할때 사용되지 않습니다. 또한 중복을 허용합니다. 해당 항목은 생략할 수 있으며, 생략할 경우 기존의 값을 유지합니다.",
+        nullable: true
     })
-    name: string;
+    name?: string;
 
     @Field(() => String, {
-        description: "유저의 자기소개 내용입니다."
+        description: "유저의 자기소개 내용입니다. 해당 항목은 생략할 수 있으며, 생략할 경우 기존의 값을 유지합니다.",
+        nullable: true
     })
-    about_me: string;
+    about_me?: string;
 }
 
 @InputType('UserUpdatePasswordInput', {
