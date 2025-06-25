@@ -30,8 +30,8 @@ export class FriendRequestService {
     async getFriendRequestById(requestUserId: string, id: string): Promise<FriendRequestDocument> {
         try{
             const result = await this.friendRequestModel.findById(id)
-                .populate('requestUser')
-                .populate('receiveUser');;
+                .populate('requester')
+                .populate('receiver');;
 
             if (!result) {
                 throw new NadoharuGraphQLError('FRIEND_REQUEST_NOT_EXIST');
