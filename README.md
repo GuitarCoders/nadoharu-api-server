@@ -47,6 +47,7 @@ Http-Header{
 ```
 JWT_SECRET=<JWT 토큰 암/복호화를 위한 무작위 문자열>
 MONGO_DB_URL=mongodb://<mongoDB 작동 네트워크 주소>:<mongoDB 작동 포트>
+PORT=<서버가 실행될 네트워크 포트 번호>
 ```
 
 해당 파일을 작성하였다면 다음과 같은 명령어로 서버를 실행할 수 있습니다.

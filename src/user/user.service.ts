@@ -1,10 +1,11 @@
-import mongoose, { Model, Document, ObjectId, LeanDocument } from 'mongoose';
+import mongoose, { Model, Document, ObjectId, LeanDocument, UpdateWriteOpResult } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as Bcrypt from 'bcrypt'
 
 import { User, UserDocument, UserSchema } from './schemas/user.schema';
-import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UsersSafeDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
+import { UserCreateRequestDto, UserDeleteRequestDto, UserDeleteResultDto, UserSafeDto, UsersSafeDto, UserUpdatePasswordRequestDto, UserUpdateRequestDto, UserUpdateResultDto } from './dto/user.dto';
+import { error } from 'console';
 
 @Injectable()
 export class UserService {
@@ -102,21 +103,21 @@ export class UserService {
     ): Promise<UserUpdateResultDto> {
         try {
             const targetUser = await this.getUserById(jwtOwnerId);
-            const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
-            const updateResult = await targetUser.updateOne({
+            // const pwd_hash = await Bcrypt.hash(updateReq.password, 10);
+            await targetUser.updateOne({
                 name: updateReq.name,
-                pwd_hash: pwd_hash,
+                // pwd_hash: pwd_hash,
                 about_me: updateReq.about_me
             })
 
-            console.log(updateResult.modifiedCount);
-
+            const updatedUserDoc = await this.getUserById(jwtOwnerId);
+            
             const updatedUser: UserUpdateResultDto = {
-                _id: targetUser._id.toString(),
-                name: targetUser.name,
-                email: targetUser.email,
-                account_id: targetUser.account_id,
-                about_me: targetUser.about_me,
+                _id: updatedUserDoc._id.toString(),
+                name: updatedUserDoc.name,
+                email: updatedUserDoc.email,
+                account_id: updatedUserDoc.account_id,
+                about_me: updatedUserDoc.about_me,
                 status: "success"
             } 
             
@@ -125,7 +126,6 @@ export class UserService {
             console.error(err)
         }
     }
-
 
     async createUser(reqUser: UserCreateRequestDto): Promise<UserSafeDto> {
         try {
@@ -137,7 +137,7 @@ export class UserService {
                 account_id: reqUser.account_id,
                 email: reqUser.email,
                 pwd_hash: pwd_hash,
-                about_me: " ", //TODO: 빈 문자열도 허용하도록 수정
+                about_me: "",
                 friends: []
             });
             await createdUser.save()
@@ -157,18 +157,16 @@ export class UserService {
         }
     }
 
-    //jwtOwnerId -> ownerId 이쪽이 좀더 의도에 맞는 듯.
-    //함수가 이게 jwt를 타고 오는건지 알 필요가 없다.
-    async deleteUser(jwtOwnerId: string, deleteReq: UserDeleteRequestDto): Promise<UserDeleteResultDto> {
+    async deleteUser(ownerId: string, deleteReq: UserDeleteRequestDto): Promise<UserDeleteResultDto> {
         const result = new UserDeleteResultDto;
         try{
 
-            const targetUser = await this.getUserById(jwtOwnerId);
+            const targetUser = await this.getUserById(ownerId);
             const deleteResult = await targetUser.deleteOne();
 
             console.log(deleteResult);
 
-            console.log(this.getUserById(jwtOwnerId));
+            console.log(this.getUserById(ownerId));
             result.deleteStatus = true;
             
             return result;
@@ -177,34 +175,5 @@ export class UserService {
             result.deleteStatus = false;
             return result;
         }
-    }
-
-    //TODO : Promise type 결정하기
-    //TODO : 사용하지 않음
-    /** @deprecated 해당 기능은 Friend부분이 처리합니다. */
-    async addFriend(
-        acceptUserId: string, 
-        reqUserId: string)
-    : Promise<any> {
-
-        try {
-            const acceptUser = await this.getUserById(acceptUserId);
-            const requestUser = await this.getUserById(reqUserId);
-
-            // acceptUser.friends.push(requestUser._id);
-            await acceptUser.updateOne({$addToSet: {friends: requestUser._id}});
-            // requestUser.friends.push(acceptUser._id);
-            await requestUser.updateOne({$addToSet: {friends: acceptUser._id}});
-
-            // await acceptUser.save();
-            // await requestUser.save();
-    
-            return {success: true};
-
-        } catch {
-            return {success: false};
-        }
-
-
     }
 }
