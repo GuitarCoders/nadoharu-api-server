@@ -117,9 +117,9 @@ export class FriendRequestService {
         }
     }
 
-    async getReceivedFriendRequestCount(receivedUserId: string): Promise<number> {
+    async getReceivedFriendRequestCount(receiverId: string): Promise<number> {
         return await this.friendRequestModel.count({
-            receiveUser: receivedUserId
+            receiver: receiverId
         });
     }
 
