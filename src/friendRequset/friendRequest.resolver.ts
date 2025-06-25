@@ -74,7 +74,7 @@ export class FriendRequestResolver {
     @UseGuards(GqlAuthGuard)
     async acceptFriendRequest(
         @CurrentUser() user: UserJwtPayload,
-        @Args('acceptFriendRequestData', {
+        @Args('friendRequestId', {
             description: "승낙할 친구신청 id"
         }) friendRequestId: string
     ): Promise<AcceptFriendRequestResultDto> {
