@@ -23,7 +23,7 @@ export class FriendRequestResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('pagination', {description: "페이지네이션 정보"}) pagination: PaginationInput 
     ): Promise<FriendRequestsQueryResultDto> {
-        return await this.FriendRequestService.getFriendRequestsByRequestUserId(user._id, pagination);
+        return await this.FriendRequestService.getFriendRequestsByRequesterId(user._id, pagination);
     }
 
     @Query(
@@ -36,7 +36,7 @@ export class FriendRequestResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('pagination', {description: "페이지네이션 정보"}) pagination: PaginationInput
     ): Promise<FriendRequestsQueryResultDto> {
-        return await this.FriendRequestService.getFriendRequestsByReceiveUserId(user._id, pagination);
+        return await this.FriendRequestService.getFriendRequestsByReceiverId(user._id, pagination);
     }
 
     @Mutation(() => CreateFriendRequestResultDto, { 
