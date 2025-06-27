@@ -15,6 +15,7 @@ import { TestModule } from './test/test.module';
 import { CommentModule } from './comment/comment.module';
 import { UserInfoModule } from './userInfo/userInfo.module';
 import { PaginationModule } from './pagination/pagination.module';
+import { NadoModule } from './nado/nado.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -41,7 +42,8 @@ console.log(process.env.NODE_ENV);
     TestModule,
     CommentModule,
     UserInfoModule,
-    PaginationModule
+    PaginationModule,
+    NadoModule
   ],
   providers: [AppService],
 })
