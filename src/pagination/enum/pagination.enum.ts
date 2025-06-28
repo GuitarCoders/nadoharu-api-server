@@ -5,4 +5,10 @@ export enum PaginationFrom {
     END
 }
 
+export enum PaginationSort {
+    ASC,
+    DESC
+}
+
 registerEnumType(PaginationFrom, { name: 'PaginationFrom' });
+registerEnumType(PaginationSort, { name: 'PaginationSort' });

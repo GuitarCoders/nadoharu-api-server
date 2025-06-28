@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { PaginationFrom } from "../enum/pagination.enum";
+import { PaginationFrom, PaginationSort } from "../enum/pagination.enum";
 
 @InputType(
     {description: "한 페이지를 가져오기 위해 필요한 입력 데이터입니다. 시작점, 끝점, 페이지 당 항목 갯수를 입력합니다."}
@@ -8,7 +8,7 @@ export class PaginationInput {
     @Field(
         () => String, {
             nullable: true,
-            description: "페이지네이션 시작점을 나타냅니다. 해당 항목을 생략하면 쿼리를 요청한 시간을 시작점으로 정합니다."
+            description: "페이지네이션 시작점을 나타냅니다. 해당 항목을 생략하면 가져올 수 있는 가장 처음 항목을 기본 cursor로 정합니다. (예를 들어, DESC의 경우 가장 최신 정보)"
         }
     )
     cursor?: string;
@@ -16,7 +16,7 @@ export class PaginationInput {
     @Field(
         () => String, {
             nullable: true,
-            description: "페이지네이션 끝점을 나타냅니다. 해당 항목을 생략하면 시작점으로 부터 제한 없이 결과를 가져옵니다."
+            description: "페이지네이션 끝점을 나타냅니다. 해당 항목을 생략하면 시작점으로 부터 기준점 없이 결과를 가져옵니다."
         }
     )
     until?: string;
@@ -27,6 +27,13 @@ export class PaginationInput {
         }
     )
     from: PaginationFrom;
+
+    @Field(
+        () => PaginationSort, {
+            description: "페이지의 정렬을 나타냅니다. ASC는 가장 '과거'의 정보를 페이지의 첫 항목으로 반환합니다. DESC는 가장 '최신'의 정보를 페이지의 첫 항목으로 반환합니다."
+        }
+    )
+    sort: PaginationSort
 
     @Field(
         () => Int, {
