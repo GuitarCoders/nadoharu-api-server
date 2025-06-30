@@ -112,7 +112,9 @@ export class PostService{
                 author: userId,
                 content: data.content,
                 tags: data.tags,
-                category: data.category
+                category: data.category,
+                isNadoPost: false,
+                nadoCount: 0
             })
 
             await createdPost.save();

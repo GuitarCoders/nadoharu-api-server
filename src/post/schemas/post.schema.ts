@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument, mongo } from "mongoose";
+import mongoose, { HydratedDocument, mongo, ObjectId } from "mongoose";
 import { UserDocument } from "src/user/schemas/user.schema";
 
 
@@ -43,6 +43,24 @@ export class Post {
     })
     author: UserDocument;
 
+    @Prop({
+        required: true,
+        type: mongoose.Schema.Types.Boolean
+    })
+    isNadoPost: boolean;
+
+    @Prop({
+        required: false,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Nado'
+    })
+    nadoId?: ObjectId;
+
+    @Prop({
+        required: true,
+        type: mongoose.Schema.Types.Number
+    })
+    nadoCount: number;
     
     @Prop({
         type: mongoose.Schema.Types.Date
