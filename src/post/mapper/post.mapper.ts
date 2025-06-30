@@ -9,6 +9,8 @@ export class PostMapper {
             content: post.content,
             tags: post.tags,
             category: post.category,
+            isNadoPost: post.isNadoPost,
+            nadoCount: post.nadoCount,
             createdAt: post.createdAt.toISOString()
         }
     }
