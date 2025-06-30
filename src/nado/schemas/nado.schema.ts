@@ -33,5 +33,6 @@ export class Nado {
 const NadoSchema = SchemaFactory.createForClass(Nado);
 
 NadoSchema.index({ createdAt: 1, _id: 1 });
+NadoSchema.index({ nadoer: 1, post: 1}, {unique: true});
 
 export { NadoSchema };

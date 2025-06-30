@@ -39,6 +39,12 @@ export class PostDto{
     })
     isNadoPost: boolean;
 
+    @Field(() => UserSafeDto, {
+        nullable: true,
+        description: "'나도' 반응을 한 사람입니다. 내용이 없을 수도 있습니다."
+    })
+    nadoer?: UserSafeDto
+
     @Field(() => Int, {
         description: "글이 얻은 나도 반응의 갯수입니다."
     })

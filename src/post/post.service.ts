@@ -106,7 +106,7 @@ export class PostService{
     async createPost(
         userId: string, 
         data: CreatePostDto
-    ): Promise<CreatePostResultDto>{
+    ): Promise<CreatePostResultDto> {
         try{
             const createdPost = new this.PostModel({
                 author: userId,
@@ -126,6 +126,47 @@ export class PostService{
             }
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async createNadoPost(
+        nadoerId: string,
+        nadoId: Types.ObjectId
+    ):Promise<boolean> {
+        try {
+            const createdPost = new this.PostModel({
+                author: nadoerId,
+                content: "nado",
+                isNadoPost: true,
+                nadoId: nadoId,
+                nadoCount: 0
+            });
+
+            await createdPost.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async addNadoCount(
+        originPostId: string,
+    ):Promise<boolean> {
+        try {
+            const originPostDocument = await this.getPostDocumentById(originPostId);
+
+            if (!originPostDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            originPostDocument.nadoCount += 1;
+            await originPostDocument.save();
+
+            return true;
+
+        } catch (err) {
+            console.error(err);
         }
     }
 
