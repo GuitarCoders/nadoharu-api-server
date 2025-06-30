@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Document, Model, Query, SortOrder } from "mongoose";
 import { PageInfo, PaginationInput } from "./dto/pagination.dto";
-import { PaginationFrom } from "./enum/pagination.enum";
+import { PaginationFrom, PaginationSort } from "./enum/pagination.enum";
 
 @Injectable()
 export class PaginationService {
@@ -19,9 +19,16 @@ export class PaginationService {
         ) : null;
 
         const [ltCursor, gtCursor, sort]
+            // = pagination.from === PaginationFrom.END
+            //     ? [cursor, until, -1 as SortOrder]
+            //     : [until, cursor, 1 as SortOrder]
             = pagination.from === PaginationFrom.END
-                ? [cursor, until, -1 as SortOrder]
-                : [until, cursor, 1 as SortOrder]
+                ? pagination.sort === PaginationSort.DESC
+                    ? [cursor, until, -1 as SortOrder]
+                    : [until, cursor, 1 as SortOrder]
+                : pagination.sort === PaginationSort.ASC
+                    ? [until, cursor, 1 as SortOrder]
+                    : [cursor, until, -1 as SortOrder]
 
         query.sort({createdAt: sort, _id: sort});
         if (ltCursor) {
@@ -54,7 +61,7 @@ export class PaginationService {
         const paginatedDoc = await paginatedQuery;
 
         if (pagination.from === PaginationFrom.START) {
-            paginatedDoc.reverse()
+            paginatedDoc.reverse();
         }
 
         return {
@@ -64,7 +71,8 @@ export class PaginationService {
                 paginatedDoc.at(-1),
                 beforePaginationQuery,
                 noLimitQuery,
-                paginatedDoc.length
+                paginatedDoc.length,
+                pagination.sort
             )
         };
     }
@@ -74,7 +82,8 @@ export class PaginationService {
         endDoc: Document,
         query: Query<ResultT, DocT>,
         noLimitQuery: Query<ResultT, DocT>,
-        paginatedDocCount: number
+        paginatedDocCount: number,
+        sort: PaginationSort
     ): Promise<PageInfo> {
 
         const startCursorJsonString = startDoc 
@@ -105,16 +114,18 @@ export class PaginationService {
 
         const hasOverStart = await documentModel.exists({
             ...query.getFilter(),
-            createdAt: {
-                $gt: startDoc?.get('createdAt')
-            }
+            createdAt: 
+                sort === PaginationSort.DESC
+                    ? {$gt: startDoc?.get('createdAt')}
+                    : {$lt: startDoc?.get('createdAt')}
         })
 
         const hasOverEnd = await documentModel.exists({
             ...query.getFilter(),
-            createdAt: {
-                $lt: endDoc?.get('createdAt')
-            }
+            createdAt: 
+                sort === PaginationSort.DESC
+                    ? {$lt: endDoc?.get('createdAt')}
+                    : {$gt: endDoc?.get('createdAt')}
         });
         
         const totalDocCount = await noLimitQuery.count();
