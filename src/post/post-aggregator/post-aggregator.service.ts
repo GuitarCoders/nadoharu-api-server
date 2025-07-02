@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { PageInfo, PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { PostDto, PostFilterInput, PostsQueryResultDto } from '../dto/post.dto';
 import { PostService } from '../post.service';
 import { UserInfoService } from 'src/userInfo/userInfo.service';
@@ -8,6 +8,7 @@ import { PostMapper } from '../mapper/post.mapper';
 import { NadoService } from 'src/nado/nado.service';
 import { Types } from 'mongoose';
 import { PaginationFrom } from 'src/pagination/enum/pagination.enum';
+import { PostDocument } from '../schemas/post.schema';
 
 @Injectable()
 export class PostAggregatorService {
@@ -19,21 +20,55 @@ export class PostAggregatorService {
     ) {}
 
     async getPostsByUserId(
-        requestUserId: string,
-        targetUserId: string, 
+        targetUserId: string,
         filter: PostFilterInput,
         pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.getPostsExcludingNadoOrigins(
+            targetUserId, filter, pagination, 
+            this.PostService.getPostDocumentsByUserId.bind(this.PostService)
+        )
+    }
+
+    async getPostsForTimeline(
+        userId: string,
+        pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.getPostsExcludingNadoOrigins(
+            userId, null, pagination,
+            this.getPostsForTimelineWrapper.bind(this)
+        );
+    }
+
+    async getPostsForTimelineWrapper(
+        userId: string,
+        filter: PostFilterInput,
+        pagination: PaginationInput
+    ): Promise<{postDocs: PostDocument[], pageInfo: PageInfo}> {
+        return this.PostService.getPostDocumentsForTimeline(userId, pagination);
+    }    
+
+    async getPostsExcludingNadoOrigins(
+        targetUserId: string, 
+        filter: PostFilterInput,
+        pagination: PaginationInput,
+        fetchPosts?: (
+            targetUserId: string, 
+            filter: PostFilterInput, 
+            pagination: PaginationInput
+        ) => Promise<{postDocs: PostDocument[], pageInfo: PageInfo}>
     ): Promise<PostsQueryResultDto> {
         try {
 
 
-            const postsResult:PostsQueryResultDto = new PostsQueryResultDto();
-            postsResult.posts = [];
+            const totalPosts:PostsQueryResultDto = new PostsQueryResultDto();
+            totalPosts.posts = [];
 
             const tempPagination = structuredClone(pagination);
+            console.log(tempPagination);
 
-            postsResult.posts = [];
-            postsResult.pageInfo = {
+            totalPosts.posts = [];
+            totalPosts.pageInfo = {
                 hasOverStart: false,
                 hasOverEnd: false,
                 hasNext: false,
@@ -47,7 +82,7 @@ export class PostAggregatorService {
             while(true) {
 
                 const tempPostsDto 
-                    = await this.PostService.getPostDocumentsByUserId(
+                    = await fetchPosts(
                         targetUserId,
                         filter,
                         tempPagination
@@ -77,50 +112,52 @@ export class PostAggregatorService {
                     }
                 })
 
+                // 추가로 가져온 것 들 끼리만 비교하므로
+                // 한번 순회한 이후부터는 거의 의미가 없을 듯
+                // resultPosts를 쌓아놓은 것을 비교해야 함
                 const resultPosts = await Promise.all(resultPostPromises);
-                const filteredPosts = resultPosts.filter((post) => 
+                if (pagination.from === PaginationFrom.END) {
+                    totalPosts.posts.push(...resultPosts);
+                } else if (pagination.from === PaginationFrom.START) {
+                    totalPosts.posts.unshift(...resultPosts);
+                }
+
+                const filteredPosts = totalPosts.posts.filter((post) => 
                     !originPostListOfNadoPost.includes(post._id) || post.isNadoPost
                 );
 
-                if (pagination.from === PaginationFrom.END) {
-                    postsResult.posts.push(...filteredPosts);
-                } else if (pagination.from === PaginationFrom.START) {
-                    postsResult.posts.unshift(...filteredPosts);
-                }
-
-                // postsResult.posts.push(...filteredPosts);
-
+                totalPosts.posts = [...filteredPosts];
 
                 if (pagination.from === PaginationFrom.END) {
-                    postsResult.pageInfo = {
-                        hasOverStart: postsResult.pageInfo.hasOverStart ?? tempPostsDto.pageInfo.hasOverStart,
-                        startCursor: postsResult.pageInfo.startCursor ?? tempPostsDto.pageInfo.startCursor,
+                    totalPosts.pageInfo = {
+                        hasOverStart: totalPosts.pageInfo.hasOverStart ?? tempPostsDto.pageInfo.hasOverStart,
+                        startCursor: totalPosts.pageInfo.startCursor ?? tempPostsDto.pageInfo.startCursor,
                         hasOverEnd: tempPostsDto.pageInfo.hasOverEnd,
                         endCursor: tempPostsDto.pageInfo.endCursor,
                         hasNext: tempPostsDto.pageInfo.hasNext
                     }
                 } else if (pagination.from === PaginationFrom.START) {
-                    postsResult.pageInfo = {
+                    totalPosts.pageInfo = {
                         hasOverStart: tempPostsDto.pageInfo.hasOverStart,
                         startCursor: tempPostsDto.pageInfo.startCursor,
-                        hasOverEnd: postsResult.pageInfo.hasOverEnd ?? tempPostsDto.pageInfo.hasOverEnd,
-                        endCursor: postsResult.pageInfo.endCursor ?? tempPostsDto.pageInfo.endCursor,
+                        hasOverEnd: totalPosts.pageInfo.hasOverEnd ?? tempPostsDto.pageInfo.hasOverEnd,
+                        endCursor: totalPosts.pageInfo.endCursor ?? tempPostsDto.pageInfo.endCursor,
                         hasNext: tempPostsDto.pageInfo.hasNext
                     }
                 }
 
-                if (postsResult.posts.length >= pagination.limit || postsResult.pageInfo.hasNext === false) {
+                if (totalPosts.posts.length >= pagination.limit || totalPosts.pageInfo.hasNext === false) {
                     break;
                 }
 
                 tempPagination.cursor = pagination.from === PaginationFrom.END 
-                    ? postsResult.pageInfo.endCursor
-                    : postsResult.pageInfo.startCursor;
+                    ? totalPosts.pageInfo.endCursor
+                    : totalPosts.pageInfo.startCursor;
                     
-                tempPagination.limit = pagination.limit - postsResult.posts.length;
+                tempPagination.limit = pagination.limit - totalPosts.posts.length;
             }
 
-            return postsResult;
+            return totalPosts;
 
         } catch (err) {
             console.error(err);

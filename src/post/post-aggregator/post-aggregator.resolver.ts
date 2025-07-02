@@ -27,7 +27,18 @@ export class PostAggregatorResolver {
             description: "페이지네이션 정보"
         }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsByUserId(user._id, targetUserId, filter, pagination);
+        return await this.PostAggregatorService.getPostsByUserId(targetUserId, filter, pagination);
+    }
+
+    @Query(() => PostsQueryResultDto)
+    @UseGuards(GqlAuthGuard)
+    async getPostsForTimelineDemo(
+        @CurrentUser() user: UserJwtPayload,
+        @Args('pagination', {
+            description: "페이지네이션 정보"
+        }) pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        return await this.PostAggregatorService.getPostsForTimeline(user._id, pagination);
     }
 
 }

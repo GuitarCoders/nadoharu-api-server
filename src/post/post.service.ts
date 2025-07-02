@@ -80,10 +80,7 @@ export class PostService{
 
             const posts = postDocuments.map(item => this.PostMapper.toPostDto(item));
 
-            return {
-                posts: posts,
-                pageInfo
-            };
+            return {posts: posts, pageInfo};
         } catch (err) {
             if (err instanceof GraphQLError) {
                 throw err;
@@ -91,10 +88,29 @@ export class PostService{
             console.error(err);
         }
     }
+
     async getPostsForTimeline(
+        userId: string,
+        pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        try {
+            const {
+                postDocs,
+                pageInfo
+            } = await this.getPostDocumentsForTimeline(userId, pagination);
+
+            const posts = postDocs.map(item => this.PostMapper.toPostDto(item));
+
+            return {posts, pageInfo};
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async getPostDocumentsForTimeline(
         userId: string, 
         pagination: PaginationInput
-    ): Promise<PostsQueryResultDto>{
+    ): Promise<{postDocs: PostDocument[], pageInfo: PageInfo}>{
         try {
             const friends = (await this.FriendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
@@ -108,15 +124,11 @@ export class PostService{
                     .populate('author');
 
             const {
-                paginatedDoc: resultPostModels,
+                paginatedDoc: resultPostDocuments,
                 pageInfo
             } = await this.PaginationService.getPaginatedDocuments(pagination, postsQuery)
-            const result = resultPostModels.map(item => this.PostMapper.toPostDto(item));
 
-            return { 
-                posts:result, 
-                pageInfo
-            };
+            return { postDocs: resultPostDocuments, pageInfo: pageInfo};
         } catch (err) {
             console.error(err);
         }
