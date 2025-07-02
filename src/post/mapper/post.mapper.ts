@@ -1,8 +1,10 @@
+import { Injectable } from "@nestjs/common";
 import { PostDto, PostsQueryResultDto } from "../dto/post.dto";
 import { PostDocument } from "../schemas/post.schema";
 
+@Injectable()
 export class PostMapper {
-    static toPostDto(post: PostDocument): PostDto {
+    toPostDto(post: PostDocument): PostDto {
         return {
             _id: post._id.toString(),
             author: post.author,

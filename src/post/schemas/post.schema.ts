@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument, mongo, ObjectId } from "mongoose";
+import mongoose, { HydratedDocument, mongo, ObjectId, Types } from "mongoose";
 import { UserDocument } from "src/user/schemas/user.schema";
 
 
@@ -54,7 +54,7 @@ export class Post {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Nado'
     })
-    nadoId?: ObjectId;
+    nadoId?: Types.ObjectId;
 
     @Prop({
         required: true,

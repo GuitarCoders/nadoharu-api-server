@@ -7,7 +7,7 @@ import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
-import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { PageInfo, PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { GraphQLError } from 'graphql';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { PostMapper } from './mapper/post.mapper';
@@ -15,8 +15,9 @@ import { PostMapper } from './mapper/post.mapper';
 @Injectable()
 export class PostService{
     constructor(
-        private friendService: FriendService,
-        private paginationService: PaginationService,
+        private FriendService: FriendService,
+        private PaginationService: PaginationService,
+        private PostMapper: PostMapper,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
 
@@ -33,18 +34,17 @@ export class PostService{
         try{
             const postDocument = await this.getPostDocumentById(postId)
             const result = await postDocument.populate('author');
-            return PostMapper.toPostDto(result);
+            return this.PostMapper.toPostDto(result);
         } catch (err) {
             console.error(err);
         }
     }
-
-
-    async getPostsByUserId(
+    
+    async getPostDocumentsByUserId(
         targetUserId: string,
         filter: PostFilterInput,
         pagination: PaginationInput
-    ): Promise<PostsQueryResultDto> {
+    ): Promise<{postDocs:PostDocument[], pageInfo:PageInfo}> {
         try {
             const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
 
@@ -56,9 +56,29 @@ export class PostService{
             const {
                 paginatedDoc: postDocuments,
                 pageInfo
-            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
-            
-            const posts = postDocuments.map(item => PostMapper.toPostDto(item));
+            } = await this.PaginationService.getPaginatedDocuments(pagination, postsQuery)
+
+            return {postDocs:postDocuments, pageInfo};
+        } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
+            console.error(err);
+        }
+    }
+        
+    async getPostsByUserId(
+        targetUserId: string,
+        filter: PostFilterInput,
+        pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        try {
+            const {
+                postDocs: postDocuments, 
+                pageInfo
+            } = await this.getPostDocumentsByUserId(targetUserId, filter, pagination);
+
+            const posts = postDocuments.map(item => this.PostMapper.toPostDto(item));
 
             return {
                 posts: posts,
@@ -71,13 +91,12 @@ export class PostService{
             console.error(err);
         }
     }
-    
     async getPostsForTimeline(
         userId: string, 
         pagination: PaginationInput
     ): Promise<PostsQueryResultDto>{
         try {
-            const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
+            const friends = (await this.FriendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
                 return item.friend._id.toString();
             });
@@ -91,8 +110,8 @@ export class PostService{
             const {
                 paginatedDoc: resultPostModels,
                 pageInfo
-            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
-            const result = resultPostModels.map(item => PostMapper.toPostDto(item));
+            } = await this.PaginationService.getPaginatedDocuments(pagination, postsQuery)
+            const result = resultPostModels.map(item => this.PostMapper.toPostDto(item));
 
             return { 
                 posts:result, 
@@ -121,7 +140,7 @@ export class PostService{
 
             const createdPostResult = await createdPost.populate('author');
             return {
-                post: PostMapper.toPostDto(createdPostResult),
+                post: this.PostMapper.toPostDto(createdPostResult),
                 success: true,
             }
         } catch (err) {

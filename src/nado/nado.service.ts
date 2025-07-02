@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { UserService } from 'src/user/user.service';
-import { Nado } from './schemas/nado.schema';
+import { Nado, NadoDocument } from './schemas/nado.schema';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
 import { NadoDto } from './dto/nado.dto';
@@ -53,6 +53,15 @@ export class NadoService {
             if (err.code === 11000) { // MongoDB unique 제약조건 에러 코드
                 throw new NadoharuGraphQLError('ALREADY_NADOED_POST');
             }
+            console.error(err);
+        }
+    }
+
+    
+    async getNadoById(nadoId: string): Promise<NadoDocument> {
+        try {
+            return await this.NadoModel.findById(nadoId);
+        } catch (err) {
             console.error(err);
         }
     }

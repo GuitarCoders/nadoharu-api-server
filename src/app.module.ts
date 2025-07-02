@@ -16,6 +16,7 @@ import { CommentModule } from './comment/comment.module';
 import { UserInfoModule } from './userInfo/userInfo.module';
 import { PaginationModule } from './pagination/pagination.module';
 import { NadoModule } from './nado/nado.module';
+import { PostAggregatorModule } from './post/post-aggregator/post-aggregator.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -43,7 +44,8 @@ console.log(process.env.NODE_ENV);
     CommentModule,
     UserInfoModule,
     PaginationModule,
-    NadoModule
+    NadoModule,
+    PostAggregatorModule
   ],
   providers: [AppService],
 })
