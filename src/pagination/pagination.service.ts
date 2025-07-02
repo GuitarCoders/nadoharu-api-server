@@ -26,7 +26,7 @@ export class PaginationService {
                 ? pagination.sort === PaginationSort.DESC
                     ? [cursor, until, -1 as SortOrder]
                     : [until, cursor, 1 as SortOrder]
-                : pagination.sort === PaginationSort.ASC
+                : pagination.sort === PaginationSort.DESC
                     ? [until, cursor, 1 as SortOrder]
                     : [cursor, until, -1 as SortOrder]
 
