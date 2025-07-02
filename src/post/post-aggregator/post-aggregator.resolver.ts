@@ -13,9 +13,12 @@ export class PostAggregatorResolver {
         private readonly PostAggregatorService: PostAggregatorService
     ) {}
 
-    @Query(() => PostsQueryResultDto)
+    @Query(() => PostsQueryResultDto, { 
+        name: "postsByUserId",
+        description: "특정 유저의 id를 통해 해당 유저가 작성한 글 목록을 가져오는 쿼리입니다."
+    })
     @UseGuards(GqlAuthGuard)
-    async getUserPostsDemo(
+    async getPostsByUserId(
         @CurrentUser() user: UserJwtPayload,
         @Args('targetUserId', {
             description: "글 작성자의 id"
@@ -30,9 +33,12 @@ export class PostAggregatorResolver {
         return await this.PostAggregatorService.getPostsByUserId(targetUserId, filter, pagination);
     }
 
-    @Query(() => PostsQueryResultDto)
+    @Query(() => PostsQueryResultDto, { 
+        name: "postsForTimeline",
+        description: "로그인한 유저 기준 타임라인에 표시될 글 목록을 가져오는 쿼리입니다. 로그인한 유저를 포함하여 친구들의 글들을 시간순으로 가져옵니다."
+    })
     @UseGuards(GqlAuthGuard)
-    async getPostsForTimelineDemo(
+    async getPostsForTimeline(
         @CurrentUser() user: UserJwtPayload,
         @Args('pagination', {
             description: "페이지네이션 정보"
