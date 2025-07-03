@@ -7,6 +7,7 @@ import { PostResolver } from './post.resolver';
 import { PostService } from './post.service';
 import { Post, PostSchema } from './schemas/post.schema';
 import { PaginationModule } from 'src/pagination/pagination.module';
+import { PostMapper } from './mapper/post.mapper';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { PaginationModule } from 'src/pagination/pagination.module';
     PaginationModule,
     MongooseModule.forFeature([{name: Post.name, schema: PostSchema}]),
   ],
-  providers: [PostResolver, PostService],
-  exports: [PostService]
+  providers: [PostResolver, PostService, PostMapper],
+  exports: [PostService, PostMapper]
 })
 export class PostModule {}

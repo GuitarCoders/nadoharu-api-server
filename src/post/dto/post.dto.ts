@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { PageInfo } from "src/pagination/dto/pagination.dto";
 import { UserSafeDto } from "src/user/dto/user.dto";
 import { UserDocument } from "src/user/schemas/user.schema";
@@ -33,6 +33,27 @@ export class PostDto{
         description: "글의 카테고리입니다. 관련 기능이 아직 구현되어있지 않습니다."
     })
     category?: string;
+
+    @Field(() => Int, {
+        description: "글에 달린 댓글의 갯수입니다."
+    })
+    commentCount: Number;
+
+    @Field(() => Boolean, {
+        description: "글이 다른사람의 '나도' 반응을 통해 전달되었는지 여부입니다."
+    })
+    isNadoPost: boolean;
+
+    @Field(() => UserSafeDto, {
+        nullable: true,
+        description: "'나도' 반응을 한 사람입니다. 내용이 없을 수도 있습니다."
+    })
+    nadoer?: UserSafeDto
+
+    @Field(() => Int, {
+        description: "글이 얻은 나도 반응의 갯수입니다."
+    })
+    nadoCount: number;
 
     @Field(() => String, {
         description: "글을 작성한 시간입니다."

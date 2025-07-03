@@ -7,7 +7,7 @@ import { FriendService } from 'src/friend/friend.service';
 import { UserService } from 'src/user/user.service';
 import { CreatePostDto, CreatePostResultDto, DeletePostResultDto, PostsQueryResultDto, PostDto, PostFilterInput } from './dto/post.dto';
 import { Post, PostDocument } from './schemas/post.schema';
-import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { PageInfo, PaginationInput } from 'src/pagination/dto/pagination.dto';
 import { GraphQLError } from 'graphql';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { PostMapper } from './mapper/post.mapper';
@@ -15,8 +15,9 @@ import { PostMapper } from './mapper/post.mapper';
 @Injectable()
 export class PostService{
     constructor(
-        private friendService: FriendService,
-        private paginationService: PaginationService,
+        private FriendService: FriendService,
+        private PaginationService: PaginationService,
+        private PostMapper: PostMapper,
         @InjectModel(Post.name) private PostModel: Model<Post>
     ){}
 
@@ -33,18 +34,17 @@ export class PostService{
         try{
             const postDocument = await this.getPostDocumentById(postId)
             const result = await postDocument.populate('author');
-            return PostMapper.toPostDto(result);
+            return this.PostMapper.toPostDto(result);
         } catch (err) {
             console.error(err);
         }
     }
-
-
-    async getPostsByUserId(
+    
+    async getPostDocumentsByUserId(
         targetUserId: string,
         filter: PostFilterInput,
         pagination: PaginationInput
-    ): Promise<PostsQueryResultDto> {
+    ): Promise<{postDocs:PostDocument[], pageInfo:PageInfo}> {
         try {
             const postsQuery = this.PostModel.find({author: targetUserId}).sort({createdAt: -1});
 
@@ -56,14 +56,9 @@ export class PostService{
             const {
                 paginatedDoc: postDocuments,
                 pageInfo
-            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
-            
-            const posts = postDocuments.map(item => PostMapper.toPostDto(item));
+            } = await this.PaginationService.getPaginatedDocuments(pagination, postsQuery)
 
-            return {
-                posts: posts,
-                pageInfo
-            };
+            return {postDocs:postDocuments, pageInfo};
         } catch (err) {
             if (err instanceof GraphQLError) {
                 throw err;
@@ -71,13 +66,53 @@ export class PostService{
             console.error(err);
         }
     }
-    
+        
+    async getPostsByUserId(
+        targetUserId: string,
+        filter: PostFilterInput,
+        pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        try {
+            const {
+                postDocs: postDocuments, 
+                pageInfo
+            } = await this.getPostDocumentsByUserId(targetUserId, filter, pagination);
+
+            const posts = postDocuments.map(item => this.PostMapper.toPostDto(item));
+
+            return {posts: posts, pageInfo};
+        } catch (err) {
+            if (err instanceof GraphQLError) {
+                throw err;
+            }
+            console.error(err);
+        }
+    }
+
     async getPostsForTimeline(
+        userId: string,
+        pagination: PaginationInput
+    ): Promise<PostsQueryResultDto> {
+        try {
+            const {
+                postDocs,
+                pageInfo
+            } = await this.getPostDocumentsForTimeline(userId, pagination);
+
+            const posts = postDocs.map(item => this.PostMapper.toPostDto(item));
+
+            return {posts, pageInfo};
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async getPostDocumentsForTimeline(
         userId: string, 
         pagination: PaginationInput
-    ): Promise<PostsQueryResultDto>{
+    ): Promise<{postDocs: PostDocument[], pageInfo: PageInfo}>{
         try {
-            const friends = (await this.friendService.getFriendDocuments(userId)).map(item => {
+            const friends = (await this.FriendService.getFriendDocuments(userId)).map(item => {
                 console.log(item.friend._id.toString());
                 return item.friend._id.toString();
             });
@@ -89,15 +124,11 @@ export class PostService{
                     .populate('author');
 
             const {
-                paginatedDoc: resultPostModels,
+                paginatedDoc: resultPostDocuments,
                 pageInfo
-            } = await this.paginationService.getPaginatedDocuments(pagination, postsQuery)
-            const result = resultPostModels.map(item => PostMapper.toPostDto(item));
+            } = await this.PaginationService.getPaginatedDocuments(pagination, postsQuery)
 
-            return { 
-                posts:result, 
-                pageInfo
-            };
+            return { postDocs: resultPostDocuments, pageInfo: pageInfo};
         } catch (err) {
             console.error(err);
         }
@@ -106,24 +137,128 @@ export class PostService{
     async createPost(
         userId: string, 
         data: CreatePostDto
-    ): Promise<CreatePostResultDto>{
+    ): Promise<CreatePostResultDto> {
         try{
             const createdPost = new this.PostModel({
                 author: userId,
                 content: data.content,
                 tags: data.tags,
-                category: data.category
+                category: data.category,
+                isNadoPost: false,
+                nadoCount: 0
             })
 
             await createdPost.save();
 
             const createdPostResult = await createdPost.populate('author');
             return {
-                post: PostMapper.toPostDto(createdPostResult),
+                post: this.PostMapper.toPostDto(createdPostResult),
                 success: true,
             }
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async createNadoPost(
+        nadoerId: string,
+        nadoId: Types.ObjectId
+    ):Promise<boolean> {
+        try {
+            const createdPost = new this.PostModel({
+                author: nadoerId,
+                content: "nado",
+                isNadoPost: true,
+                nadoId: nadoId,
+                nadoCount: 0
+            });
+
+            await createdPost.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async addNadoCount(
+        originPostId: string,
+    ):Promise<boolean> {
+        try {
+            const originPostDocument = await this.getPostDocumentById(originPostId);
+
+            if (!originPostDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            originPostDocument.nadoCount += 1;
+            await originPostDocument.save();
+
+            return true;
+
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    async subNadoCount(
+        originPostId: string,
+    ):Promise<boolean> {
+        try {
+            const originPostDocument = await this.getPostDocumentById(originPostId);
+
+            if (!originPostDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            originPostDocument.nadoCount -= 1;
+            await originPostDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    async addCommentCount(
+        postId: string
+    ): Promise<boolean> {
+        try {
+            const postDocument = await this.getPostDocumentById(postId);
+
+            if (!postDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            postDocument.commentCount += 1;
+            await postDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    async subCommentCount(
+        postId: string
+    ): Promise<boolean> {
+        try {
+            const postDocument = await this.getPostDocumentById(postId);
+
+            if (!postDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            postDocument.commentCount -= 1;
+            await postDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
         }
     }
 
@@ -132,13 +267,30 @@ export class PostService{
         postId: string
     ): Promise<DeletePostResultDto> {
         try{
-            const targetPostModel = await this.PostModel.findById(postId).populate('author');
-            if(targetPostModel.author._id.toString() != userId){
+            const targetPostDocument = await this.PostModel.findById(postId).populate('author');
+            if(targetPostDocument.author._id.toString() != userId){
                 throw new Error("본인의 글만 삭제할 수 있습니다.");
             }
-            await targetPostModel.deleteOne();
+            await targetPostDocument.deleteOne();
 
             return {success: true}
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async deleteNadoPostByNadoId(
+        userId: string,
+        nadoId: string,
+    ): Promise<boolean> {
+        try {
+            const targetPostDocument = await this.PostModel.findOne({nadoId});
+            if(targetPostDocument.author._id.toHexString() != userId) {
+                throw new Error("본인의 글만 삭제할 수 있습니다.")
+            }
+            await targetPostDocument.deleteOne();
+
+            return true
         } catch (err) {
             console.error(err);
         }
