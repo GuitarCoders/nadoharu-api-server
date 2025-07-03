@@ -11,10 +11,7 @@ export class NadoMapper {
 
     toNadoDto(nadoDoc: NadoDocument): NadoDto {
         return {
-            _id: nadoDoc._id.toHexString(),
-            nadoer: this.UserService.userDocumentToUserSafe(nadoDoc.nadoer),
-            postId: nadoDoc.post._id.toHexString(),
-            createdAt: nadoDoc.createdAt.toISOString()
+            originPostId: nadoDoc.post._id.toHexString()
         }
     }
 }

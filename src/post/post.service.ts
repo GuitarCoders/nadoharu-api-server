@@ -198,21 +198,59 @@ export class PostService{
 
         } catch (err) {
             console.error(err);
+            return false;
         }
     }
+
+    async subNadoCount(
+        originPostId: string,
+    ):Promise<boolean> {
+        try {
+            const originPostDocument = await this.getPostDocumentById(originPostId);
+
+            if (!originPostDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            originPostDocument.nadoCount -= 1;
+            await originPostDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+     }
 
     async deletePost(
         userId: string,
         postId: string
     ): Promise<DeletePostResultDto> {
         try{
-            const targetPostModel = await this.PostModel.findById(postId).populate('author');
-            if(targetPostModel.author._id.toString() != userId){
+            const targetPostDocument = await this.PostModel.findById(postId).populate('author');
+            if(targetPostDocument.author._id.toString() != userId){
                 throw new Error("본인의 글만 삭제할 수 있습니다.");
             }
-            await targetPostModel.deleteOne();
+            await targetPostDocument.deleteOne();
 
             return {success: true}
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async deleteNadoPostByNadoId(
+        userId: string,
+        nadoId: string,
+    ): Promise<boolean> {
+        try {
+            const targetPostDocument = await this.PostModel.findOne({nadoId});
+            if(targetPostDocument.author._id.toHexString() != userId) {
+                throw new Error("본인의 글만 삭제할 수 있습니다.")
+            }
+            await targetPostDocument.deleteOne();
+
+            return true
         } catch (err) {
             console.error(err);
         }

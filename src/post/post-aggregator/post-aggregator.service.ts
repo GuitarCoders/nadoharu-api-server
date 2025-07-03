@@ -92,6 +92,7 @@ export class PostAggregatorService {
                     if (postDocument.isNadoPost) {
 
                         const nado = await this.NadoService.getNadoById(postDocument.nadoId.toHexString());
+                        console.log(postDocument._id);
                         originPostListOfNadoPost.push(nado.post._id.toHexString());
                         const originPost = await this.PostService.getPostDocumentById(nado.post._id.toHexString());
                         await originPost.populate('author');
