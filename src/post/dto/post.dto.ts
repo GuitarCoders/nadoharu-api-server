@@ -34,6 +34,11 @@ export class PostDto{
     })
     category?: string;
 
+    @Field(() => Int, {
+        description: "글에 달린 댓글의 갯수입니다."
+    })
+    commentCount: Number;
+
     @Field(() => Boolean, {
         description: "글이 다른사람의 '나도' 반응을 통해 전달되었는지 여부입니다."
     })

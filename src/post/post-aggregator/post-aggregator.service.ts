@@ -103,6 +103,7 @@ export class PostAggregatorService {
                             content: originPost.content,
                             tags: originPost.tags,
                             category: originPost.category,
+                            commentCount: originPost.commentCount,
                             isNadoPost: true,
                             nadoer: await this.UserService.getUserByIdSafe(nado.nadoer._id.toHexString()),
                             nadoCount: originPost.nadoCount,

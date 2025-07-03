@@ -31,6 +31,7 @@ export class CommentService{
     
             await createdComment.save();
             await createdComment.populate('commenter');
+            await this.PostService.addCommentCount(createdComment.post._id.toHexString());
 
             const resultComment = CommentMapper.toCommentDto(
                 createdComment,
@@ -79,6 +80,7 @@ export class CommentService{
                 throw new Error("댓글 작성자와 삭제 요청자가 일치하지 않습니다.")
             }
 
+            await this.PostService.subCommentCount(targetCommentDocument.post._id.toHexString());
             await targetCommentDocument.delete();
 
             return {success: true}

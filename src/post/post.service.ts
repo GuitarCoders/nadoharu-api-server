@@ -220,7 +220,47 @@ export class PostService{
             console.error(err);
             return false;
         }
-     }
+    }
+
+    async addCommentCount(
+        postId: string
+    ): Promise<boolean> {
+        try {
+            const postDocument = await this.getPostDocumentById(postId);
+
+            if (!postDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            postDocument.commentCount += 1;
+            await postDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    async subCommentCount(
+        postId: string
+    ): Promise<boolean> {
+        try {
+            const postDocument = await this.getPostDocumentById(postId);
+
+            if (!postDocument) {
+                throw new Error("해당 게시글이 존재하지 않습니다.");
+            }
+
+            postDocument.commentCount -= 1;
+            await postDocument.save();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
 
     async deletePost(
         userId: string,

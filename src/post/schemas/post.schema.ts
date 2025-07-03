@@ -32,9 +32,10 @@ export class Post {
 
     @Prop({
         required: false,
+        default: 0,
         type: mongoose.Schema.Types.Number
     })
-    hasCommentCount: number;
+    commentCount: number;
 
     @Prop({
         required: true,
