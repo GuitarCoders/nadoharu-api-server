@@ -25,6 +25,7 @@ export class PostAggregatorService {
         requestUserId: string, postId: string
     ): Promise<PostDto> {
         const postDoc = await this.PostService.getPostDocumentById(postId);
+        await postDoc.populate('author');
         return await this.PostAggregatorMapper.toPostDto(postDoc, requestUserId);
     }
 
