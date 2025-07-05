@@ -9,6 +9,7 @@ import { NadoService } from 'src/nado/nado.service';
 import { Types } from 'mongoose';
 import { PaginationFrom } from 'src/pagination/enum/pagination.enum';
 import { PostDocument } from '../schemas/post.schema';
+import { PostAggregatorMapper } from './mapper/post-aggregator.mapper';
 
 @Injectable()
 export class PostAggregatorService {
@@ -16,16 +17,25 @@ export class PostAggregatorService {
         private PostService: PostService,
         private UserService: UserService,
         private NadoService: NadoService,
+        private PostAggregatorMapper: PostAggregatorMapper,
         private PostMapper: PostMapper
     ) {}
 
+    async getPostById(
+        requestUserId: string, postId: string
+    ): Promise<PostDto> {
+        const postDoc = await this.PostService.getPostDocumentById(postId);
+        return await this.PostAggregatorMapper.toPostDto(postDoc, requestUserId);
+    }
+
     async getPostsByUserId(
+        requestUserId: string,
         targetUserId: string,
         filter: PostFilterInput,
         pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.getPostsExcludingNadoOrigins(
-            targetUserId, filter, pagination, 
+            requestUserId, targetUserId, filter, pagination, 
             this.PostService.getPostDocumentsByUserId.bind(this.PostService)
         )
     }
@@ -35,7 +45,7 @@ export class PostAggregatorService {
         pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.getPostsExcludingNadoOrigins(
-            userId, null, pagination,
+            userId, userId, null, pagination,
             this.getPostsForTimelineWrapper.bind(this)
         );
     }
@@ -49,6 +59,7 @@ export class PostAggregatorService {
     }    
 
     async getPostsExcludingNadoOrigins(
+        requestUserId: string,
         targetUserId: string, 
         filter: PostFilterInput,
         pagination: PaginationInput,
@@ -105,12 +116,13 @@ export class PostAggregatorService {
                             category: originPost.category,
                             commentCount: originPost.commentCount,
                             isNadoPost: true,
+                            isNadoed: true,
                             nadoer: await this.UserService.getUserByIdSafe(nado.nadoer._id.toHexString()),
                             nadoCount: originPost.nadoCount,
                             createdAt: originPost.createdAt.toISOString()
                         }
                     } else {
-                        return this.PostMapper.toPostDto(postDocument);
+                        return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId);
                     }
                 })
 

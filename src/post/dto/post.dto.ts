@@ -39,6 +39,16 @@ export class PostDto{
     })
     commentCount: Number;
 
+    @Field(() => Int, {
+        description: "글이 얻은 나도 반응의 갯수입니다."
+    })
+    nadoCount: number;
+
+    @Field(() => Boolean, {
+        description: "글을 요청한 유저가 해당 글에 나도를 눌렀는지 여부입니다."
+    })
+    isNadoed: boolean;
+
     @Field(() => Boolean, {
         description: "글이 다른사람의 '나도' 반응을 통해 전달되었는지 여부입니다."
     })
@@ -46,14 +56,9 @@ export class PostDto{
 
     @Field(() => UserSafeDto, {
         nullable: true,
-        description: "'나도' 반응을 한 사람입니다. 내용이 없을 수도 있습니다."
+        description: "나도를 통해 전달된 글인 경우, 해당 '나도' 반응을 한 사람입니다. 내용이 없을 수도 있습니다."
     })
     nadoer?: UserSafeDto
-
-    @Field(() => Int, {
-        description: "글이 얻은 나도 반응의 갯수입니다."
-    })
-    nadoCount: number;
 
     @Field(() => String, {
         description: "글을 작성한 시간입니다."

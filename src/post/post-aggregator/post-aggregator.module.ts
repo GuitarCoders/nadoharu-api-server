@@ -6,6 +6,7 @@ import { PostModule } from '../post.module';
 import { CommentModule } from 'src/comment/comment.module';
 import { UserInfoModule } from 'src/userInfo/userInfo.module';
 import { UserModule } from 'src/user/user.module';
+import { PostAggregatorMapper } from './mapper/post-aggregator.mapper';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { UserModule } from 'src/user/user.module';
   ],
   providers: [
     PostAggregatorService,
-    PostAggregatorResolver
+    PostAggregatorResolver,
+    PostAggregatorMapper,
   ],
   exports: [PostAggregatorService]
 })

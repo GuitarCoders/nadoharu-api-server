@@ -65,6 +65,26 @@ export class NadoService {
         }
     }
 
+    async isNadoedByUserAndPostId(
+        userId: string, 
+        postId: string
+    ): Promise<boolean> {
+        try {
+            const existNadoDoc = await this.NadoModel.find({
+                nadoer: userId,
+                post: postId
+            })
+
+            if (existNadoDoc.length !== 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async cancelNado(userId: string, targetPostId: string): Promise<NadoCancelResultDto> {
         try {
             const userDocument = await this.UserService.getUserByIdSafe(userId);

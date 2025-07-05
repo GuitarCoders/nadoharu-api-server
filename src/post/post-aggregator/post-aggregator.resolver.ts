@@ -1,6 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { PostAggregatorService } from './post-aggregator.service';
-import { PostFilterInput, PostsQueryResultDto } from '../dto/post.dto';
+import { PostDto, PostFilterInput, PostsQueryResultDto } from '../dto/post.dto';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { CurrentUser } from 'src/auth/auth-user.decorator';
@@ -12,6 +12,20 @@ export class PostAggregatorResolver {
     constructor (
         private readonly PostAggregatorService: PostAggregatorService
     ) {}
+
+    @Query(() => PostDto, {
+        name: "post",
+        description: "글 정보를 가져오는 쿼리입니다."    
+    })
+    @UseGuards(GqlAuthGuard)
+    async getPost(
+        @CurrentUser() user:UserJwtPayload,
+        @Args('postId', {
+            description: "가져올 글의 id입니다."
+        }) targetPostId: string
+    ): Promise<PostDto> {
+        return await this.PostAggregatorService.getPostById(user._id, targetPostId);
+    }
 
     @Query(() => PostsQueryResultDto, { 
         name: "postsByMe",
@@ -27,7 +41,7 @@ export class PostAggregatorResolver {
             description: "페이지네이션 정보"
         }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsByUserId(user._id, filter, pagination);
+        return await this.PostAggregatorService.getPostsByUserId(user._id, user._id, filter, pagination);
     }
 
     @Query(() => PostsQueryResultDto, { 
@@ -47,7 +61,7 @@ export class PostAggregatorResolver {
             description: "페이지네이션 정보"
         }) pagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsByUserId(targetUserId, filter, pagination);
+        return await this.PostAggregatorService.getPostsByUserId(user._id, targetUserId, filter, pagination);
     }
 
     @Query(() => PostsQueryResultDto, { 

@@ -13,20 +13,6 @@ export class PostResolver {
     constructor(
         private readonly PostService: PostService
     ) {}
-
-    @Query(() => PostDto, {
-        name: "post",
-        description: "글 정보를 가져오는 쿼리입니다."    
-    })
-    @UseGuards(GqlAuthGuard)
-    async getPost(
-        @CurrentUser() user:UserJwtPayload,
-        @Args('postId', {
-            description: "가져올 글의 id입니다."
-        }) targetPostId: string
-    ): Promise<PostDto> {
-        return await this.PostService.getPostById(targetPostId);
-    }
         
     @Mutation(() => CreatePostResultDto, { 
         name: "createPost",

@@ -13,6 +13,7 @@ export class PostMapper {
             category: post.category,
             commentCount: post.commentCount,
             isNadoPost: post.isNadoPost,
+            isNadoed: false,
             nadoCount: post.nadoCount,
             createdAt: post.createdAt.toISOString()
         }
