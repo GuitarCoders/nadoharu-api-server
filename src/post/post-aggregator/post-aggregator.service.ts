@@ -131,9 +131,12 @@ export class PostAggregatorService {
                     totalPosts.posts.unshift(...resultPosts);
                 }
 
-                const filteredPosts = totalPosts.posts.filter((post) => 
-                    !originPostListOfNadoPost.includes(post._id) || post.isNadoPost
-                );
+                const postIdStack:string[] = []
+                const filteredPosts = totalPosts.posts.filter((post) => {
+                    const isFilteredPost = !postIdStack.includes(post._id);
+                    postIdStack.push(post._id);
+                    return isFilteredPost
+                });
 
                 totalPosts.posts = [...filteredPosts];
 
