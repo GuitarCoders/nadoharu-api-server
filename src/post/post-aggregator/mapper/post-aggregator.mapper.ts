@@ -3,6 +3,8 @@ import { PostDto, PostsQueryResultDto } from "../../dto/post.dto";
 import { PostDocument } from "../../schemas/post.schema";
 import { NadoService } from "src/nado/nado.service";
 import { UserService } from "src/user/user.service";
+import { PaginationInput } from "src/pagination/dto/pagination.dto";
+import { AggregatedPostDto } from "../dto/post-aggregator.dto";
 
 @Injectable()
 export class PostAggregatorMapper {
@@ -11,7 +13,11 @@ export class PostAggregatorMapper {
         private readonly UserService: UserService
     ) {}
 
-    async toPostDto(post: PostDocument, requestingUserId: string): Promise<PostDto> {
+    async toPostDto(
+        post: PostDocument, 
+        requestingUserId: string, 
+        nadoUsersPagination: PaginationInput
+    ): Promise<AggregatedPostDto> {
         
         return {
             _id: post._id.toString(),
@@ -22,12 +28,20 @@ export class PostAggregatorMapper {
             commentCount: post.commentCount,
             isNadoPost: post.isNadoPost,
             isNadoed: await this.NadoService.isNadoedByUserAndPostId(requestingUserId, post._id.toHexString()),
+            nadoUsers: 
+                nadoUsersPagination 
+                ? await this.NadoService.getNadoUsersByPostId(post._id.toHexString(), nadoUsersPagination)
+                : null,
             nadoCount: post.nadoCount,
             createdAt: post.createdAt.toISOString()
         }
     }
 
-    async toPostDtoFromNadoPost(originPost: PostDocument, requestUserId: string): Promise<PostDto> {
+    async toPostDtoFromNadoPost(
+        originPost: PostDocument, 
+        requestUserId: string,
+        nadoUsersPagination: PaginationInput
+    ): Promise<AggregatedPostDto> {
 
         return {
             _id: originPost._id.toHexString(),
@@ -39,6 +53,10 @@ export class PostAggregatorMapper {
             isNadoPost: true,
             isNadoed: await this.NadoService.isNadoedByUserAndPostId(requestUserId, originPost._id.toHexString()),
             nadoer: await this.UserService.getUserByIdSafe(requestUserId),
+            nadoUsers: 
+                nadoUsersPagination 
+                ? await this.NadoService.getNadoUsersByPostId(originPost._id.toHexString(), nadoUsersPagination)
+                : null,
             nadoCount: originPost.nadoCount,
             createdAt: originPost.createdAt.toISOString()
         }

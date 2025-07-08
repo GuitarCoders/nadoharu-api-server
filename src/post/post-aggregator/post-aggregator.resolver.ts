@@ -6,6 +6,7 @@ import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { CurrentUser } from 'src/auth/auth-user.decorator';
 import { UserJwtPayload } from 'src/auth/models/auth.model';
 import { PaginationInput } from 'src/pagination/dto/pagination.dto';
+import { AggregatedPostDto, AggregatedPostsQueryResultDto } from './dto/post-aggregator.dto';
 
 @Resolver()
 export class PostAggregatorResolver {
@@ -13,7 +14,7 @@ export class PostAggregatorResolver {
         private readonly PostAggregatorService: PostAggregatorService
     ) {}
 
-    @Query(() => PostDto, {
+    @Query(() => AggregatedPostDto, {
         name: "post",
         description: "글 정보를 가져오는 쿼리입니다."    
     })
@@ -22,12 +23,16 @@ export class PostAggregatorResolver {
         @CurrentUser() user:UserJwtPayload,
         @Args('postId', {
             description: "가져올 글의 id입니다."
-        }) targetPostId: string
+        }) targetPostId: string,
+        @Args('nadoUsersPagination', {
+            nullable: true,
+            description: "각 글들의 나도를 누른 유저를 가져오기 위한 페이지네이션 정보. 해당 옵션은 생략할 수 있으나, 생략할 경우 nadoUsers를 가져오지 않습니다."
+        }) nadoPagination?: PaginationInput
     ): Promise<PostDto> {
-        return await this.PostAggregatorService.getPostById(user._id, targetPostId);
+        return await this.PostAggregatorService.getPostById(user._id, targetPostId, nadoPagination);
     }
 
-    @Query(() => PostsQueryResultDto, { 
+    @Query(() => AggregatedPostsQueryResultDto, { 
         name: "postsByMe",
         description: "로그인한 유저가 작성한 글 목록을 가져오는 쿼리입니다."
     })
@@ -39,12 +44,16 @@ export class PostAggregatorResolver {
         }) filter: PostFilterInput,
         @Args('pagination', {
             description: "페이지네이션 정보"
-        }) pagination: PaginationInput
+        }) pagination: PaginationInput,
+        @Args('nadoUsersPagination', {
+            nullable: true,
+            description: "각 글들의 나도를 누른 유저를 가져오기 위한 페이지네이션 정보. 해당 옵션은 생략할 수 있으나, 생략할 경우 nadoUsers를 가져오지 않습니다."
+        }) nadoPagination?: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsByUserId(user._id, user._id, filter, pagination);
+        return await this.PostAggregatorService.getPostsByUserId(user._id, user._id, filter, pagination, nadoPagination);
     }
 
-    @Query(() => PostsQueryResultDto, { 
+    @Query(() => AggregatedPostsQueryResultDto, { 
         name: "postsByUserId",
         description: "특정 유저의 id를 통해 해당 유저가 작성한 글 목록을 가져오는 쿼리입니다."
     })
@@ -59,12 +68,16 @@ export class PostAggregatorResolver {
         }) filter: PostFilterInput,
         @Args('pagination', {
             description: "페이지네이션 정보"
-        }) pagination: PaginationInput
+        }) pagination: PaginationInput,
+        @Args('nadoUsersPagination', {
+            nullable: true,
+            description: "각 글들의 나도를 누른 유저를 가져오기 위한 페이지네이션 정보. 해당 옵션은 생략할 수 있으나, 생략할 경우 nadoUsers를 가져오지 않습니다."
+        }) nadoPagination?: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsByUserId(user._id, targetUserId, filter, pagination);
+        return await this.PostAggregatorService.getPostsByUserId(user._id, targetUserId, filter, pagination, nadoPagination);
     }
 
-    @Query(() => PostsQueryResultDto, { 
+    @Query(() => AggregatedPostsQueryResultDto, { 
         name: "postsForTimeline",
         description: "로그인한 유저 기준 타임라인에 표시될 글 목록을 가져오는 쿼리입니다. 로그인한 유저를 포함하여 친구들의 글들을 시간순으로 가져옵니다."
     })
@@ -73,9 +86,13 @@ export class PostAggregatorResolver {
         @CurrentUser() user: UserJwtPayload,
         @Args('pagination', {
             description: "페이지네이션 정보"
-        }) pagination: PaginationInput
+        }) pagination: PaginationInput,
+        @Args('nadoUsersPagination', {
+            nullable: true,
+            description: "각 글들의 나도를 누른 유저를 가져오기 위한 페이지네이션 정보. 해당 옵션은 생략할 수 있으나, 생략할 경우 nadoUsers를 가져오지 않습니다."
+        }) nadoPagination?: PaginationInput
     ): Promise<PostsQueryResultDto> {
-        return await this.PostAggregatorService.getPostsForTimeline(user._id, pagination);
+        return await this.PostAggregatorService.getPostsForTimeline(user._id, pagination, nadoPagination);
     }
 
 }

@@ -1,12 +1,13 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
+import { NadoUsersDto } from "src/nado/dto/nado.dto";
 import { PageInfo } from "src/pagination/dto/pagination.dto";
-import { UserSafeDto } from "src/user/dto/user.dto";
+import { UserSafeDto, UsersSafeDto } from "src/user/dto/user.dto";
 import { UserDocument } from "src/user/schemas/user.schema";
 
-@ObjectType('PostBase', {
-    description: "글에 대한 정보를 표현하는 객체입니다."
+@ObjectType('Post', {
+    description: "글 정보를 표현하는 객체입니다. 기본 글 정보에 나도 여부, 나도한 사람 등의 추가 정보가 포함됩니다."
 })
-export class PostDto{
+export class AggregatedPostDto{
     @Field(() => String, {
         description: "글의 고유 id입니다."
     })
@@ -60,70 +61,25 @@ export class PostDto{
     })
     nadoer?: UserSafeDto
 
+    @Field(() => NadoUsersDto, {
+        nullable: true,
+        description: "글에 나도를 누른 사람들의 목록입니다. 내용이 없을 수도 있습니다. 페이지 정보를 포함합니다."
+    })
+    nadoUsers?: NadoUsersDto
+
     @Field(() => String, {
         description: "글을 작성한 시간입니다."
     })
     createdAt: string;
 }
 
-@InputType('PostFilter', {
-    description: "특정 분류의 글을 가져오기 위한 필터 Input객체입니다. 카테고리 등의 분류 내용을 지정할 수 있습니다. 내용은 생략 가능합니다."
-})
-export class PostFilterInput{
-    @Field(() => String, { 
-        nullable: true, 
-        description: "어떤 카테고리의 글을 가져올지 정합니다. 지금은 아직 관련 기능이 구현되어있지 않습니다."
-    })
-    category?: string;
-
-    // @Field(() => String, { nullable: true })
-    // search?: string;
-}
-
-@ObjectType('PostBasesQueryResult',
+@ObjectType('PostsQueryResult',
     {description: "글 목록 쿼리 결과 객체입니다. Post객체를 배열로 가지고 있습니다. 페이지네이션을 위한 정보가 포함되어있습니다."}
 )
-export class PostsQueryResultDto {
-    @Field(() => [PostDto])
-    posts: PostDto[];
+export class AggregatedPostsQueryResultDto {
+    @Field(() => [AggregatedPostDto])
+    posts: AggregatedPostDto[];
 
     @Field(() => PageInfo)
     pageInfo: PageInfo
-}
-
-@InputType('CreatePostInput',
-    {description: "글 작성에 필요한 정보를 표현하고 있는 Input객체입니다."}
-)
-export class CreatePostDto{
-    @Field(() => String, {
-        description: "글 내용을 지정합니다."
-    })
-    content: string;
-
-    @Field(() => String, { 
-        nullable: true,
-        description: "글의 태그를 지정합니다. 내용을 비울 수 있습니다."
-    })
-    tags?: string;
-
-    @Field(() => String, { 
-        nullable: true, 
-        description: "글의 카테고리를 지정합니다. 내용을 비울 수 있습니다."
-    })
-    category?: string;
-}
-
-@ObjectType('CreatePostResult')
-export class CreatePostResultDto{
-    @Field(() => PostDto)
-    post: PostDto;
-
-    @Field(() => Boolean)
-    success: boolean;
-}
-
-@ObjectType('DeletePostResult')
-export class DeletePostResultDto {
-    @Field(() => Boolean)
-    success: boolean;
 }
