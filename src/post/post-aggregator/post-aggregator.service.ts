@@ -110,7 +110,12 @@ export class PostAggregatorService {
                         const originPost = await this.PostService.getPostDocumentById(nado.post._id.toHexString());
                         await originPost.populate('author');
 
-                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(originPost, requestUserId, nadoUsersPagination);
+                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(
+                            originPost, 
+                            requestUserId, 
+                            nado.nadoer._id.toHexString(),
+                            nadoUsersPagination
+                        );
                     } else {
                         return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId, nadoUsersPagination);
                     }
