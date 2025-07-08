@@ -5,9 +5,10 @@ import { UserService } from 'src/user/user.service';
 import { Nado, NadoDocument } from './schemas/nado.schema';
 import { Model } from 'mongoose';
 import { PostService } from 'src/post/post.service';
-import { NadoCancelResultDto, NadoDto } from './dto/nado.dto';
+import { NadoCancelResultDto, NadoDto, NadoUsersDto } from './dto/nado.dto';
 import { NadoMapper } from './mapper/nado.mapper';
 import { NadoharuGraphQLError } from 'src/errors/nadoharuGraphQLError';
+import { PaginationInput } from 'src/pagination/dto/pagination.dto';
 
 @Injectable()
 export class NadoService {
@@ -18,6 +19,29 @@ export class NadoService {
         private readonly PaginationService: PaginationService,
         @InjectModel(Nado.name) private readonly NadoModel: Model<Nado>
     ){}
+
+    async getNadoUsersByPostId(
+        postId: string, pagination: PaginationInput
+    ): Promise<NadoUsersDto> {
+        try {
+            const nadoQuery = this.NadoModel.find({post: postId});
+            nadoQuery.populate('nadoer');
+
+            const {
+                paginatedDoc: nadoDocuments, 
+                pageInfo
+            } = await this.PaginationService.getPaginatedDocuments(pagination, nadoQuery);
+
+            const nadoUsers = nadoDocuments.map(
+                nado => this.UserService.userDocumentToUserSafe(nado.nadoer)
+            );
+
+            return { users: nadoUsers, pageInfo }
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     async addNado(
         userId: string, targetPostId: string

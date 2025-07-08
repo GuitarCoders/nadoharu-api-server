@@ -17,36 +17,37 @@ export class PostAggregatorService {
         private PostService: PostService,
         private UserService: UserService,
         private NadoService: NadoService,
-        private PostAggregatorMapper: PostAggregatorMapper,
-        private PostMapper: PostMapper
+        private PostAggregatorMapper: PostAggregatorMapper
     ) {}
 
     async getPostById(
-        requestUserId: string, postId: string
+        requestUserId: string, postId: string, nadoUsersPagination: PaginationInput
     ): Promise<PostDto> {
         const postDoc = await this.PostService.getPostDocumentById(postId);
         await postDoc.populate('author');
-        return await this.PostAggregatorMapper.toPostDto(postDoc, requestUserId);
+        return await this.PostAggregatorMapper.toPostDto(postDoc, requestUserId, nadoUsersPagination);
     }
 
     async getPostsByUserId(
         requestUserId: string,
         targetUserId: string,
         filter: PostFilterInput,
-        pagination: PaginationInput
+        pagination: PaginationInput,
+        nadoUsersPagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.getPostsExcludingNadoOrigins(
-            requestUserId, targetUserId, filter, pagination, 
+            requestUserId, targetUserId, filter, pagination, nadoUsersPagination,
             this.PostService.getPostDocumentsByUserId.bind(this.PostService)
         )
     }
 
     async getPostsForTimeline(
         userId: string,
-        pagination: PaginationInput
+        pagination: PaginationInput,
+        nadoUsersPagination: PaginationInput
     ): Promise<PostsQueryResultDto> {
         return await this.getPostsExcludingNadoOrigins(
-            userId, userId, null, pagination,
+            userId, userId, null, pagination, nadoUsersPagination,
             this.getPostsForTimelineWrapper.bind(this)
         );
     }
@@ -64,7 +65,8 @@ export class PostAggregatorService {
         targetUserId: string, 
         filter: PostFilterInput,
         pagination: PaginationInput,
-        fetchPosts?: (
+        nadoUsersPagination: PaginationInput,
+        fetchPosts: (
             targetUserId: string, 
             filter: PostFilterInput, 
             pagination: PaginationInput
@@ -104,26 +106,13 @@ export class PostAggregatorService {
                     if (postDocument.isNadoPost) {
 
                         const nado = await this.NadoService.getNadoById(postDocument.nadoId.toHexString());
-                        console.log(postDocument._id);
                         originPostListOfNadoPost.push(nado.post._id.toHexString());
                         const originPost = await this.PostService.getPostDocumentById(nado.post._id.toHexString());
                         await originPost.populate('author');
 
-                        return {
-                            _id: originPost._id.toHexString(),
-                            author: originPost.author,
-                            content: originPost.content,
-                            tags: originPost.tags,
-                            category: originPost.category,
-                            commentCount: originPost.commentCount,
-                            isNadoPost: true,
-                            isNadoed: true,
-                            nadoer: await this.UserService.getUserByIdSafe(nado.nadoer._id.toHexString()),
-                            nadoCount: originPost.nadoCount,
-                            createdAt: originPost.createdAt.toISOString()
-                        }
+                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(originPost, requestUserId, nadoUsersPagination);
                     } else {
-                        return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId);
+                        return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId, nadoUsersPagination);
                     }
                 })
 
