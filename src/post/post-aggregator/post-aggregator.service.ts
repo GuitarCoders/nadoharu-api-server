@@ -104,24 +104,11 @@ export class PostAggregatorService {
                     if (postDocument.isNadoPost) {
 
                         const nado = await this.NadoService.getNadoById(postDocument.nadoId.toHexString());
-                        console.log(postDocument._id);
                         originPostListOfNadoPost.push(nado.post._id.toHexString());
                         const originPost = await this.PostService.getPostDocumentById(nado.post._id.toHexString());
                         await originPost.populate('author');
 
-                        return {
-                            _id: originPost._id.toHexString(),
-                            author: originPost.author,
-                            content: originPost.content,
-                            tags: originPost.tags,
-                            category: originPost.category,
-                            commentCount: originPost.commentCount,
-                            isNadoPost: true,
-                            isNadoed: await this.NadoService.isNadoedByUserAndPostId(requestUserId, originPost._id.toHexString()),
-                            nadoer: await this.UserService.getUserByIdSafe(nado.nadoer._id.toHexString()),
-                            nadoCount: originPost.nadoCount,
-                            createdAt: originPost.createdAt.toISOString()
-                        }
+                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(originPost, requestUserId);
                     } else {
                         return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId);
                     }
