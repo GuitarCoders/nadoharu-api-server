@@ -110,7 +110,12 @@ export class PostAggregatorService {
                         const originPost = await this.PostService.getPostDocumentById(nado.post._id.toHexString());
                         await originPost.populate('author');
 
-                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(originPost, requestUserId, nadoUsersPagination);
+                        return await this.PostAggregatorMapper.toPostDtoFromNadoPost(
+                            originPost, 
+                            requestUserId, 
+                            nado.nadoer._id.toHexString(),
+                            nadoUsersPagination
+                        );
                     } else {
                         return this.PostAggregatorMapper.toPostDto(postDocument, requestUserId, nadoUsersPagination);
                     }
@@ -126,9 +131,12 @@ export class PostAggregatorService {
                     totalPosts.posts.unshift(...resultPosts);
                 }
 
-                const filteredPosts = totalPosts.posts.filter((post) => 
-                    !originPostListOfNadoPost.includes(post._id) || post.isNadoPost
-                );
+                const postIdStack:string[] = []
+                const filteredPosts = totalPosts.posts.filter((post) => {
+                    const isFilteredPost = !postIdStack.includes(post._id);
+                    postIdStack.push(post._id);
+                    return isFilteredPost
+                });
 
                 totalPosts.posts = [...filteredPosts];
 

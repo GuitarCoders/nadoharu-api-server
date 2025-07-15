@@ -40,6 +40,7 @@ export class PostAggregatorMapper {
     async toPostDtoFromNadoPost(
         originPost: PostDocument, 
         requestUserId: string,
+        nadoUserId: string,
         nadoUsersPagination: PaginationInput
     ): Promise<AggregatedPostDto> {
 
@@ -52,7 +53,7 @@ export class PostAggregatorMapper {
             commentCount: originPost.commentCount,
             isNadoPost: true,
             isNadoed: await this.NadoService.isNadoedByUserAndPostId(requestUserId, originPost._id.toHexString()),
-            nadoer: await this.UserService.getUserByIdSafe(requestUserId),
+            nadoer: await this.UserService.getUserByIdSafe(nadoUserId),
             nadoUsers: 
                 nadoUsersPagination 
                 ? await this.NadoService.getNadoUsersByPostId(originPost._id.toHexString(), nadoUsersPagination)
