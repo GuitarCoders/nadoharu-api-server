@@ -39,3 +39,6 @@ lerna-debug.log*
 
 # Auto generated GraphQL Schema
 src/schema.gql
+
+keys/
+keys/*

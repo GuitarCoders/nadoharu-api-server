@@ -17,6 +17,7 @@ import { UserInfoModule } from './userInfo/userInfo.module';
 import { PaginationModule } from './pagination/pagination.module';
 import { NadoModule } from './nado/nado.module';
 import { PostAggregatorModule } from './post/post-aggregator/post-aggregator.module';
+import { ImageModule } from './image/image.module';
 
 
 console.log(process.env.NODE_ENV);
@@ -45,7 +46,8 @@ console.log(process.env.NODE_ENV);
     UserInfoModule,
     PaginationModule,
     NadoModule,
-    PostAggregatorModule
+    PostAggregatorModule,
+    ImageModule
   ],
   providers: [AppService],
 })
