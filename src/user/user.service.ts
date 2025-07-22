@@ -18,6 +18,7 @@ export class UserService {
             email: doc.email,
             account_id: doc.account_id,
             about_me: doc.about_me,
+            profile_image_url: doc.profile_image_url,
         }
     }
 
@@ -63,7 +64,8 @@ export class UserService {
                 name: result.name,
                 email: result.email,
                 account_id: result.account_id,
-                about_me: result.about_me
+                about_me: result.about_me,
+                profile_image_url: result.profile_image_url,
             }
             return resultUserSafe;
         } catch (err) {
@@ -90,6 +92,7 @@ export class UserService {
                 email: result.email,
                 account_id: result.account_id,
                 about_me: result.about_me,
+                profile_image_url: result.profile_image_url,
             }
             return resultUserSafe;
         } catch (err) {
@@ -108,7 +111,7 @@ export class UserService {
                     if ((updateReq[key] == null) || (updateReq[key] === "")) {
                         delete updateReq[key]
                     }
-                } 
+                }
             )
             await targetUser.updateOne(
                 updateReq
@@ -122,6 +125,7 @@ export class UserService {
                 email: updatedUserDoc.email,
                 account_id: updatedUserDoc.account_id,
                 about_me: updatedUserDoc.about_me,
+                profile_image_url: updatedUserDoc.profile_image_url,
                 status: "success"
             } 
             
@@ -151,7 +155,8 @@ export class UserService {
                 name : createdUser.name,
                 email : createdUser.email,
                 account_id : createdUser.account_id,
-                about_me: createdUser.about_me
+                about_me: createdUser.about_me,
+                profile_image_url: createdUser.profile_image_url,
             }
 
             return createdUserSafe;

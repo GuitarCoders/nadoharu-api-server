@@ -37,6 +37,12 @@ export class User{
         type: mongoose.Schema.Types.String,
     })
     about_me: string;
+
+    @Prop({
+        required: false,
+        type: mongoose.Schema.Types.String
+    })
+    profile_image_url: string;
 }
 
 const UserSchema = SchemaFactory.createForClass(User);

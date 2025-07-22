@@ -25,6 +25,12 @@ export class UserSafeDto{
     
     @Field(() => String, {description: "유저의 자기소개 내용입니다."})
     about_me: string;
+
+    @Field(() => String, {
+        nullable: true,
+        description: "유저의 프로필 이미지의 url입니다. 내용이 없을 수도 있습니다."
+    })
+    profile_image_url?: string;
 }
 
 @ObjectType('Users',
@@ -77,6 +83,12 @@ export class UserUpdateRequestDto{
         nullable: true
     })
     about_me?: string;
+
+    @Field(() => String, {
+        description: "유저의 프로필 사진이 들어갈 url입니다. 해당 항목은 생략할 수 있으며, 생략할 경우 기존의 값을 유지합니다.",
+        nullable: true
+    })
+    profile_image_url?: string;
 }
 
 @InputType('UserUpdatePasswordInput', {
