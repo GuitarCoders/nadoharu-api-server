@@ -144,6 +144,7 @@ export class PostService{
                 content: data.content,
                 tags: data.tags,
                 category: data.category,
+                imageUrls: data.imageUrls,
                 isNadoPost: false,
                 nadoCount: 0
             })

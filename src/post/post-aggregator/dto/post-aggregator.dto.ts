@@ -35,6 +35,12 @@ export class AggregatedPostDto{
     })
     category?: string;
 
+    @Field(() => [String], {
+        nullable: true,
+        description: "글에 포함된 이미지의 url입니다. 내용이 없을 수도 있습니다."
+    })
+    imageUrls?: string[];
+
     @Field(() => Int, {
         description: "글에 달린 댓글의 갯수입니다."
     })

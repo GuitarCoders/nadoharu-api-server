@@ -34,6 +34,12 @@ export class PostDto{
     })
     category?: string;
 
+    @Field(() => [String], {
+        nullable: true,
+        description: "글에 포함된 이미지의 url입니다. 내용이 없을 수도 있습니다."
+    })
+    imageUrls?: string[];
+
     @Field(() => Int, {
         description: "글에 달린 댓글의 갯수입니다."
     })
@@ -111,6 +117,12 @@ export class CreatePostDto{
         description: "글의 카테고리를 지정합니다. 내용을 비울 수 있습니다."
     })
     category?: string;
+
+    @Field(() => [String], {
+        nullable: true,
+        description: "글에 첨부할 이미지의 url을 지정합니다. 내용을 비울 수 있습니다."
+    })
+    imageUrls?: string;
 }
 
 @ObjectType('CreatePostResult')

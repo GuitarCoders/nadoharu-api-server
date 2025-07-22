@@ -11,6 +11,7 @@ export class PostMapper {
             content: post.content,
             tags: post.tags,
             category: post.category,
+            imageUrls: post.imageUrls,
             commentCount: post.commentCount,
             isNadoPost: post.isNadoPost,
             isNadoed: false,

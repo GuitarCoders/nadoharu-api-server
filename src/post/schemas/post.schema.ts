@@ -62,6 +62,12 @@ export class Post {
         type: mongoose.Schema.Types.Number
     })
     nadoCount: number;
+
+    @Prop({
+        required: false,
+        type: [mongoose.Schema.Types.String]
+    })
+    imageUrls: string[];
     
     @Prop({
         type: mongoose.Schema.Types.Date
