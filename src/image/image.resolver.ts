@@ -1,14 +1,15 @@
-import { Storage } from '@google-cloud/storage';
 import { UseGuards } from '@nestjs/common';
 import { Query, Resolver } from '@nestjs/graphql';
 import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { ImageUploadInfo } from './dto/image.dto';
 import { randomBytes } from 'crypto';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 @Resolver()
 export class ImageResolver {
     constructor(
-        private readonly storage: Storage
+        private readonly s3Client: S3Client
     ) {}
 
     @UseGuards(GqlAuthGuard)
@@ -16,19 +17,22 @@ export class ImageResolver {
     async requestImageUploadUrl(): Promise<ImageUploadInfo> {
         // 완전 랜덤 해시 파일명 생성 (32바이트 = 64자리 hex)
         const randomFileName = randomBytes(32).toString('hex');
-        
-        const options = {
-            version: 'v4' as const,
-            action: 'write' as const,
-            expires: Date.now() + 15 * 60 * 1000
-        };
 
-        const [uploadUrl] = await this.storage
-            .bucket(process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME)
-            .file(randomFileName)
-            .getSignedUrl(options);
+        const putObjectCommand = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: randomFileName,
+            ContentType: 'image/*'
+        })
 
-        const publicUrl = `https://storage.googleapis.com/${process.env.GOOGLE_CLOUD_STORAGE_BUCKET_NAME}/${randomFileName}`;
+        const uploadUrl = await getSignedUrl(
+            this.s3Client,
+            putObjectCommand,
+            {
+                expiresIn: 15 * 60
+            }
+        );
+
+        const publicUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${randomFileName}`;
 
         return {
             uploadUrl,
