@@ -6,15 +6,15 @@ Nest.JS와 GraphQL을 사용해보고 싶어 만든 마이크로 블로그형 SN
 
 
 
-## 🖥️ 사용해보기
+## 🖥️ ~~사용해보기~~
 
-### ⚙️ API 사용해보기
+### ⚙️ ~~API 사용해보기~~
 
-다음 링크에서 현재 테스트로 돌아가고 있는 서버에 API를 사용해볼 수 있습니다. ***쿼리 및 뮤테이션의 결과는 [JongCo](https://github.com/JongCo)의 개인 서버에 저장됩니다. 민감한 정보를 입력하지 마세요***
+~~다음 링크에서 현재 테스트로 돌아가고 있는 서버에 API를 사용해볼 수 있습니다. ***쿼리 및 뮤테이션의 결과는 [JongCo](https://github.com/JongCo)의 개인 서버에 저장됩니다. 민감한 정보를 입력하지 마세요***~~
 
-[나도하루 GraphQL PlayGround](http://nadoharu.duckdns.org/api/graphql)
+~~[나도하루 GraphQL PlayGround](http://nadoharu.duckdns.org/api/graphql)~~
 
-로그인 후 인증은 Bearer토큰을 사용합니다. 현재 'login 쿼리', 'createUser 뮤테이션'을 제외한 모든 요청은 토큰을 요구합니다.
+~~로그인 후 인증은 Bearer토큰을 사용합니다. 현재 'login 쿼리', 'createUser 뮤테이션'을 제외한 모든 요청은 토큰을 요구합니다.~~
 
 ```
 Http-Header{
@@ -24,13 +24,13 @@ Http-Header{
 ```
 
 
-### 🏞️ 서비스 이용해보기
+### 🏞️ ~~서비스 이용해보기~~
 
-다음 링크에서 현재 테스트로 동작하는 서비스를 이용해볼 수 있습니다. ***계정 정보 및 작성한 글의 내용은 [JongCo](https://github.com/JongCo)의 개인 서버에 저장됩니다. 민감한 정보를 입력하지 마세요***
+~~다음 링크에서 현재 테스트로 동작하는 서비스를 이용해볼 수 있습니다. ***계정 정보 및 작성한 글의 내용은 [JongCo](https://github.com/JongCo)의 개인 서버에 저장됩니다. 민감한 정보를 입력하지 마세요***~~
 
-[나도하루 테스트 홈페이지](http://nadoharu.duckdns.org/)
+~~[나도하루 테스트 홈페이지](http://nadoharu.duckdns.org/)~~
 
-나도하루의 테스트 홈페이지는 [Hyeongjin(KeMezz)](https://github.com/KeMezz)님의 [프로젝트](https://github.com/GuitarCoders/front)를 사용하고 있습니다.
+~~나도하루의 테스트 홈페이지는 [Hyeongjin(KeMezz)](https://github.com/KeMezz)님의 [프로젝트](https://github.com/GuitarCoders/front)를 사용하고 있습니다.~~
 
 
 ## 📀 소스코드 직접 실행
